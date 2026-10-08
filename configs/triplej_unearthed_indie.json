@@ -1,0 +1,7 @@
+{
+  "_comment": "Configuration for the Triple J Unearthed Agent",
+  "triplej_unearthed": {
+    "searchName": "Triple J Unearthed Discovery",
+    "limit": 100
+  }
+}

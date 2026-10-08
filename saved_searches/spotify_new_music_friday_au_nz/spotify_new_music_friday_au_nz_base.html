@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Search: Spotify New Music Friday AU NZ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .meta {
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .card a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .card a:hover {
+            color: var(--accent-hover);
+        }
+        .badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .video-container {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+        .video-container p {
+            margin: 0 0 0.5rem 0;
+        }
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            grid-column: 1 / -1;
+            padding: 4rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Spotify New Music Friday AU NZ</h1>
+        <p class="meta">Generated on 07/09/2026, 11:40:20 am &bull; Found 80 active channels</p>
+    </header>
+    <main class="grid">
+        
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/5Jh7h57SHsgmvPLnkN2P76" target="_blank">Angus & Julia Stone - The Start</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/25773d2e8065dc6ed304062379d66fdbcdbb3286" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/2FZcjBYK4dTt48q94pJbJD" target="_blank">Miley Cyrus - Bass Persuades</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/e57b7c5fcb52b8bb4c781cc1e2e5b25f8a6c6e79" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/25kqjl0To6q08zgnRkKqE1" target="_blank">Beyoncé, Pharrell Williams - CAN I WATCH YOU (feat. Pharrell Williams)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/e3c77d6f7c99fbfdb0ca16212cd4e5484a1add76" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/4TtFvGGps7haO0XbmhVz2y" target="_blank">Nemzzz, Travis Scott - GASS (feat. Travis Scott)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/5954e27022cf8541ae0f4619187a5d4c7bd23be3" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/70cHKK8bHAfJrOGVnfRG9J" target="_blank">ADÉLA - Nicole Kidman</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/68bc3cb0611cfe6569ce56eeb025359233168a69" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/3sUptJLBaqhHOrDnRvgJqK" target="_blank">Drax Project - D A D A</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/8dc55d64cde491b82be266660b24481811ab5b6a" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/70ylRIQ5Hkz8CUPd0gfnLi" target="_blank">Polaris - Without You</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/921e61f74e3424b65bafaaad6fbc27158748cdcd" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/1VWiDyYTrqQhhmnWANWkFa" target="_blank">LISA - SaWaDiKa</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/3f5b29adf9f673b9f985c1976c26f5820649d711" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6NFhJLpovj3CqgT1rKC95l" target="_blank">Ladyhawke - Bad to the Bone</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/4391bbb10e2d65e3abe3fe61badafe4921d439d2" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6ytpqi2XfBbtNguP5QsmN5" target="_blank">3%, Fred Leone - Not Many - Ganay Biralunbar</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/32541b510ffdc7c841a1e43a08a8f12aa19e72ff" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/1i1Blr6MbP98bkiiDPM4um" target="_blank">Ellie Goulding - For Your Entertainment</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/fd549ea9b6dd45fd8ae11500c4c375be15804770" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/4NHk4jvrsiaaaMHXnc6qJh" target="_blank">Sycco - I've Loved And I've Lost</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/58a65b37423e057dfb9ac3cf7ed35e1566e3dcc0" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/3yXMMzqvq3aTiczg8lpkfS" target="_blank">DIIV - Kid</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/cd6e71871dbf1b64298c9ccb6262152ddfc42a28" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/5PtAedMHGvCyxtkhauvPhg" target="_blank">Dan Sultan - There's A River</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/fc3f5ffe827eae435244d5580e51fa556a702db4" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/3XxVB46IAWBOq4d4mjKFOQ" target="_blank">Dustin Lynch - Made In A Bottle</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/6da525b7fb5454424c8d07986fb53aa859b0af0a" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/3xSR1SmielI1yzhYh841wt" target="_blank">Wiz Khalifa - Yiccen</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/9bbacaec5d871aa900134f69f032813297e2cf63" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/3vv4bbwHPvt10Y9c1ASv2k" target="_blank">Psychedelic Porn Crumpets - Juice A Jumbo Jet</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/b39a538a55d859dabf14f8c93c86d20659eb3808" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/4cU5HrOrG8nz95VcnVQ2YD" target="_blank">Logic1000, Christine and the Queens - The Only One (feat. Christine and the Queens)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/d016280384094ece7b40ee3e2e3dbfbd2b5e82e2" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6M96eRsP7LP2HHLR9S7a66" target="_blank">Ziggy Alberts - I Blame Myself</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/7e6fce727923cc48fa21b4c97ce07b96112a2d3b" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/1zyNO73bPNPC6KBi3raNmZ" target="_blank">JISOO - CLICK</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/c41abed6c94df3735766be1ec2e291e666b18ef9" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/46museEHuxvmYT16wjAEkD" target="_blank">Fat Dog - Call It What You Want</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/bc7bc0599f7940e4db2beebfd9ed27e828524b14" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/2kdc0dTPGGhfOrdznE9hpB" target="_blank">TheWesternGuide - Little Red Number</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/1860c2f68e42b68f45c1f994a6f9696d8b11f6f7" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/0pix73eaOwBURno4UHghTW" target="_blank">Youngn Lipz - Down Under</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/0b7cb886a13f84f78459ce12c1b59d109fd99aec" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6LdPN8UPj0Ne9Reg6XkDyO" target="_blank">Ashe - Funeral</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/4411c05027df8b2aeec498dee53f3dbdd091b63f" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/2wR7SGoq7lVcz6KeE8Y2GN" target="_blank">HAAi, James Massiah - I Wanna Feel Like Someone</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/45d699c38394d45303ff13551eaa1015ebd4da80" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/2nPQ1ciKDQmJR683XXyDbX" target="_blank">Jordan Adetunji - Distraction</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/7d9e6a78cc217d60337251ecba4d281b08fe6033" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/01KdnakFsRqKyGAQBhH4kB" target="_blank">Vancouver Sleep Clinic - tired eyes</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/9d5011204ac5c85607d0594a1498fd9fe8fcf918" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/7yvzMIqwbGRMjqBriuUUmm" target="_blank">2 Chainz, Cash Cobain, Young Nudy - Reign</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/1220c3d37256c8ae88a54178c11671e707eaba93" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/7lwdZOcoaB6eZyFOAqNH8R" target="_blank">Hellcat Speedracer, KOATES - Back To Life</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/0e5644be3d70d5621cb7386b052f01d29dc106af" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/00l7TLaSN8lb5uNBMN4tXb" target="_blank">Ella Thompson - My Weakness</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/bcd921b48c68000f97bf9e4230cecfa08118d563" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/38aiEXAczaCvUqGKsfANxE" target="_blank">A.R.T - Look At Me</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/b31c613f20e44c76e0aaa3cb96ac6d213de0f50b" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/3RwtuFcPUZWm7zDEO3YK4J" target="_blank">SWIM - Leaving On</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/59b9428d0312e146df513f3e1774f780a180a490" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/5rY84zFwgOUR1NKtprIupQ" target="_blank">Olivia Escuyos - TWO MINDS</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/d2d031c91008ed2a3cf33c08837351acd4559e6d" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6KmnrYGLTStjxonyQYRPbU" target="_blank">M83 - Blister Sunrise</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/6af78db61e3329988f6e8ca2190fd910f0c33a5d" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/2gNtJs3FFGS8Bq67wQpYjq" target="_blank">Kardinal Offishall, Glenn Lewis - Kiss Me When I</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/1f0704ad8b66b99063034acc1d3f21328b3ae00d" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6ukoKgaAueZa5CSMxpJTqp" target="_blank">K.Flay - Ants</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/08b43224c094393a0754102eb3f1b6de86b17260" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/3Sz8u6tlAiSXBsDbWfKVKt" target="_blank">Sam Alfred - Ascension</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/369b6eeff3426bb2e256c1ab5d15a0acbb96a1c1" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/02kiA7m6xx7F7KC1ukLpTq" target="_blank">Matilda Mann - Chain Reaction</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/34aaa2f39033e8f4177b62a37ab60751cb5d5fd0" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/7buthCT0ygAmfSN8iAjmMU" target="_blank">Paris Paloma - Silhouette on the Hill</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/2625faced21eba65de3fa6adc6cc48240cdcbe43" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/58SM8GoeArGdh9xNqicg3G" target="_blank">Natalie Imbruglia - Beautiful Love</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/0185c5566d9bf54634d6a22e0942cfa8b2d2e0fd" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6Ep6LoM0zWCDTZg3dLhlTR" target="_blank">Airbourne - Bogota</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/ac9415e096d74265b10f096b3899c829b77b974e" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/7vnDJaomEwLJljbe3e13Zq" target="_blank">Armlock - Half Time</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/f653689cdf7747fc10af1545ff2e332aba41a49f" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/4Mr1kvqFKseh4iKiB5GoYx" target="_blank">Aaron Frazer - Paint The Picture</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/1a383f1ca1a046cc3afdbb6d00b253ca4b7755f2" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/44qaBTMpW8ICz3iKDg5LwV" target="_blank">EDYONTHEBEAT, Jaedyn Randell - Little Things</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/94992466214770191eb35da57993e170c0d556dc" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6fm6Vlj5O740EVdB9tS7fL" target="_blank">Villainy - Demons</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/4c61f818ffe3b57e9d59ae2d3ab8cdb871a9103a" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6oAQWAZf1PNxRSrbKoY0SI" target="_blank">Ivoris, Clara Benin - Lipgloss</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/fb33f0970c9e55a0e73ca502a70bb6e0a4f74be8" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/22JLm8VcNSWxmdy6CWOnrk" target="_blank">Ra Ra Viper - Ramona, Again</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/069a168db666d9f72bdd4a9a204a1f64bacf0350" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/21FIfzHFdjn8oZKUVvCqwf" target="_blank">Tseba, Cavi - It's Love</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/5716d635489f8b75d546773d98732173bfbfd2e2" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/3Ejy6pLIS9Qm307liIBvrw" target="_blank">Rachael Fahim - Our Funeral</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/c27213872b6f9ed9c027c8bae64d06fc4b96f190" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/1HhWXkYa4qnE8J4F11lswX" target="_blank">Original Koffee - OVA SO</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/159f7658b2662289992407751cfbf9c4d60b8fed" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6r57Tr2Yn7lDElWeCOyWOG" target="_blank">Luca George - Ashes</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/8a8f43d0d095958bad536ff4c264ca074c240f0b" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/7B7V5Ul8kKGkSZ5lk7YwwZ" target="_blank">After - Blind</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/56b5fdfe7c1b01613601f11bb532a454bf412b1f" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/4jBcxErstMOXurmgTzZmwC" target="_blank">Holly Throsby - Wouldn't it be Good?</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/875000de4daa264250c889f1b59a2d9ec9355bb5" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6HX8WkPl9lMW4p19mvhGlI" target="_blank">moktar - Bank Storm</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/62f57731ff8f486d5673fd7fd42255f523e684e8" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/1Mc3WfY3EHlYbHAvBwWOph" target="_blank">Shenseea, DJ Frass - TIGHTNESS</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/bbc921089dfaf77d3f3550ba04a3308f57b0094b" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/56kYfxM3fhM2j6GfnDrfOX" target="_blank">The Beefs - Take My Advice</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/95b40d580ce3a8c8d4a94f22767ff4d094fc23d4" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/1gjcl8rzI9nBXRre7VeHRp" target="_blank">LION BABE - Fashion Week</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/a027757db1f5b957ca0be613ce7cc157df7c2413" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/1BgZyTf26WaeUMeDtBspC2" target="_blank">Dizzee Rascal - Foxtrot Oscar</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/dfe5b177de7c5587064ee0391b8e45923d5939c3" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/4Wt3IblTMoFA8Xcs1Ds0YN" target="_blank">Noah Hill - Heaven</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/d5d6ea0d8f17f7410ee6c78b53333384e06ece9f" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/09OPfu1Xy5fD0a9L93hhIh" target="_blank">Jayda G - Forever Now</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/3e93c2b6ca817a31bfeb8d2ba520d50a091cbcec" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/3yApBuMF7exJQdxooBdItf" target="_blank">Sidney - when you know you know</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/1eba4c95f2f44df1ee855a4a9c656ac7c765647e" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/0orUpt2hP2AJkShGLxYUSj" target="_blank">Bad Computer - confessions</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/34164109037035fdfba9c49f349e5834d562c86c" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/1KoZm0t30ad0P1bxUbtZx1" target="_blank">The Bamboos - Sugar On Top</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/6d08cfc7b667b77f7b9a2ed8ed673b4202865c16" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/0qFmjpNGhjaxp789YQ7zMb" target="_blank">PRESIDENT - Sleepwalker</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/7fc54951084820d46472265b9104a46d066db5cb" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/2q40r1POGq0BHWpJoaKIAo" target="_blank">CHEEKY LEASH - Best Friend's House</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/c6e05eea6ef15b102f0a1516b0d59f4f9fff9c0a" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/02yXkwWXgBioTFSzTzwyHW" target="_blank">Khalia, Queen Omega - Majestic (with Queen Omega)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/625e27278b5289e7f73c8f739d40d40cc2ea7766" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/3MgmGCYPqMIh8RVhlHmYRf" target="_blank">Ellen Krauss - I Roll My Eyes</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/8ecdcbf1168251564aa25166ffe493a33631dcf1" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/1fk4tJhMkhfagXPBP6BBnJ" target="_blank">Faker - Frida</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/cb6af59198f72dcb06c850a9c26e1c23d0a462f1" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6yAsXhdjZd8AvcX91LtQ7a" target="_blank">Princess Superstar, Laidback Luke - U N ME</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/ffe7b8e4a30a5bef6a2991967a30c6b9d184e45e" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/7MIBXDEi3xnE3m70pA1Ynd" target="_blank">Jet Vesper - Mercury's in Marmalade</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/90ea96bbde24f29ae93afbab5107a197bf418f1c" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/4KDYzpRAeh9jHfd7RzWWaB" target="_blank">Tim Hart - Caroline</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/6bb079c89a1bf82344122bbc5a0a0939c1cee26e" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6IvrPhGXKrr2iWweWJNWeY" target="_blank">Kasabian - SILVER APPLE EYES</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/542377328fce383d5eb2c919c442e907ccb50119" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/2sIxRWfGDTwAH5v3kOe3wr" target="_blank">DJ BORING, Luuk Van Dijk - Precious Diamond</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/059a396c4ecc68a73f58acc9482bb25facbe93d4" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/7uIcvAmCTcOUfRThVWZoU9" target="_blank">STUMPS - The Local Drug Front</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/448979d0caba48cede040fc1243af6a328293528" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/24otX6zNcSe86Ly0OHu3dB" target="_blank">*teeth, Kaikobad - Forgotten Promises</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/9292594321840c81784f5731fde2b86bb2df42b6" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/5lTjvMxI870Bu6LMYmyzQC" target="_blank">Simona Castricum - Say Less</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/3b9b8ee53cbd5bcbdb36bab7113cea503c48545f" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/6zcbD3JSXLcBMHjOEreQHA" target="_blank">Lachie Gill - Are You Okay?</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/9ab5d236c1015556f8fb287669f3a72b88ce4510" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/4VYNI4AteaW7YgQxrIvl1B" target="_blank">belac - cascade (I had to go)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/df1040cbbcb1ad878e431e1a6042a51f4cf7ae36" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/0Sr5UiPU4yn26MJ2fXacTS" target="_blank">Marta Vega - OMG! I'm in love</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/e5b772730b74ec91e5e790d30ba18bedb0d36501" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://open.spotify.com/track/0VDRMYkL7BhyM40Dxycbv9" target="_blank">OAKK - SIRENS</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">New Music Friday AU & NZ</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Preview: <audio controls src="https://p.scdn.co/mp3-preview/4631d9034527fdfb78cbf11e4408c06a537f7a86" style="height:20px"></audio></p>
+            </div>
+        </div>
+    
+    </main>
+</body>
+</html>

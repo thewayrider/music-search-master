@@ -1,0 +1,8 @@
+{
+  "_comment": "Configuration for the Triple J Agent",
+  "triplej": {
+    "searchName": "Triple J Hitlist Discovery",
+    "playlistId": "7vFQNWXoblEJXpbnTuyz76"
+  },
+  "targetGenres": ["Indie Rock", "Alt Rock", "Surf Rock", "Indie"]
+}

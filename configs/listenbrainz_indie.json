@@ -1,0 +1,14 @@
+{
+  "_comment": "Configuration for the ListenBrainz Agent",
+  "listenbrainz": {
+    "searchName": "ListenBrainz Indie Discovery",
+    "maxEnrich": 2000
+  },
+  "targetGenres": ["Indie Rock", "Alt Rock", "Surf Rock", "Indie"],
+  "genreMappings": {
+    "Indie Rock": ["indie rock", "indie-rock"],
+    "Alt Rock": ["alternative rock", "alt rock", "alt-rock"],
+    "Surf Rock": ["surf rock", "surf-rock"],
+    "Indie": ["indie", "indie pop", "indietronica"]
+  }
+}

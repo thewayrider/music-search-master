@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Search: ListenBrainz Indie Discovery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .meta {
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .card a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .card a:hover {
+            color: var(--accent-hover);
+        }
+        .badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .video-container {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+        .video-container p {
+            margin: 0 0 0.5rem 0;
+        }
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            grid-column: 1 / -1;
+            padding: 4rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ListenBrainz Indie Discovery</h1>
+        <p class="meta">Generated on 11/09/2026, 5:55:50 pm &bull; Found 23 active channels</p>
+    </header>
+    <main class="grid">
+        
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/282c9035-92fa-4440-838b-4cc2b149acb1" target="_blank">Agneu - Air and Twigs</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: New Zealand | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/49c3b0dd-3706-49f7-9557-c50bbcc41463" target="_blank">Alex Albrecht - In The Turpid Heat Of The Afternoon</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/73ccb005-2b41-4037-bfd2-5ce7169d68fa" target="_blank">Alexandria - The Jester and The Queen</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/5965099e-d404-44b4-98bd-d27041ce91d5" target="_blank">AViVA - White Lies</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/d3f948bb-19ac-4ec1-b8e6-acae9076f91c" target="_blank">Deepspace - The Atlas Sector</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/07efff9b-4a20-4a4d-8d7a-f907441391e3" target="_blank">dusk2dawn - Make a Wish</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/da7f80d5-6d3c-4cdf-ae77-ed71b3ea7f37" target="_blank">Future Static - Swing</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/44045544-6775-42bb-9fd3-f0a3d62f3764" target="_blank">imber - Signals</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/56a513d8-ce95-474e-9bd2-647233cf58cf" target="_blank">Jarrahh - Warded Life</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: Australia | Origin: musicbrainz:begin-area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/f7d6f577-5758-4de8-b5fd-317ca708fe21" target="_blank">Jaxxon James - DEUCES in the SAND</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:begin-area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/6ad00114-1ca7-4338-9f58-8f7ba8360840" target="_blank">Jensen Interceptor - Primal Transmissions</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/eec3e2ec-b2e6-4926-8732-6476840851ac" target="_blank">mHz - Prime Frequencies</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: New Zealand | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/a1f0e26b-7fc1-4da6-979d-ed7626765e7f" target="_blank">Party Dozen - Euro Stomper</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/1bdaa3c0-0977-44aa-89b0-b94b6a274db7" target="_blank">Planet of Souls & Lily Papas - One (The Remixes)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/74bed6cd-760b-423a-b890-9138d2e542e9" target="_blank">Ponies at Dawn - Respite</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/2a38e04b-4687-42d2-8d90-7426cceb4a29" target="_blank">Rick Springfield - Godforsaken World</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/06c0f605-874b-44e3-8f13-7631f186711c" target="_blank">Rogue Traders & Dannii Minogue - Dirty Dirty Disco</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/1c4b548c-157e-4e2c-8d83-896b77c5af54" target="_blank">Sa Pa - Rhythm From Ambient</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/04f51f1e-b1b8-4e3e-bc58-f76c95d438a2" target="_blank">Slaughtercult - Devoured by Perversion</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/d2d7f007-15ab-45f7-9189-1125853b2926" target="_blank">Stone - Psalms of Dust and Bone</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:begin-area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/1af9ddcf-5b69-4e1f-b894-4b7a54a837a1" target="_blank">The Devil In I - Psychosocial</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:begin-area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/21e391bf-3dd8-408b-9042-468c16c4f723" target="_blank">W.O.M.B.A.T. - Ordinary Apocalypse</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/d94c7de3-5b76-4a59-a116-25e9375c71e5" target="_blank">Zoofles - Prisim</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+    </main>
+</body>
+</html>

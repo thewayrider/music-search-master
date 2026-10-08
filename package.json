@@ -1,0 +1,32 @@
+{
+  "name": "music-search-master",
+  "version": "1.0.0",
+  "description": "Unified Autonomous Music Discovery Fleet: 24/7 Daily Radars, Weekly Tastemaker Crawlers, and Command Center",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "radar:global": "node src/index.js --radar-global",
+    "radar:us": "node src/index.js --radar-us",
+    "dry-run:global": "node src/index.js --radar-global --dry-run",
+    "dry-run:us": "node src/index.js --radar-us --dry-run",
+    "command-center": "node src/server.js",
+    "stats": "node src/index.js --stats"
+  },
+  "keywords": [
+    "music-discovery",
+    "indie-rock",
+    "crawler",
+    "radar",
+    "fleet-command-center"
+  ],
+  "author": "Kim Rampling & Antigravity Agent",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "nodemailer": "^6.9.14",
+    "puppeteer": "^24.0.0"
+  }
+}

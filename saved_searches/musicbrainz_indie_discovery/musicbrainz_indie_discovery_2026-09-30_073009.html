@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Search: MusicBrainz Indie Discovery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .meta {
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .card a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .card a:hover {
+            color: var(--accent-hover);
+        }
+        .badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .video-container {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+        .video-container p {
+            margin: 0 0 0.5rem 0;
+        }
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            grid-column: 1 / -1;
+            padding: 4rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MusicBrainz Indie Discovery</h1>
+        <p class="meta">Generated on 30/09/2026, 9:30:11 am &bull; Found 9 active channels</p>
+    </header>
+    <main class="grid">
+        
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/c7ab7327-b7e3-432f-b308-e7b8c85764b0" target="_blank">Deep Beep - Dressed by Dad</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: ep | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/69b225be-1b3a-492d-a54c-fb0ba86c52af" target="_blank">ivycomb - 4K CARPET (ivycomb Remix)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: single | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/cf6744a8-45d5-478d-bdf8-a92f9ec11e44" target="_blank">Midnight In Saskatchewan - Sea of Life: An Instrumental Journey (EMOtional Prelude)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/2ff8ce15-7a7e-4f7a-b751-0a9212d44208" target="_blank">Midnight In Saskatchewan - EMOtional</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/a6b026b9-fe40-4201-a303-fc19d4f2d1f6" target="_blank">New Power - SHOCK THERAPY</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: ep | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/3750755b-a83b-4bc9-9bf4-d06d62bc78bb" target="_blank">Sugreev Roman - Dil ki Baatein</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: single | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/c00de6ab-3dec-4c4b-b2d9-c54cc3ea508d" target="_blank">Sugreev Roman - Paisa</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: single | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/f7544e09-dd48-4731-a48f-7b787f5efdbc" target="_blank">The Endorphins - The Ephemeral Mind</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/9c428594-8a8a-4aea-a066-dacc1a46db64" target="_blank">Weave - Thirst To Joy</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: ep | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+    </main>
+</body>
+</html>

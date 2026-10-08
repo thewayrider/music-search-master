@@ -1,0 +1,9 @@
+{
+  "_comment": "Configuration for the MusicBrainz Discovery Agent",
+  "searchName": "MusicBrainz Indie Discovery",
+  "musicbrainz": {
+    "runWindowDays": 7,
+    "targetGenres": ["indie", "indie rock", "alternative pop/rock"],
+    "maxResultsPerGenre": 20
+  }
+}

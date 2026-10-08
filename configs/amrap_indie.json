@@ -1,0 +1,8 @@
+{
+  "_comment": "Configuration for the AMRAP Community Radio Indie Charts",
+  "amrap": {
+    "searchName": "AMRAP Indie Discovery",
+    "chartKeys": ["indie", "rock"],
+    "targetGenres": ["Indie Rock", "Alt Rock", "Surf Rock", "Indie"]
+  }
+}

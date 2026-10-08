@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Search: ListenBrainz Indie Discovery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .meta {
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .card a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .card a:hover {
+            color: var(--accent-hover);
+        }
+        .badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .video-container {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+        .video-container p {
+            margin: 0 0 0.5rem 0;
+        }
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            grid-column: 1 / -1;
+            padding: 4rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ListenBrainz Indie Discovery</h1>
+        <p class="meta">Generated on 02/10/2026, 10:13:50 am &bull; Found 18 active channels</p>
+    </header>
+    <main class="grid">
+        
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/be9377cc-e57f-4f55-b788-4b624118fe2c" target="_blank">Alex the Astronaut - The Weird One</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/e9737edb-46bd-4036-ae24-94dde717780d" target="_blank">Azure Ryder - Even Flowers Can Bruise</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/6a819bde-134a-4fe4-b853-059e2c9d1e7f" target="_blank">Dave Machine - PORTALS</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/3c785571-8d6e-40c1-84ca-602c54a4ebae" target="_blank">Dave Machine - who tf is jb</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/c69011ba-76ec-4cff-9135-cccab42fc782" target="_blank">Harley - You're The One I'll See At Home</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/3d583ac6-7567-4536-98a1-901aa23a0bb9" target="_blank">Isabel Wood - Mood Swings</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/caeff3b3-b0b6-48d9-a10f-dc7a34bef6df" target="_blank">Jack Biilmann - Move The Mountains</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:begin-area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/b205a2e3-fd11-40e1-bf19-fd17b7e2b335" target="_blank">jan. - ismybloodpoison</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/5e6e4327-5f75-466b-9e99-cd4fef9333df" target="_blank">Kommodus - Gilded Scar Tissue</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:begin-area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/10c9da4e-cfb7-46b5-ac0d-811bed02ceca" target="_blank">Larry Frisbee Ambient - Larry Frisbee 2</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/1cc0c4de-49f9-42b5-a4a3-18946d7bc375" target="_blank">Mannequin Pants’d - Shrinking Sun</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/6aafdf80-db08-484d-ad2e-ef9861746592" target="_blank">Mish - Just the Way You Are</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:begin-area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/0b88feaf-7f95-4094-9ac7-8c31c851722a" target="_blank">most ominous mystic - Ironstone Tower</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/34b859e4-0f1a-4903-b8d1-4d6d575b4518" target="_blank">Odd Mob & FAST BOY - Super High</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/8b1e88cf-adfb-42f0-9e14-e9b6df64b685" target="_blank">raiwinnn. - soul seeking, searching</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/2a052f74-0c25-442b-ac3f-30abb01b1915" target="_blank">RinRin - fever dream</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/a442050d-353e-48c9-bf42-5730870d652b" target="_blank">Shannon Noll - The Road in Front of Me</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/37d57453-5e33-4cdd-9d3a-053f768703aa" target="_blank">Sink - is it better where you are?</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+    </main>
+</body>
+</html>

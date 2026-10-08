@@ -1,0 +1,7 @@
+{
+  "_comment": "Configuration for the Bandcamp Discover Agent",
+  "bandcamp": {
+    "searchName": "Bandcamp Indie Discovery",
+    "targetGenres": ["Indie Rock", "Alt Rock", "Surf Rock", "Indie"]
+  }
+}

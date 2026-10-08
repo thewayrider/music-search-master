@@ -1,0 +1,86 @@
+{
+  "triple_j_hitlist_discovery": {
+    "name": "Triple J Hitlist Discovery",
+    "lastRun": "2026-09-18T10:00:23.016Z",
+    "totalSongsFound": 70,
+    "newSongsEmailed": 0,
+    "status": "Success"
+  },
+  "triple_j_unearthed_discovery": {
+    "name": "Triple J Unearthed Discovery",
+    "lastRun": "2026-10-08T09:09:48.497Z",
+    "totalSongsFound": 3,
+    "newSongsEmailed": 1,
+    "status": "Success"
+  },
+  "amrap_indie_discovery": {
+    "name": "AMRAP Indie Discovery",
+    "lastRun": "2026-10-08T11:08:18.877Z",
+    "totalSongsFound": 13,
+    "newSongsEmailed": 0,
+    "status": "Success"
+  },
+  "roots_mag": {
+    "name": "Roots Mag",
+    "lastRun": "2026-10-08T09:09:14.035Z",
+    "totalSongsFound": 8,
+    "newSongsEmailed": 7,
+    "status": "Success"
+  },
+  "bandcamp_indie_discovery": {
+    "name": "Bandcamp Indie Discovery",
+    "lastRun": "2026-10-08T08:36:58.446Z",
+    "totalSongsFound": 37,
+    "newSongsEmailed": 18,
+    "status": "Success"
+  },
+  "futuremag_indie_discovery": {
+    "name": "Futuremag Indie Discovery",
+    "lastRun": "2026-10-08T08:45:23.257Z",
+    "totalSongsFound": 0,
+    "newSongsEmailed": 0,
+    "status": "Success"
+  },
+  "listenbrainz_indie_discovery": {
+    "name": "ListenBrainz Indie Discovery",
+    "lastRun": "2026-10-08T09:07:50.867Z",
+    "totalSongsFound": 110,
+    "newSongsEmailed": 68,
+    "status": "Success"
+  },
+  "acid_stag_discovery": {
+    "name": "Acid Stag Discovery",
+    "lastRun": "2026-09-25T14:05:53.321Z",
+    "totalSongsFound": 19,
+    "newSongsEmailed": 19,
+    "status": "Success"
+  },
+  "air_charts_discovery": {
+    "name": "AIR Charts Discovery",
+    "lastRun": "2026-10-08T08:36:45.466Z",
+    "totalSongsFound": 16,
+    "newSongsEmailed": 2,
+    "status": "Success"
+  },
+  "musicbrainz_indie_discovery": {
+    "name": "MusicBrainz Indie Discovery",
+    "lastRun": "2026-10-08T09:07:59.913Z",
+    "totalSongsFound": 14,
+    "newSongsEmailed": 8,
+    "status": "Success"
+  },
+  "deezer_indie_discovery": {
+    "name": "Deezer Indie Discovery",
+    "lastRun": "2026-10-08T08:45:20.638Z",
+    "totalSongsFound": 5,
+    "newSongsEmailed": 5,
+    "status": "Success"
+  },
+  "nialler9_indie_discovery": {
+    "name": "Nialler9 Indie Discovery",
+    "lastRun": "2026-10-08T09:09:07.922Z",
+    "totalSongsFound": 25,
+    "newSongsEmailed": 17,
+    "status": "Success"
+  }
+}

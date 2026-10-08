@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Search: ListenBrainz Indie Discovery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .meta {
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .card a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .card a:hover {
+            color: var(--accent-hover);
+        }
+        .badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .video-container {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+        .video-container p {
+            margin: 0 0 0.5rem 0;
+        }
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            grid-column: 1 / -1;
+            padding: 4rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ListenBrainz Indie Discovery</h1>
+        <p class="meta">Generated on 21/09/2026, 9:13:12 am &bull; Found 32 active channels</p>
+    </header>
+    <main class="grid">
+        
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/4c0fa213-ff65-4b14-a89b-9c8313284ccb" target="_blank">2charm - making out</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/aa0db919-17c1-4b59-a636-46d09c2f16b9" target="_blank">Adam Halliwell - Sono Una Pera</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/f7ed9550-adc6-4fc6-b0c9-602eb1998177" target="_blank">Anais Vacariu - Coroanele</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:begin-area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/54239b7f-2ee6-4847-983b-a50e6c285c7f" target="_blank">ANYREBELLION - Red Dress</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/f77dcb96-674b-4009-a1f5-8014512b56d7" target="_blank">BIG NOTER - SONGS IN THE KEY OF WRESTLING</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/b36e517b-22af-4e45-953c-538b2cdea288" target="_blank">Black Dime Cabaret - Act III, Part One: Through the Cabaret</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/4c2bdce4-a50a-4c68-b835-3e3e7c0f2b32" target="_blank">Body 13 - #372: When We Had Given Our Bodies to the Wind</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/5a3868c4-635a-403f-9d4f-c4bc626a9d14" target="_blank">Body 13 - #373: And All the Shadowy Banks on Either Side Came Sweeping Through the Darkness</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/a9497389-0283-4772-979a-650aeeaac58f" target="_blank">Body 13 - #374: The Resounding Horn, the Pack Loud-Chiming, and the Hunted Hare</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/d7f02c93-05bb-4735-bcf8-44bbfaa1e67c" target="_blank">Body 13 - #375: When Vapours Rolling Down the Valleys Made a Lonely Scene More Lonesome</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/4eb0e02a-25d0-4d46-a3a4-8213614123fd" target="_blank">Body 13 - #376: Not With the Mean and Vulgar Works of Man</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/f544dce6-b003-4b49-aac2-64b6613bca91" target="_blank">Body 13 - #377: Until We Recognise a Grandeur in the Beatings of the Heart</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/aa6b01be-9118-4002-9eac-0c50a103f4c0" target="_blank">Body 13 - #378: And in the West the Orange Sky of Evening Died Away</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/27d6f7d9-d70d-4514-b653-9ca3a8bab572" target="_blank">Cenobia - Lethal Devotion</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/b8f25a4d-92d9-48c2-ac76-6868741dcf80" target="_blank">Clare Perrott - How Can I Tell You?</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/f08eed29-c759-4c6e-8ba0-2ce52a520e6c" target="_blank">Deezl - STRESS TEST</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/c2030167-9a52-4210-8915-dc63dfb9f6ca" target="_blank">Goblinviolence - A Bullet Waits For You</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/f1a7677e-500e-434a-aa03-a791b05a9024" target="_blank">Half/Angel - Bunny</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: New Zealand | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/0c742ab3-560f-49b9-85dc-687a80f07caa" target="_blank">Larissa Lambert - Yearning</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/f7b88e12-2fb8-4aad-a19e-22feee0c4952" target="_blank">LEISURE - Ride It Out (Poolside Remix)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: New Zealand | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/054517d5-b571-4de8-bc33-8fdf395d8fa7" target="_blank">Little Quirks - Game Boy</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/5d98ab23-30a3-4525-8c45-6752d2b0bf10" target="_blank">Mogo - Fiesta!</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/238d541f-c55b-4fb8-a728-73d5db67b8be" target="_blank">Mogo - Mogo</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/81556c92-f772-457e-a6cb-1fc9286592c7" target="_blank">Powers - Twelfth Powers</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: New Zealand | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/e3150a47-4d18-45a6-a731-95b2611ab542" target="_blank">RatBag - never put a ring on a lady</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: New Zealand | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/a9db01cf-ce6d-4818-9ee8-a9a09a6504e1" target="_blank">Soul Wun - Kaleidoscope</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/76d03cd9-07c5-43e5-9aad-d92b20b68ea7" target="_blank">sunbleached - Stop Destroying the Things You Love</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/f2394428-e18b-426d-a9cd-92c1d77a8914" target="_blank">Talk Heavy - Slow Motion Exit</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/14fe1041-1f86-466e-91d9-3a66bd8c7064" target="_blank">Tash Sultana - Something in the Water</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/8e11f69f-7ef6-4bf9-b41c-2009457b05b5" target="_blank">Wet Denim - Water for Dogs</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: New Zealand | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/96b7748b-d583-4122-9b3b-2463e6e3ae5f" target="_blank">Yes Boone - Nosebleeds</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/da798fb7-b873-4749-b786-cddfc78ec044" target="_blank">ONEFOUR - In the Air Tonight (triple j Like a Version)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Manual review</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 4 | Type: unknown | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+    </main>
+</body>
+</html>

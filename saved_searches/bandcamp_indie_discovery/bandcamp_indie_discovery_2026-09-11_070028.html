@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Search: Bandcamp Indie Discovery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .meta {
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .card a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .card a:hover {
+            color: var(--accent-hover);
+        }
+        .badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .video-container {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+        .video-container p {
+            margin: 0 0 0.5rem 0;
+        }
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            grid-column: 1 / -1;
+            padding: 4rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bandcamp Indie Discovery</h1>
+        <p class="meta">Generated on 11/09/2026, 9:00:31 am &bull; Found 21 active channels</p>
+    </header>
+    <main class="grid">
+        
+        <div class="card">
+            <h3><a href="https://quarterminus.bandcamp.com/album/one?from=discover_page" target="_blank">1/4 Minus - ONE</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://armlock.bandcamp.com/album/half-time-strobe?from=discover_page" target="_blank">Armlock - Half Time / Strobe</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://chrisbieniektranscriptions.bandcamp.com/album/chelsea-bridge-solo-guitar-etude?from=discover_page" target="_blank">Chris Bieniek Transcriptions - Chelsea Bridge Solo Guitar Etude</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://darrenmiddleton.bandcamp.com/album/pathways?from=discover_page" target="_blank">Darren Middleton - PATHWAYS</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://davewright.bandcamp.com/album/the-archive-recordings-volume-9-castlemaine-2014?from=discover_page" target="_blank">Dave Wright & The Midnight Electric - The Archive Recordings Volume 9- Castlemaine 2014</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://descensionrecords.bandcamp.com/album/brutalise-brutalise-bourgeoisie?from=discover_page" target="_blank">descension records - Brutalise!Brutalise!Bourgeoisie!</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://eminentvinyl.bandcamp.com/album/connectors-sydney-post-punk-1979-1983?from=discover_page" target="_blank">Eminent Vinyl - Connectors: Sydney Post-Punk 1979 - 1983</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://ghostsbeyondghosts.bandcamp.com/album/our-last-breath-2?from=discover_page" target="_blank">Ghosts Beyond Ghosts - Our Last Breath</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://glasshives.bandcamp.com/album/how-you-feel?from=discover_page" target="_blank">Glasshives - How You Feel</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://jpshilo.bandcamp.com/album/hungry-ghosts-deluxe-edition?from=discover_page" target="_blank">J.P. Shilo - HUNGRY GHOSTS (deluxe edition)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://jordielane.bandcamp.com/album/habitual?from=discover_page" target="_blank">Jordie Lane - Habitual</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://justinjkelly.bandcamp.com/album/dive?from=discover_page" target="_blank">Justin J Kelly - Dive</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://lehmannbsmith.bandcamp.com/album/three-knots-3?from=discover_page" target="_blank">Lehmann B Smith - Three Knots</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://lifelairregretrecords.bandcamp.com/album/vulture?from=discover_page" target="_blank">life lair regret records - Vulture</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://rickycalbeck.bandcamp.com/album/expensive-music?from=discover_page" target="_blank">Ricky Albeck - Expensive Music</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://sagescreams.bandcamp.com/album/free-brainwashing?from=discover_page" target="_blank">Sage - Free Brainwashing</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://shirkher.bandcamp.com/album/white-light-unimaginable-light?from=discover_page" target="_blank">Shirkher - White Light / Unimaginable Light</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://snakethighs.bandcamp.com/album/we-are-nobodies?from=discover_page" target="_blank">Snake Thighs - We Are Nobodies</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://thesistineguns.bandcamp.com/album/end-of-the-night?from=discover_page" target="_blank">The Sistine Guns - End of The Night</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://the-sprouts.bandcamp.com/album/singin-with-the-sprouts?from=discover_page" target="_blank">The Sprouts - Singin' With The Sprouts</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://wrekabyte.bandcamp.com/album/bitumen-rail?from=discover_page" target="_blank">wrekabyte - Bitumen Rail</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Bandcamp Discover</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Melbourne, Australia</p>
+            </div>
+        </div>
+    
+    </main>
+</body>
+</html>

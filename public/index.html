@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fleet Command Center | 24/7 Indie Radars</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="radar-ping">
+        <span class="ping-dot"></span>
+        <span class="ping-wave"></span>
+      </div>
+      <div>
+        <h1 class="brand-title">FLEET COMMAND CENTER</h1>
+        <p class="brand-subtitle">Unified Operations for 24/7 Indie Radars &amp; Crawler Fleets</p>
+      </div>
+    </div>
+
+    <div class="header-telemetry">
+      <div class="telemetry-pill live" id="server-status-pill">
+        <span class="status-indicator"></span>
+        <span id="server-status-text">CONNECTING...</span>
+      </div>
+      <div class="telemetry-meta">
+        <span id="uptime-display">Uptime: 0s</span>
+        <span class="dot-separator">•</span>
+        <span id="port-display">Port: 4000</span>
+      </div>
+      <button id="btn-manual-refresh" class="btn-icon" title="Refresh Telemetry">🔄</button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="dashboard-grid">
+
+    <!-- Row 1: Catalog & Fleet KPI Cards -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Master Catalog Songs</div>
+        <div class="kpi-value" id="kpi-unique-songs">-</div>
+        <div class="kpi-sub">Strict EveryNoise clean verified tracks</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total Sightings</div>
+        <div class="kpi-value" id="kpi-sightings">-</div>
+        <div class="kpi-sub">Multi-day &amp; cross-source detections</div>
+      </div>
+      <div class="kpi-card highlight">
+        <div class="kpi-label">Consensus Multi-Source Hits</div>
+        <div class="kpi-value" id="kpi-consensus">-</div>
+        <div class="kpi-sub">Discovered by 2+ independent channels</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Active Radars</div>
+        <div class="kpi-value" id="kpi-active-services">4 Ready</div>
+        <div class="kpi-sub">Global &amp; US Daily Radars Online</div>
+      </div>
+    </section>
+
+    <!-- Row 2: Fleet Control Panels -->
+    <section class="section-container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">🛰️ Fleet Control Deck</h2>
+          <p class="section-desc">Launch, monitor, and manage autonomous crawler services in real time</p>
+        </div>
+      </div>
+
+      <div class="services-grid" id="services-container">
+        <!-- Dynamically injected service cards -->
+        <div class="loading-placeholder">Loading fleet services registry...</div>
+      </div>
+    </section>
+
+    <!-- Row 3: Master SQLite Recent Discoveries -->
+    <section class="section-container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">🎵 Recent Verified Discoveries</h2>
+          <p class="section-desc">Live feed from native SQLite catalog (<code>data/master_catalog.sqlite</code>)</p>
+        </div>
+        <div class="table-actions">
+          <input type="text" id="track-filter-input" placeholder="Filter artist or title..." class="search-box">
+          <button id="btn-refresh-tracks" class="btn-secondary">Refresh Feed</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Heat</th>
+              <th>Artist</th>
+              <th>Song Title</th>
+              <th>Channel</th>
+              <th>First Seen</th>
+            </tr>
+          </thead>
+          <tbody id="discoveries-tbody">
+            <tr><td colspan="5" class="empty-state">Fetching recent discoveries...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Live Terminal / Logs Drawer -->
+  <aside class="log-drawer" id="log-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <span class="terminal-icon">📟</span>
+        <div>
+          <h3 id="drawer-service-name">Live Terminal Logs</h3>
+          <span class="drawer-service-id" id="drawer-service-id">service-id</span>
+        </div>
+      </div>
+      <div class="drawer-controls">
+        <label class="autoscroll-toggle">
+          <input type="checkbox" id="autoscroll-check" checked> Auto-scroll
+        </label>
+        <button id="btn-clear-terminal" class="btn-icon" title="Clear View">🧹</button>
+        <button id="btn-close-drawer" class="btn-icon" title="Close Terminal">✕</button>
+      </div>
+    </div>
+    <div class="terminal-body" id="terminal-body">
+      <div class="terminal-line">[Ready] Select a service to inspect live console output.</div>
+    </div>
+  </aside>
+
+  <script src="app.js"></script>
+</body>
+</html>

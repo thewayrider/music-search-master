@@ -1,0 +1,12 @@
+{
+  "_comment": "Configuration for the Nialler9 Crawler",
+  "nialler9": {
+    "searchName": "Nialler9 Indie Discovery",
+    "targetGenres": [
+      "Indie Rock",
+      "Alt Rock",
+      "Indie"
+    ],
+    "country": "Ireland"
+  }
+}

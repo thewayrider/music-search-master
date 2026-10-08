@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Search: Triple J Hitlist Discovery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .meta {
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .card a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .card a:hover {
+            color: var(--accent-hover);
+        }
+        .badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .video-container {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+        .video-container p {
+            margin: 0 0 0.5rem 0;
+        }
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            grid-column: 1 / -1;
+            padding: 4rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Triple J Hitlist Discovery</h1>
+        <p class="meta">Generated on 07/09/2026, 10:59:12 am &bull; Found 68 active channels</p>
+    </header>
+    <main class="grid">
+        
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Balu Brigada - BedHead</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/balubrigada-bedhead.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Becca Hatch - Daylight Robbery</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/beccahatch-daylightrobbery.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Steve Lacy - oh yeah?</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/stevelacy-ohyeah.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">SPIKE FUCK - HAD YOUR WAY</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/dig/covers/spikefuck-evidence.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Jungle - Sunshine</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/jungle-sunshine.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Arlo Parks - Get Go</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/dig/covers/arloparks-ambiguousdesire.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">DICE - COOLER</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/dice-cooler.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Baker Boy - YOLŊU FEVER</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/bakerboy-djandjay.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Kayps, Yung Maynie, Sachem, Denzel Kennedy & Big Deej - STICK TO THE CODE</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/kaypsyungmayniesachemdenzelkennedybigdeej-bunubababy.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">daine - Love Love (Love Love)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/daine-lovelovelovelove.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Troye Sivan - She's the Best</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/troyesivan-shesthebest.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Tove Lo - I'm your girl right?</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/tovelo-estrus.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Genesis Owusu & Ladyhawke - The Other Black Dog / My Delirium</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://images.abcradio.net.au/release/mi7gV7E4m9/2ce8b70caa8f67ce6891969546f14847.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Violet Grohl - High</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/violetgrohl-violetgrohllikeaversion2026.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">ROLE MODEL - Harmony</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/rolemodel-chucktimelythehourglass.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">iKeda - Go!</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/ikeda-go.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Slayyyter - brand new chanel$</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/slayyyter-brandnewchanel.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Stand Atlantic - LUCID</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/standatlantic-godbreath.png" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Nerve & Songer - Around the World</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/nervesonger-growingpains.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">DMA'S, Griffith Combined Schools Choir - Silver</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://images.abcradio.net.au/release/miV9ZQEBWg/2ce8b70caa8f67ce6891969546f14847.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Lottie McLeod - Wednesdays at the Waterloo</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/lottiemcleod-wednesdaysatthewaterloo.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Fool Nelson - Keepsake</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/foolnelson-baddreams.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Soul Wun - When The Rain Begins To Fall</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/soulwun-whentherainbeginstofall.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Ninajirachi - Fuck My Computer</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://images.abcradio.net.au/release/mi2ewlD1yP/2ce8b70caa8f67ce6891969546f14847.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Tkay Maidza, Jenevieve - Romanticize</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/tkaymaidza-romanticize.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Sycco - Look Up</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/sycco-lookup.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">The Tullamarines - Flight Path</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/thetullamarines-flightpath.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">kayeonwun - CHANEL</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/kayeonwun-chanel.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">LUPO.THEBOY & POOLCLVB) - Champagne</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/lupotheboypoolclvb-champagne.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">DEM MOB - DREAM</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/demmob-dream.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Partiboi69 & KETTAMA - Pumpin</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/partiboi69kettama-pumpin.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Haute & Freddy - Touch Touch</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/hautefreddy-touchtouch.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Sly Withers - Look Down</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/slywithers-tobehonest.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">2charm - girls</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/2charm-starscumcity.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">effe - Tears Always Burn</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/effe-solder.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Harry Hayes - Moolah</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/harryhayes-moolah.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">beabadoobee - Memories</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/beabadoobee-pylon.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Genesis Owusu & Ladyhawke - FALLING BOTH WAYS</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/genesisowusuladyhawke-redstarwutheworldwidescourge.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">TooLa - SOLO</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/toola-solo.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Fcukers - L.U.C.K.Y</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/fcukers-lucky.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Charli Lucas - Sunburn</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/charlilucas-sunburn.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Khal!l - ANGEL</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/khall-angelwalls.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Day We Ran - Used To</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/dayweran-usedto.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">ONEFOUR - HIM</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/onefour-him.png" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Nerve - 3shots</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/nerve-growingpains.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Olivia Rodrigo - serena joy</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/oliviarodrigo-serenajoy.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">NOTION & X CLUB. - U KNOW</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/notionxclub-uknow.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Down And Out - Messiah</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/downandout-messiah.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Ninajirachi & Porter Robinson - WannaCry</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/ninajirachiporterrobinson-wannacry.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Dev Lemons - eat the pavement</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/devlemons-eatthepavement.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Surusinghe - FRIED (Radio Edit)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/surusinghe-friedradioedit.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Darcie Haven - Wishbone</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/darciehaven-wishbone.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Beddy Rays - Khe Sanh</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://images.abcradio.net.au/release/mi0eXvERng/2ce8b70caa8f67ce6891969546f14847.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">DEVAURA - I Wanna Be Down</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/devaura-devauralikeaversion2026.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Nia Archives - Danger</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/niaarchives-danger.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Trophy Wyfe - Spiders</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/trophywyfe-spiders.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Tinashe - Crash Out</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/tinashe-popstar.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Drifting Clouds - Rarrandharr</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/driftingclouds-rarrandharr.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Tyla - KISS</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/tyla-apop.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Gurriers - Nobody's Coming To Save You</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/gurriers-nobodyscomingtosaveyou.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Old Mervs - Tether</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/oldmervs-tether.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Charli xcx - Camera</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/charlixcx-camera.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Nerve, Kobie Dee & Barkaa - Bad Company</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/nervekobiedeebarkaa-growingpains.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">The Buoys - Welcome To My Brain</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/thebuoys-concretecowboys.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Clancy - Oh Why</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/clancy-ohwhy.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Partiboi69 & Habstrakt - Losing Control</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/partiboi69habstrakt-losingcontrol.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">Teen Jesus and the Jean Teasers - GO WASTE MY TIME</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 8 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/triplej/albums/teenjesusandthejeanteasers-glory.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://www.abc.net.au/triplej/" target="_blank">The Strokes - Lonely In The Future</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">Triple J</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 5 | Release Year: 2026 | Played: 2026-09-07 | Cover: <img src="https://www.abc.net.au/dig/covers/thestrokes-realityawaits.jpg" style="height:50px"></p>
+            </div>
+        </div>
+    
+    </main>
+</body>
+</html>

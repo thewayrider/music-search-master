@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Search: ListenBrainz Indie Discovery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .meta {
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .card a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .card a:hover {
+            color: var(--accent-hover);
+        }
+        .badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .video-container {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+        .video-container p {
+            margin: 0 0 0.5rem 0;
+        }
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            grid-column: 1 / -1;
+            padding: 4rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ListenBrainz Indie Discovery</h1>
+        <p class="meta">Generated on 14/09/2026, 9:10:34 am &bull; Found 15 active channels</p>
+    </header>
+    <main class="grid">
+        
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/4ff564dc-f9c3-448b-a7e9-2e54fcaaa81b" target="_blank">Avarice in Audio - Welcome To Weimar America</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/8f39dcb3-aa9b-4474-aed1-7e2afcbf6707" target="_blank">Awayday - Handsignature</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: ep | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/fef74944-5c36-4863-abfb-527c68b720b1" target="_blank">Contenders - Death of me</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: New Zealand | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/aee914cc-ac23-418c-8d3c-bd1f217d8f87" target="_blank">Daffodils - String</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: New Zealand | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/5c56c5ba-d1e6-451c-bcab-6ca685576915" target="_blank">Darren Middleton - Pathways</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/5ba759fa-d26d-44ba-9548-3dbc80b0ab0f" target="_blank">Ecca Vandal - Looking For People To Unfollow</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/c207fdd3-879d-4de0-bfb3-01ab41fc1004" target="_blank">Euphoreon - Gravity</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: New Zealand | Origin: musicbrainz:begin-area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/53445b82-79c4-4fbd-b152-61dff2b2209e" target="_blank">Magnetik Slaughter Enterprise - I Want it that way</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/904751d2-cdbc-4bf0-99e1-ce46bb09bb72" target="_blank">Mick Harvey & Amanda Acevedo - Psychedelia in White</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/2e493032-14b4-4b56-b896-d939bc5e28f8" target="_blank">moyamoya - hol newland</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/128e7169-5e17-44f3-9bfa-5380da980cf2" target="_blank">Sheppard - Night Drive</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/403e6c3c-41bd-4fac-9c2b-71b27f891004" target="_blank">Stink & Snivel - Stink & Snivel</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: album | Loc: New Zealand | Origin: musicbrainz:area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/dc0e5089-851f-411c-a7f9-d536d35a6e6d" target="_blank">Terrible Muriel - Introverted Weirdo</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/128d0102-7b73-4be1-8497-4dd8fb47ca54" target="_blank">Yanderechainsawregurgitationfactory Ft.Ancestral Maloence - 黒い太陽引きずり下ろせ</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:begin-area</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/61945674-6b0d-4c98-b59c-bb269320de4e" target="_blank">コウ！ - _₍^. ﹏ .^_₎ ੭</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">ListenBrainz API</span></p>
+            <p><strong>Status:</strong> Worth checking</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 7 | Type: single | Loc: Australia | Origin: musicbrainz:country</p>
+            </div>
+        </div>
+    
+    </main>
+</body>
+</html>

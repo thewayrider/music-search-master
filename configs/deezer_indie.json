@@ -1,0 +1,9 @@
+{
+  "_comment": "Configuration for the Deezer Agent",
+  "deezer": {
+    "searchName": "Deezer Indie Discovery",
+    "playlistNames": ["New Alternative", "Hot New Rock", "Hard Rock Now"],
+    "minTimeAdd": 1788220800
+  },
+  "targetGenres": ["Alternative", "Rock"]
+}

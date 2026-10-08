@@ -1,0 +1,7 @@
+{
+  "_comment": "Configuration for the Futuremag Music Agent",
+  "futuremag": {
+    "searchName": "Futuremag Indie Discovery",
+    "targetGenres": ["Indie Rock", "Alt Rock", "Surf Rock", "Indie"]
+  }
+}

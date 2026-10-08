@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Search: MusicBrainz Indie Discovery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .meta {
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .card a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .card a:hover {
+            color: var(--accent-hover);
+        }
+        .badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .video-container {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+        .video-container p {
+            margin: 0 0 0.5rem 0;
+        }
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            grid-column: 1 / -1;
+            padding: 4rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MusicBrainz Indie Discovery</h1>
+        <p class="meta">Generated on 18/09/2026, 1:41:17 pm &bull; Found 16 active channels</p>
+    </header>
+    <main class="grid">
+        
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/4b5417b4-27d5-4d57-9c01-e1cca5b66fcd" target="_blank">Ari Nurdiman - Senyummu Cukup</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: single | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/ee15c561-0539-41a1-8272-0e31b9b7cdc9" target="_blank">Bilderbuch - ∞+1</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/4fd6a903-cbd8-4cbe-8789-645137ac43da" target="_blank">Blood Red Shoes - Stay Lonely</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/86aa34ba-56ea-4d42-9552-d70655ae9db9" target="_blank">Child Seat - Hyperphantasia</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/472f3832-4434-45a1-a896-7d8e96293eb9" target="_blank">Cigarette Stereo - The Lovers Freefall</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/eb21a899-bbcf-43c3-8351-17c20e442054" target="_blank">Cor de Lux - Year Of The Horse</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/3fd716f5-2f67-3890-95ec-20c4032511c8" target="_blank">Crystal Castles - Crystal Castles</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/3de83337-e73d-4422-b5e9-ab343f642867" target="_blank">Ghost Loft - All Our Dreams</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/85658a04-8a57-47bc-b624-18ee1467889b" target="_blank">Golden Apes - The Sun Came Up Tremendously</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/fd62a077-8fe0-478d-8756-e6027dee96d5" target="_blank">James Tonic - Slow Down</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: single | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/4165b995-bbdd-4c27-86c0-4369e5f1c195" target="_blank">ShitKid - The Essential (Vol. 2)</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/86e58c8e-45e8-4724-95ca-a6abd3704dd8" target="_blank">Sparks from the Sky - Sparks from the Sky</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/2e35dc4a-df69-41cb-8a24-e7476ae7f6d8" target="_blank">Swayglow - Unpredictable Blooming</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: ep | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/dc0e5089-851f-411c-a7f9-d536d35a6e6d" target="_blank">Terrible Muriel - Introverted Weirdo</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: single | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/e54514b4-c4d9-4ff2-a51e-881fc9e47d49" target="_blank">The Gekker - Psychic Realty</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: album | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+        <div class="card">
+            <h3><a href="https://musicbrainz.org/release-group/46978e0e-d8c8-423c-9531-6621d4107711" target="_blank">Warahenege - Singularities</a></h3>
+            <p><strong>Chart:</strong> <span class="badge">MusicBrainz Lucene API</span></p>
+            <p><strong>Status:</strong> Best matches</p>
+            <div class="video-container">
+                <p><strong>Details:</strong></p>
+                <p>Score: 9 | Type: ep | Genres: indie | Origin: musicbrainz:lucene</p>
+            </div>
+        </div>
+    
+    </main>
+</body>
+</html>
