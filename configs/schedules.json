@@ -44,16 +44,6 @@
     "time": "04:00PM"
   },
   {
-    "id": "triplej",
-    "name": "Triple J Weekly Reminder",
-    "description": "Sends the Triple J Weekly Reminder on Friday at 12:00",
-    "script": "run_triplej.bat",
-    "days": [
-      "Friday"
-    ],
-    "time": "12:00PM"
-  },
-  {
     "id": "triplejunearthed",
     "name": "Triple J Unearthed Crawler",
     "description": "Runs the Triple J Unearthed Crawler on Mon, Wed, Fri at 14:00",

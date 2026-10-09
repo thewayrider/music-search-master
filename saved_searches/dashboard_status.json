@@ -1,9 +1,16 @@
 {
-  "triple_j_hitlist_discovery": {
-    "name": "Triple J Hitlist Discovery",
-    "lastRun": "2026-09-18T10:00:23.016Z",
-    "totalSongsFound": 70,
-    "newSongsEmailed": 0,
+  "global_radar_daily": {
+    "name": "Global 24h Radar",
+    "lastRun": "2026-10-09T06:30:00.000Z",
+    "totalSongsFound": 17,
+    "newSongsEmailed": 17,
+    "status": "Success"
+  },
+  "us_radar_daily": {
+    "name": "US Edition Radar",
+    "lastRun": "2026-10-09T07:00:00.000Z",
+    "totalSongsFound": 15,
+    "newSongsEmailed": 15,
     "status": "Success"
   },
   "triple_j_unearthed_discovery": {

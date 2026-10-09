@@ -1,89 +1,99 @@
 {
-  "generatedAt": "2026-10-09T10:19:47.217Z",
+  "generatedAt": "2026-10-09T10:32:08.843Z",
   "summary": {
     "totalCrawlers": 14,
-    "systemNewToday": 0,
-    "systemNewWeek": 137,
-    "systemNewAllTime": 776,
-    "systemTotalRuns": 95,
-    "healthyCount": 9,
+    "systemNewToday": 13,
+    "systemNewWeek": 150,
+    "systemNewAllTime": 789,
+    "systemTotalRuns": 97,
+    "healthyCount": 11,
     "reviewCount": 0,
-    "inactiveCount": 4
+    "inactiveCount": 2
   },
   "crawlers": [
     {
       "id": "global_radar_daily",
       "name": "Global 24h Radar",
       "schedule": "Daily 06:30",
-      "status": "Pending",
-      "lastRun": null,
-      "lastRunFoundTotal": null,
-      "lastRunNewAdded": 0,
+      "status": "Success",
+      "lastRun": "2026-10-09T06:30:00.000Z",
+      "lastRunFoundTotal": 17,
+      "lastRunNewAdded": 17,
       "stats": {
         "today": {
-          "runs": 0,
-          "newSongs": 0
+          "runs": 1,
+          "newSongs": 5
         },
         "past7Days": {
-          "runs": 0,
-          "newSongs": 0
+          "runs": 1,
+          "newSongs": 5
         },
         "past30Days": {
-          "runs": 0,
-          "newSongs": 0
+          "runs": 1,
+          "newSongs": 5
         },
         "allTime": {
-          "runs": 0,
-          "newSongs": 0,
+          "runs": 1,
+          "newSongs": 5,
           "baselinePool": 0,
-          "totalUniqueProcessed": 0
+          "totalUniqueProcessed": 5
         }
       },
       "health": {
-        "healthStatus": "Inactive",
-        "badge": "danger",
-        "recommendation": "No runs detected in 999 days. Check Windows Task Scheduler.",
+        "healthStatus": "Healthy",
+        "badge": "success",
+        "recommendation": "Operating normally with consistent discoveries.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 999
+        "daysSinceLastRun": 0
       },
-      "recentRunHistory": []
+      "recentRunHistory": [
+        {
+          "date": "2026-10-09T04:30:00.000Z",
+          "newSongs": 5
+        }
+      ]
     },
     {
       "id": "us_radar_daily",
       "name": "US Edition Radar",
       "schedule": "Daily 07:00",
-      "status": "Pending",
-      "lastRun": null,
-      "lastRunFoundTotal": null,
-      "lastRunNewAdded": 0,
+      "status": "Success",
+      "lastRun": "2026-10-09T07:00:00.000Z",
+      "lastRunFoundTotal": 15,
+      "lastRunNewAdded": 15,
       "stats": {
         "today": {
-          "runs": 0,
-          "newSongs": 0
+          "runs": 1,
+          "newSongs": 8
         },
         "past7Days": {
-          "runs": 0,
-          "newSongs": 0
+          "runs": 1,
+          "newSongs": 8
         },
         "past30Days": {
-          "runs": 0,
-          "newSongs": 0
+          "runs": 1,
+          "newSongs": 8
         },
         "allTime": {
-          "runs": 0,
-          "newSongs": 0,
+          "runs": 1,
+          "newSongs": 8,
           "baselinePool": 0,
-          "totalUniqueProcessed": 0
+          "totalUniqueProcessed": 8
         }
       },
       "health": {
-        "healthStatus": "Inactive",
-        "badge": "danger",
-        "recommendation": "No runs detected in 999 days. Check Windows Task Scheduler.",
+        "healthStatus": "Healthy",
+        "badge": "success",
+        "recommendation": "Operating normally with consistent discoveries.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 999
+        "daysSinceLastRun": 0
       },
-      "recentRunHistory": []
+      "recentRunHistory": [
+        {
+          "date": "2026-10-09T05:00:00.000Z",
+          "newSongs": 8
+        }
+      ]
     },
     {
       "id": "bandcamp_indie_discovery",
@@ -600,8 +610,8 @@
       "name": "Triple J Reminder",
       "schedule": "Fri 12:00",
       "status": "Success",
-      "lastRun": "2026-09-18T10:00:23.016Z",
-      "lastRunFoundTotal": 70,
+      "lastRun": "2026-09-18T08:00:21.000Z",
+      "lastRunFoundTotal": null,
       "lastRunNewAdded": 0,
       "stats": {
         "today": {

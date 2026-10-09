@@ -13,7 +13,6 @@ const AGENTS = [
     { id: 'futuremag_indie_discovery', name: 'Futuremag', schedule: 'Fri 09:00' },
     { id: 'roots_mag', name: 'Roots Mag', schedule: 'Fri 09:00' },
     { id: 'triple_j_unearthed_discovery', name: 'Triple J Unearthed', schedule: 'Mon, Wed, Fri 14:00' },
-    { id: 'triple_j_hitlist_discovery', name: 'Triple J Reminder', schedule: 'Fri 12:00' },
     { id: 'nialler9_indie_discovery', name: 'Nialler9', schedule: 'Fri 10:00' },
     { id: 'acid_stag_discovery', name: 'Acid Stag (Archived)', schedule: 'Archived' }
 ];
@@ -54,7 +53,11 @@ function calculateHealth(agent, runHistory, statusData) {
     let badge = 'success';
     let recommendation = 'Operating normally with consistent discoveries.';
 
-    if (agent.schedule !== 'Manual' && daysSinceLastRun > 10) {
+    if (agent.schedule === 'Archived' || agent.schedule === 'Archive') {
+        healthStatus = 'Archived';
+        badge = 'neutral';
+        recommendation = 'Legacy crawler safely archived. Historical discoveries preserved.';
+    } else if (agent.schedule !== 'Manual' && daysSinceLastRun > 10) {
         healthStatus = 'Inactive';
         badge = 'danger';
         recommendation = `No runs detected in ${daysSinceLastRun} days. Check Windows Task Scheduler.`;
