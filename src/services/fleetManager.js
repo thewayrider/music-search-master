@@ -108,22 +108,6 @@ class FleetManager {
         lastDurationMs: null,
         logs: []
       },
-      'triplej-weekly': {
-        id: 'triplej-weekly',
-        name: 'Triple J Broadcasts',
-        description: 'ABC Radio live broadcast rotations filtered to new Australian releases',
-        market: 'WEEKLY',
-        schedule: 'Friday at 12:00 PM',
-        command: 'node',
-        args: ['src/index.js', 'configs/triplej_indie.json'],
-        cwd: this.projectRoot,
-        state: 'idle',
-        lastRunStartedAt: null,
-        lastRunFinishedAt: null,
-        lastExitCode: null,
-        lastDurationMs: null,
-        logs: []
-      },
       'listenbrainz-weekly': {
         id: 'listenbrainz-weekly',
         name: 'ListenBrainz Explorer',

@@ -55,13 +55,6 @@
     "newSongsEmailed": 68,
     "status": "Success"
   },
-  "acid_stag_discovery": {
-    "name": "Acid Stag Discovery",
-    "lastRun": "2026-09-25T14:05:53.321Z",
-    "totalSongsFound": 19,
-    "newSongsEmailed": 19,
-    "status": "Success"
-  },
   "air_charts_discovery": {
     "name": "AIR Charts Discovery",
     "lastRun": "2026-10-08T08:36:45.466Z",

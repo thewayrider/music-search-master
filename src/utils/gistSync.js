@@ -53,7 +53,7 @@ function mergeMetrics(localMetrics, gistMetrics) {
     const gistCrawlersMap = new Map(gistMetrics.crawlers.map(c => [c.id, c]));
 
     // Combine all unique crawler IDs
-    const DEPRECATED_IDS = new Set(['triple_j_hitlist_discovery', 'triplej']);
+    const DEPRECATED_IDS = new Set(['triple_j_hitlist_discovery', 'triplej', 'triplej-weekly', 'acid_stag_discovery', 'acid_stag']);
     const allCrawlerIds = new Set([...localCrawlersMap.keys(), ...gistCrawlersMap.keys()]);
 
     for (const id of allCrawlerIds) {

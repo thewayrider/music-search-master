@@ -18,7 +18,8 @@ $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatt
 # 1. Clean up obsolete legacy tasks if present
 $obsoleteTasks = @(
     "LiveMusicSearchAgent_AcidStag",
-    "Triple J API Crawler"
+    "Triple J API Crawler",
+    "Triple J Weekly Reminder"
 )
 foreach ($legacyName in $obsoleteTasks) {
     if (Get-ScheduledTask -TaskName $legacyName -ErrorAction SilentlyContinue) {
