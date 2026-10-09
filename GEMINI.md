@@ -7,8 +7,8 @@ This document serves as the permanent system architecture reference, discovery r
 ## 1. Unified Project Mission & Structure
 
 `music-search-master` is the unified single-repository codebase combining:
-1. **The 24/7 Rapid Response Radars** (Global & US Edition) — daily 36-hour release detection at 06:30 and 07:00 AM.
-2. **The 11 Weekly Tastemaker Crawlers** (Bandcamp, AMRAP, Triple J, ListenBrainz, MusicBrainz, Deezer, etc.).
+1. **The 24/7 Rapid Response Radars** (Global & US Edition) — daily 36-hour release detection at 06:30 and 07:00 AM (includes Under the Radar Magazine).
+2. **The 12 Weekly Tastemaker Crawlers** (Bandcamp, AMRAP, Triple J Unearthed, ListenBrainz, MusicBrainz, Deezer, Futuremag, Roots Mag, Air Charts, Nialler9, New Releases Now).
 3. **The Unified Fleet Command Center** — Express REST API daemon (Port 4000) and dedicated standalone App-Mode window.
 4. **The Master SQLite Brain** (`data/master_catalog.sqlite`) — single shared database for all sightings and Tastemaker Heat consensus tracking.
 
@@ -16,7 +16,7 @@ This document serves as the permanent system architecture reference, discovery r
 ```text
 music-search-master/
 ├── configs/                       # All crawler configurations, exclusions, and schedules
-│   ├── schedules.json             # 13 automated tasks definitions
+│   ├── schedules.json             # 14 automated tasks definitions
 │   ├── exclusions.json            # Keyword exclusions
 │   └── secrets.json               # Email & API credentials (ignored by git)
 ├── data/
@@ -99,3 +99,36 @@ node src/index.js --stats                  # Show master database metrics
 npm run command-center                     # Start API server on port 4000
 .\launch_command_center.bat                # 1-click dedicated Edge app window
 ```
+
+---
+
+## 6. Mini PC Git Sync & Collision Resolution
+
+Because the Always-On Mini PC runs crawlers continuously, local telemetry (`saved_searches/crawler_analytics.json`) and untracked lockfiles (`package-lock.json`) can block `git pull origin main`.
+
+**Standard resolution on Mini PC:**
+```powershell
+git checkout -- saved_searches/crawler_analytics.json
+Remove-Item -Force package-lock.json -ErrorAction SilentlyContinue
+git pull origin main
+```
+
+---
+
+## 7. Windows Task Scheduler Standard (PowerShell 5.1 Native)
+
+Because paths contain spaces (`C:\Antigravity Projects\music-search-master`), `schtasks.exe` quote escaping breaks in Windows PowerShell 5.1. Always use pure PowerShell cmdlets to register tasks on Windows:
+
+```powershell
+$action = New-ScheduledTaskAction -Execute 'C:\Antigravity Projects\music-search-master\run_newreleasesnow.bat'
+$trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Saturday -At 09:30AM
+Register-ScheduledTask -TaskName 'MusicSearch_NewReleasesNow' -Action $action -Trigger $trigger -Force
+```
+
+---
+
+## 8. Upcoming Architecture Roadmap
+
+- **Integrated In-Process Node Scheduler**: Transition from Windows Task Scheduler to an embedded Node scheduler (`node-cron` in `src/server.js`) driven dynamically by `configs/schedules.json`. This will make scheduling 100% self-contained within Git and eliminate OS-level task registration.
+- **US Indie Sources Onboarding**: Continue single-site technical audits and integrations.
+
