@@ -1,0 +1,14 @@
+{
+  "_comment": "Configuration for the New Releases Now Weekly Crawler",
+  "newreleasesnow": {
+    "searchName": "New Releases Now Indie Discovery",
+    "genreSlugs": [
+      "new-indie-rock-songs",
+      "new-indie-pop-songs",
+      "new-indie-folk-songs",
+      "new-alternative-songs",
+      "new-post-punk-songs"
+    ],
+    "includeRss": true
+  }
+}

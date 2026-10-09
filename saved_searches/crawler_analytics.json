@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-09T10:37:37.305Z",
+  "generatedAt": "2026-10-09T16:28:46.343Z",
   "summary": {
-    "totalCrawlers": 12,
+    "totalCrawlers": 13,
     "systemNewToday": 13,
     "systemNewWeek": 150,
     "systemNewAllTime": 713,
     "systemTotalRuns": 81,
     "healthyCount": 11,
     "reviewCount": 0,
-    "inactiveCount": 0
+    "inactiveCount": 1
   },
   "crawlers": [
     {
@@ -410,7 +410,7 @@
         "badge": "success",
         "recommendation": "High performer! Added 11 new tracks in the past 7 days.",
         "consecutiveZeros": 1,
-        "daysSinceLastRun": 0
+        "daysSinceLastRun": 1
       },
       "recentRunHistory": [
         {
@@ -646,6 +646,43 @@
           "newSongs": 17
         }
       ]
+    },
+    {
+      "id": "new_releases_now_indie_discovery",
+      "name": "New Releases Now",
+      "schedule": "Sat 09:30",
+      "status": "Pending",
+      "lastRun": null,
+      "lastRunFoundTotal": null,
+      "lastRunNewAdded": 0,
+      "stats": {
+        "today": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past7Days": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past30Days": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "allTime": {
+          "runs": 0,
+          "newSongs": 0,
+          "baselinePool": 0,
+          "totalUniqueProcessed": 0
+        }
+      },
+      "health": {
+        "healthStatus": "Inactive",
+        "badge": "danger",
+        "recommendation": "No runs detected in 999 days. Check Windows Task Scheduler.",
+        "consecutiveZeros": 0,
+        "daysSinceLastRun": 999
+      },
+      "recentRunHistory": []
     }
   ]
 }

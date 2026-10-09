@@ -142,6 +142,11 @@ Examples:
         if (agent?.runNialler9Agent) {
             results = results.concat(await agent.runNialler9Agent(config.nialler9, exclusions));
         }
+    } else if (config.newreleasesnow) {
+        const agent = loadAgentSafely('newreleasesnow', './crawlers/newReleasesNowAgent');
+        if (agent?.runNewReleasesNowAgent) {
+            results = results.concat(await agent.runNewReleasesNowAgent(config.newreleasesnow, exclusions));
+        }
     }
 
     // Save outputs in saved_searches
@@ -159,6 +164,7 @@ Examples:
                        config.deezer?.searchName ||
                        config.spotify_oauth?.searchName ||
                        config.nialler9?.searchName ||
+                       config.newreleasesnow?.searchName ||
                        'search_results';
 
     const safeSearchName = searchName.replace(/[^a-z0-9]/gi, '_').toLowerCase();

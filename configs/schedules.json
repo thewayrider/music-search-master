@@ -106,5 +106,15 @@
       "Friday"
     ],
     "time": "10:00AM"
+  },
+  {
+    "id": "newreleasesnow",
+    "name": "LiveMusicSearchAgent_NewReleasesNow",
+    "description": "Runs the New Releases Now Crawler on Saturday at 09:30 CET",
+    "script": "run_newreleasesnow.bat",
+    "days": [
+      "Saturday"
+    ],
+    "time": "09:30AM"
   }
 ]

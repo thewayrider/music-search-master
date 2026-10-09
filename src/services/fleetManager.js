@@ -219,6 +219,22 @@ class FleetManager {
         lastExitCode: null,
         lastDurationMs: null,
         logs: []
+      },
+      'newreleasesnow-weekly': {
+        id: 'newreleasesnow-weekly',
+        name: 'New Releases Now',
+        description: 'Friday album & EP releases across indie rock, pop, folk, alternative, and post-punk',
+        market: 'WEEKLY',
+        schedule: 'Saturday at 09:30 AM',
+        command: 'node',
+        args: ['src/index.js', 'configs/newreleasesnow_indie.json'],
+        cwd: this.projectRoot,
+        state: 'idle',
+        lastRunStartedAt: null,
+        lastRunFinishedAt: null,
+        lastExitCode: null,
+        lastDurationMs: null,
+        logs: []
       }
     };
 
