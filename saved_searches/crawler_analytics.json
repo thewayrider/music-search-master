@@ -1,16 +1,314 @@
 {
-  "generatedAt": "2026-10-08T11:08:18.879Z",
+  "generatedAt": "2026-10-09T10:19:47.217Z",
   "summary": {
-    "totalCrawlers": 9,
-    "systemNewToday": 132,
-    "systemNewWeek": 132,
-    "systemNewAllTime": 681,
-    "systemTotalRuns": 76,
-    "healthyCount": 8,
+    "totalCrawlers": 14,
+    "systemNewToday": 0,
+    "systemNewWeek": 137,
+    "systemNewAllTime": 776,
+    "systemTotalRuns": 95,
+    "healthyCount": 9,
     "reviewCount": 0,
-    "inactiveCount": 0
+    "inactiveCount": 4
   },
   "crawlers": [
+    {
+      "id": "global_radar_daily",
+      "name": "Global 24h Radar",
+      "schedule": "Daily 06:30",
+      "status": "Pending",
+      "lastRun": null,
+      "lastRunFoundTotal": null,
+      "lastRunNewAdded": 0,
+      "stats": {
+        "today": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past7Days": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past30Days": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "allTime": {
+          "runs": 0,
+          "newSongs": 0,
+          "baselinePool": 0,
+          "totalUniqueProcessed": 0
+        }
+      },
+      "health": {
+        "healthStatus": "Inactive",
+        "badge": "danger",
+        "recommendation": "No runs detected in 999 days. Check Windows Task Scheduler.",
+        "consecutiveZeros": 0,
+        "daysSinceLastRun": 999
+      },
+      "recentRunHistory": []
+    },
+    {
+      "id": "us_radar_daily",
+      "name": "US Edition Radar",
+      "schedule": "Daily 07:00",
+      "status": "Pending",
+      "lastRun": null,
+      "lastRunFoundTotal": null,
+      "lastRunNewAdded": 0,
+      "stats": {
+        "today": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past7Days": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past30Days": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "allTime": {
+          "runs": 0,
+          "newSongs": 0,
+          "baselinePool": 0,
+          "totalUniqueProcessed": 0
+        }
+      },
+      "health": {
+        "healthStatus": "Inactive",
+        "badge": "danger",
+        "recommendation": "No runs detected in 999 days. Check Windows Task Scheduler.",
+        "consecutiveZeros": 0,
+        "daysSinceLastRun": 999
+      },
+      "recentRunHistory": []
+    },
+    {
+      "id": "bandcamp_indie_discovery",
+      "name": "Bandcamp",
+      "schedule": "Mon, Wed, Fri, Sat 09:00",
+      "status": "Success",
+      "lastRun": "2026-10-08T08:36:58.446Z",
+      "lastRunFoundTotal": 37,
+      "lastRunNewAdded": 18,
+      "stats": {
+        "today": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past7Days": {
+          "runs": 1,
+          "newSongs": 18
+        },
+        "past30Days": {
+          "runs": 12,
+          "newSongs": 76
+        },
+        "allTime": {
+          "runs": 15,
+          "newSongs": 95,
+          "baselinePool": 39,
+          "totalUniqueProcessed": 134
+        }
+      },
+      "health": {
+        "healthStatus": "High Yield",
+        "badge": "success",
+        "recommendation": "High performer! Added 18 new tracks in the past 7 days.",
+        "consecutiveZeros": 0,
+        "daysSinceLastRun": 1
+      },
+      "recentRunHistory": [
+        {
+          "date": "2026-09-25T05:36:03.000Z",
+          "newSongs": 9
+        },
+        {
+          "date": "2026-09-26T05:00:31.000Z",
+          "newSongs": 2
+        },
+        {
+          "date": "2026-09-28T05:00:25.000Z",
+          "newSongs": 4
+        },
+        {
+          "date": "2026-09-30T05:00:21.000Z",
+          "newSongs": 5
+        },
+        {
+          "date": "2026-10-08T06:36:58.000Z",
+          "newSongs": 18
+        }
+      ]
+    },
+    {
+      "id": "deezer_indie_discovery",
+      "name": "Deezer",
+      "schedule": "Fri 11:00",
+      "status": "Success",
+      "lastRun": "2026-10-08T08:45:20.638Z",
+      "lastRunFoundTotal": 5,
+      "lastRunNewAdded": 5,
+      "stats": {
+        "today": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past7Days": {
+          "runs": 1,
+          "newSongs": 5
+        },
+        "past30Days": {
+          "runs": 3,
+          "newSongs": 19
+        },
+        "allTime": {
+          "runs": 3,
+          "newSongs": 19,
+          "baselinePool": 0,
+          "totalUniqueProcessed": 19
+        }
+      },
+      "health": {
+        "healthStatus": "Healthy",
+        "badge": "success",
+        "recommendation": "Operating normally with consistent discoveries.",
+        "consecutiveZeros": 0,
+        "daysSinceLastRun": 1
+      },
+      "recentRunHistory": [
+        {
+          "date": "2026-09-24T06:45:08.000Z",
+          "newSongs": 12
+        },
+        {
+          "date": "2026-09-25T07:10:39.000Z",
+          "newSongs": 2
+        },
+        {
+          "date": "2026-10-08T06:45:20.000Z",
+          "newSongs": 5
+        }
+      ]
+    },
+    {
+      "id": "listenbrainz_indie_discovery",
+      "name": "ListenBrainz",
+      "schedule": "Mon, Fri 09:00",
+      "status": "Success",
+      "lastRun": "2026-10-08T09:07:50.867Z",
+      "lastRunFoundTotal": 110,
+      "lastRunNewAdded": 68,
+      "stats": {
+        "today": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past7Days": {
+          "runs": 1,
+          "newSongs": 68
+        },
+        "past30Days": {
+          "runs": 9,
+          "newSongs": 263
+        },
+        "allTime": {
+          "runs": 10,
+          "newSongs": 305,
+          "baselinePool": 37,
+          "totalUniqueProcessed": 342
+        }
+      },
+      "health": {
+        "healthStatus": "High Yield",
+        "badge": "success",
+        "recommendation": "High performer! Added 68 new tracks in the past 7 days.",
+        "consecutiveZeros": 0,
+        "daysSinceLastRun": 1
+      },
+      "recentRunHistory": [
+        {
+          "date": "2026-09-21T05:13:10.000Z",
+          "newSongs": 32
+        },
+        {
+          "date": "2026-09-25T05:49:23.000Z",
+          "newSongs": 27
+        },
+        {
+          "date": "2026-09-25T05:52:43.000Z",
+          "newSongs": 3
+        },
+        {
+          "date": "2026-09-28T05:13:37.000Z",
+          "newSongs": 18
+        },
+        {
+          "date": "2026-10-08T07:07:50.000Z",
+          "newSongs": 68
+        }
+      ]
+    },
+    {
+      "id": "musicbrainz_indie_discovery",
+      "name": "MusicBrainz",
+      "schedule": "Mon, Wed, Fri 09:30",
+      "status": "Success",
+      "lastRun": "2026-10-08T09:07:59.913Z",
+      "lastRunFoundTotal": 14,
+      "lastRunNewAdded": 8,
+      "stats": {
+        "today": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past7Days": {
+          "runs": 1,
+          "newSongs": 8
+        },
+        "past30Days": {
+          "runs": 5,
+          "newSongs": 36
+        },
+        "allTime": {
+          "runs": 5,
+          "newSongs": 36,
+          "baselinePool": 0,
+          "totalUniqueProcessed": 36
+        }
+      },
+      "health": {
+        "healthStatus": "Healthy",
+        "badge": "success",
+        "recommendation": "Operating normally with consistent discoveries.",
+        "consecutiveZeros": 0,
+        "daysSinceLastRun": 1
+      },
+      "recentRunHistory": [
+        {
+          "date": "2026-09-16T08:52:09.000Z",
+          "newSongs": 2
+        },
+        {
+          "date": "2026-09-16T08:52:44.000Z",
+          "newSongs": 1
+        },
+        {
+          "date": "2026-09-18T09:41:15.000Z",
+          "newSongs": 16
+        },
+        {
+          "date": "2026-09-30T05:30:09.000Z",
+          "newSongs": 9
+        },
+        {
+          "date": "2026-10-08T07:07:59.000Z",
+          "newSongs": 8
+        }
+      ]
+    },
     {
       "id": "air_charts_discovery",
       "name": "Air Charts",
@@ -21,8 +319,8 @@
       "lastRunNewAdded": 2,
       "stats": {
         "today": {
-          "runs": 1,
-          "newSongs": 2
+          "runs": 0,
+          "newSongs": 0
         },
         "past7Days": {
           "runs": 1,
@@ -44,7 +342,7 @@
         "badge": "success",
         "recommendation": "Operating normally with consistent discoveries.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 0
+        "daysSinceLastRun": 1
       },
       "recentRunHistory": [
         {
@@ -79,8 +377,8 @@
       "lastRunNewAdded": 0,
       "stats": {
         "today": {
-          "runs": 5,
-          "newSongs": 11
+          "runs": 0,
+          "newSongs": 0
         },
         "past7Days": {
           "runs": 5,
@@ -128,180 +426,6 @@
       ]
     },
     {
-      "id": "bandcamp_indie_discovery",
-      "name": "Bandcamp",
-      "schedule": "Mon, Wed, Fri, Sat 09:00",
-      "status": "Success",
-      "lastRun": "2026-10-08T08:36:58.446Z",
-      "lastRunFoundTotal": 37,
-      "lastRunNewAdded": 18,
-      "stats": {
-        "today": {
-          "runs": 1,
-          "newSongs": 18
-        },
-        "past7Days": {
-          "runs": 1,
-          "newSongs": 18
-        },
-        "past30Days": {
-          "runs": 12,
-          "newSongs": 76
-        },
-        "allTime": {
-          "runs": 15,
-          "newSongs": 95,
-          "baselinePool": 39,
-          "totalUniqueProcessed": 134
-        }
-      },
-      "health": {
-        "healthStatus": "High Yield",
-        "badge": "success",
-        "recommendation": "High performer! Added 18 new tracks in the past 7 days.",
-        "consecutiveZeros": 0,
-        "daysSinceLastRun": 0
-      },
-      "recentRunHistory": [
-        {
-          "date": "2026-09-25T05:36:03.000Z",
-          "newSongs": 9
-        },
-        {
-          "date": "2026-09-26T05:00:31.000Z",
-          "newSongs": 2
-        },
-        {
-          "date": "2026-09-28T05:00:25.000Z",
-          "newSongs": 4
-        },
-        {
-          "date": "2026-09-30T05:00:21.000Z",
-          "newSongs": 5
-        },
-        {
-          "date": "2026-10-08T06:36:58.000Z",
-          "newSongs": 18
-        }
-      ]
-    },
-    {
-      "id": "listenbrainz_indie_discovery",
-      "name": "ListenBrainz",
-      "schedule": "Mon, Fri 09:00",
-      "status": "Success",
-      "lastRun": "2026-10-08T09:07:50.867Z",
-      "lastRunFoundTotal": 110,
-      "lastRunNewAdded": 68,
-      "stats": {
-        "today": {
-          "runs": 1,
-          "newSongs": 68
-        },
-        "past7Days": {
-          "runs": 1,
-          "newSongs": 68
-        },
-        "past30Days": {
-          "runs": 9,
-          "newSongs": 263
-        },
-        "allTime": {
-          "runs": 10,
-          "newSongs": 305,
-          "baselinePool": 37,
-          "totalUniqueProcessed": 342
-        }
-      },
-      "health": {
-        "healthStatus": "High Yield",
-        "badge": "success",
-        "recommendation": "High performer! Added 68 new tracks in the past 7 days.",
-        "consecutiveZeros": 0,
-        "daysSinceLastRun": 0
-      },
-      "recentRunHistory": [
-        {
-          "date": "2026-09-21T05:13:10.000Z",
-          "newSongs": 32
-        },
-        {
-          "date": "2026-09-25T05:49:23.000Z",
-          "newSongs": 27
-        },
-        {
-          "date": "2026-09-25T05:52:43.000Z",
-          "newSongs": 3
-        },
-        {
-          "date": "2026-09-28T05:13:37.000Z",
-          "newSongs": 18
-        },
-        {
-          "date": "2026-10-08T07:07:50.000Z",
-          "newSongs": 68
-        }
-      ]
-    },
-    {
-      "id": "musicbrainz_indie_discovery",
-      "name": "MusicBrainz",
-      "schedule": "Mon, Wed, Fri 09:30",
-      "status": "Success",
-      "lastRun": "2026-10-08T09:07:59.913Z",
-      "lastRunFoundTotal": 14,
-      "lastRunNewAdded": 8,
-      "stats": {
-        "today": {
-          "runs": 1,
-          "newSongs": 8
-        },
-        "past7Days": {
-          "runs": 1,
-          "newSongs": 8
-        },
-        "past30Days": {
-          "runs": 5,
-          "newSongs": 36
-        },
-        "allTime": {
-          "runs": 5,
-          "newSongs": 36,
-          "baselinePool": 0,
-          "totalUniqueProcessed": 36
-        }
-      },
-      "health": {
-        "healthStatus": "Healthy",
-        "badge": "success",
-        "recommendation": "Operating normally with consistent discoveries.",
-        "consecutiveZeros": 0,
-        "daysSinceLastRun": 0
-      },
-      "recentRunHistory": [
-        {
-          "date": "2026-09-16T08:52:09.000Z",
-          "newSongs": 2
-        },
-        {
-          "date": "2026-09-16T08:52:44.000Z",
-          "newSongs": 1
-        },
-        {
-          "date": "2026-09-18T09:41:15.000Z",
-          "newSongs": 16
-        },
-        {
-          "date": "2026-09-30T05:30:09.000Z",
-          "newSongs": 9
-        },
-        {
-          "date": "2026-10-08T07:07:59.000Z",
-          "newSongs": 8
-        }
-      ]
-    },
-    {
       "id": "futuremag_indie_discovery",
       "name": "Futuremag",
       "schedule": "Fri 09:00",
@@ -311,7 +435,7 @@
       "lastRunNewAdded": 0,
       "stats": {
         "today": {
-          "runs": 1,
+          "runs": 0,
           "newSongs": 0
         },
         "past7Days": {
@@ -334,7 +458,7 @@
         "badge": "info",
         "recommendation": "No new songs this week, but normal for bi-weekly / monthly release patterns.",
         "consecutiveZeros": 1,
-        "daysSinceLastRun": 0
+        "daysSinceLastRun": 1
       },
       "recentRunHistory": [
         {
@@ -369,8 +493,8 @@
       "lastRunNewAdded": 7,
       "stats": {
         "today": {
-          "runs": 1,
-          "newSongs": 7
+          "runs": 0,
+          "newSongs": 0
         },
         "past7Days": {
           "runs": 1,
@@ -392,7 +516,7 @@
         "badge": "success",
         "recommendation": "Operating normally with consistent discoveries.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 0
+        "daysSinceLastRun": 1
       },
       "recentRunHistory": [
         {
@@ -427,8 +551,8 @@
       "lastRunNewAdded": 1,
       "stats": {
         "today": {
-          "runs": 1,
-          "newSongs": 1
+          "runs": 0,
+          "newSongs": 0
         },
         "past7Days": {
           "runs": 1,
@@ -450,7 +574,7 @@
         "badge": "success",
         "recommendation": "Operating normally with consistent discoveries.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 0
+        "daysSinceLastRun": 1
       },
       "recentRunHistory": [
         {
@@ -472,6 +596,64 @@
       ]
     },
     {
+      "id": "triple_j_hitlist_discovery",
+      "name": "Triple J Reminder",
+      "schedule": "Fri 12:00",
+      "status": "Success",
+      "lastRun": "2026-09-18T10:00:23.016Z",
+      "lastRunFoundTotal": 70,
+      "lastRunNewAdded": 0,
+      "stats": {
+        "today": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past7Days": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past30Days": {
+          "runs": 4,
+          "newSongs": 0
+        },
+        "allTime": {
+          "runs": 6,
+          "newSongs": 0,
+          "baselinePool": 68,
+          "totalUniqueProcessed": 68
+        }
+      },
+      "health": {
+        "healthStatus": "Inactive",
+        "badge": "danger",
+        "recommendation": "No runs detected in 21 days. Check Windows Task Scheduler.",
+        "consecutiveZeros": 6,
+        "daysSinceLastRun": 21
+      },
+      "recentRunHistory": [
+        {
+          "date": "2026-09-09T08:00:18.000Z",
+          "newSongs": 0
+        },
+        {
+          "date": "2026-09-11T08:00:22.000Z",
+          "newSongs": 0
+        },
+        {
+          "date": "2026-09-14T08:00:17.000Z",
+          "newSongs": 0
+        },
+        {
+          "date": "2026-09-16T08:00:16.000Z",
+          "newSongs": 0
+        },
+        {
+          "date": "2026-09-18T08:00:21.000Z",
+          "newSongs": 0
+        }
+      ]
+    },
+    {
       "id": "nialler9_indie_discovery",
       "name": "Nialler9",
       "schedule": "Fri 10:00",
@@ -481,8 +663,8 @@
       "lastRunNewAdded": 17,
       "stats": {
         "today": {
-          "runs": 1,
-          "newSongs": 17
+          "runs": 0,
+          "newSongs": 0
         },
         "past7Days": {
           "runs": 1,
@@ -504,12 +686,70 @@
         "badge": "success",
         "recommendation": "High performer! Added 17 new tracks in the past 7 days.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 0
+        "daysSinceLastRun": 1
       },
       "recentRunHistory": [
         {
           "date": "2026-10-08T07:09:07.000Z",
           "newSongs": 17
+        }
+      ]
+    },
+    {
+      "id": "acid_stag_discovery",
+      "name": "Acid Stag (Archived)",
+      "schedule": "Archived",
+      "status": "Success",
+      "lastRun": "2026-09-25T14:05:53.321Z",
+      "lastRunFoundTotal": 19,
+      "lastRunNewAdded": 19,
+      "stats": {
+        "today": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past7Days": {
+          "runs": 0,
+          "newSongs": 0
+        },
+        "past30Days": {
+          "runs": 3,
+          "newSongs": 55
+        },
+        "allTime": {
+          "runs": 10,
+          "newSongs": 76,
+          "baselinePool": 20,
+          "totalUniqueProcessed": 96
+        }
+      },
+      "health": {
+        "healthStatus": "Inactive",
+        "badge": "danger",
+        "recommendation": "No runs detected in 13 days. Check Windows Task Scheduler.",
+        "consecutiveZeros": 0,
+        "daysSinceLastRun": 13
+      },
+      "recentRunHistory": [
+        {
+          "date": "2026-09-04T12:01:51.000Z",
+          "newSongs": 0
+        },
+        {
+          "date": "2026-09-04T12:11:22.000Z",
+          "newSongs": 21
+        },
+        {
+          "date": "2026-09-11T12:19:52.000Z",
+          "newSongs": 15
+        },
+        {
+          "date": "2026-09-20T09:55:36.000Z",
+          "newSongs": 21
+        },
+        {
+          "date": "2026-09-25T12:05:50.000Z",
+          "newSongs": 19
         }
       ]
     }

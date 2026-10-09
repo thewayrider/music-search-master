@@ -256,11 +256,105 @@ btnClearTerminal.addEventListener('click', () => {
 btnManualRefresh.addEventListener('click', () => {
   fetchFleetStatus();
   fetchDiscoveries();
+  fetchAnalytics();
 });
 btnRefreshTracks.addEventListener('click', fetchDiscoveries);
 trackFilterInput.addEventListener('input', renderDiscoveries);
 
+// 7. Fetch Crawler Performance & Health Analytics (Android & Gist Synced)
+const analyticsTbody = document.getElementById('analytics-tbody');
+const analyticsAlertBox = document.getElementById('analytics-alert-box');
+const analyticsAlertList = document.getElementById('analytics-alert-list');
+const btnSyncGist = document.getElementById('btn-sync-gist');
+
+async function fetchAnalytics() {
+  try {
+    const res = await fetch('/api/analytics');
+    if (!res.ok) return;
+    const data = await res.json();
+    renderAnalytics(data);
+  } catch (err) {
+    console.error('Error fetching analytics:', err);
+  }
+}
+
+function renderAnalytics(data) {
+  if (!analyticsTbody || !data.crawlers) return;
+  analyticsTbody.innerHTML = '';
+
+  const reviewCrawlers = data.crawlers.filter(c => c.health.badge === 'warning' || c.health.badge === 'danger');
+  if (reviewCrawlers.length > 0) {
+    analyticsAlertBox.style.display = 'block';
+    analyticsAlertList.innerHTML = reviewCrawlers.map(c => `<li><strong>${c.name}:</strong> ${c.health.recommendation}</li>`).join('');
+  } else {
+    analyticsAlertBox.style.display = 'none';
+  }
+
+  data.crawlers.forEach(c => {
+    const tr = document.createElement('tr');
+    if (c.health.badge === 'warning') tr.className = 'row-warning';
+
+    const healthBadgeClass = c.health.badge === 'success'
+      ? 'badge-success'
+      : (c.health.badge === 'warning' ? 'badge-warning' : (c.health.badge === 'danger' ? 'badge-danger' : 'badge-neutral'));
+
+    const lastRunText = c.lastRun ? new Date(c.lastRun).toLocaleString() : 'Never';
+
+    tr.innerHTML = `
+      <td>
+        <div style="font-weight: 600; color: #f8fafc;">${c.name}</div>
+        <div style="font-size: 0.75rem; color: #94a3b8;">${c.schedule}</div>
+      </td>
+      <td>
+        <span class="status-pill status-${(c.status || 'success').toLowerCase()}">${c.status || 'Success'}</span>
+        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;">${lastRunText}</div>
+      </td>
+      <td style="text-align: center;">
+        <span style="font-weight: 700; color: #38bdf8;">${c.stats?.today?.newSongs || 0}</span>
+        <span style="font-size: 0.75rem; color: #94a3b8; display: block;">(${c.stats?.today?.runs || 0} runs)</span>
+      </td>
+      <td style="text-align: center;">
+        <span style="font-weight: 700; color: #38bdf8;">${c.stats?.past7Days?.newSongs || 0}</span>
+        <span style="font-size: 0.75rem; color: #94a3b8; display: block;">(${c.stats?.past7Days?.runs || 0} runs)</span>
+      </td>
+      <td style="text-align: center;">
+        <span style="font-weight: 700; color: #38bdf8;">${c.stats?.allTime?.newSongs || 0}</span>
+        <span style="font-size: 0.75rem; color: #94a3b8; display: block;">(${c.stats?.allTime?.runs || 0} runs)</span>
+      </td>
+      <td>
+        <span class="badge ${healthBadgeClass}">${c.health?.healthStatus || 'Healthy'}</span>
+        <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 4px;">${c.health?.recommendation || ''}</div>
+      </td>
+    `;
+    analyticsTbody.appendChild(tr);
+  });
+}
+
+if (btnSyncGist) {
+  btnSyncGist.addEventListener('click', async () => {
+    btnSyncGist.textContent = '⏳ Syncing...';
+    btnSyncGist.disabled = true;
+    try {
+      const res = await fetch('/api/analytics/sync', { method: 'POST' });
+      const d = await res.json();
+      if (d.success) {
+        alert('Telemetry synchronized successfully to GitHub Gist for Android Monitor!');
+        fetchAnalytics();
+      } else {
+        alert('Sync error: ' + (d.error || 'Failed'));
+      }
+    } catch (e) {
+      alert('Network error syncing to Gist: ' + e.message);
+    } finally {
+      btnSyncGist.textContent = '☁️ Sync to Gist';
+      btnSyncGist.disabled = false;
+    }
+  });
+}
+
 // Initialization
 fetchFleetStatus();
 fetchDiscoveries();
+fetchAnalytics();
 setInterval(fetchFleetStatus, 2500);
+

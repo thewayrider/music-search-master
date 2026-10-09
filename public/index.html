@@ -80,7 +80,47 @@
       </div>
     </section>
 
-    <!-- Row 3: Master SQLite Recent Discoveries -->
+    <!-- Row 3: Crawler Performance & Health Matrix (Gist / Android Synced) -->
+    <section class="section-container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">📊 Crawler Performance &amp; Health Matrix</h2>
+          <p class="section-desc">Historical yield, consecutive zero tracking, and diagnostic telemetry (synchronized with Android App)</p>
+        </div>
+        <div class="table-actions">
+          <button id="btn-sync-gist" class="btn-secondary">☁️ Sync to Gist</button>
+          <a href="/dashboard" target="_blank" class="btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center;">📄 Full HTML Report</a>
+        </div>
+      </div>
+
+      <!-- Action Required Alert Box -->
+      <div id="analytics-alert-box" class="alert-box" style="display:none;">
+        <div class="alert-header">
+          <strong>⚠️ Action Required: Reviewing Non-Performing Crawlers</strong>
+        </div>
+        <ul id="analytics-alert-list" style="margin: 8px 0 0 20px; font-size: 0.85rem; color: #fbbf24;"></ul>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Crawler Agent &amp; Schedule</th>
+              <th>Status &amp; Last Run</th>
+              <th>Today</th>
+              <th>Past 7 Days</th>
+              <th>All-Time</th>
+              <th>Health &amp; Diagnostics</th>
+            </tr>
+          </thead>
+          <tbody id="analytics-tbody">
+            <tr><td colspan="6" class="empty-state">Loading crawler performance matrix...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Row 4: Master SQLite Recent Discoveries -->
     <section class="section-container">
       <div class="section-header">
         <div>

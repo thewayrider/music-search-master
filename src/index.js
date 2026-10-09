@@ -203,6 +203,23 @@ Examples:
     console.log(`Archived JSON saved to ${jsonPath}`);
     console.log(`Interactive HTML report saved to ${htmlPath}`);
 
+    // Update Dashboard Status
+    const dashboardStatusPath = path.join(savedSearchesDir, 'dashboard_status.json');
+    let dashboardStatus = {};
+    if (fs.existsSync(dashboardStatusPath)) {
+        try {
+            dashboardStatus = JSON.parse(fs.readFileSync(dashboardStatusPath, 'utf8'));
+        } catch (_) {}
+    }
+    dashboardStatus[safeSearchName] = {
+        name: searchName,
+        lastRun: new Date().toISOString(),
+        totalSongsFound: results.length,
+        newSongsEmailed: newSongs.length,
+        status: "Success"
+    };
+    fs.writeFileSync(dashboardStatusPath, JSON.stringify(dashboardStatus, null, 2));
+
     // Update Telemetry & Sync to Gist for Android app
     try {
         console.log("\n[Telemetry] Updating aggregated crawler statistics...");

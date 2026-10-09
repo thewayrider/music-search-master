@@ -2,15 +2,20 @@ const fs = require('fs');
 const path = require('path');
 
 const AGENTS = [
-    { id: 'air_charts_discovery', name: 'Air Charts', schedule: 'Mon 16:00' },
-    { id: 'amrap_indie_discovery', name: 'Amrap', schedule: 'Thu 16:00' },
+    { id: 'global_radar_daily', name: 'Global 24h Radar', schedule: 'Daily 06:30' },
+    { id: 'us_radar_daily', name: 'US Edition Radar', schedule: 'Daily 07:00' },
     { id: 'bandcamp_indie_discovery', name: 'Bandcamp', schedule: 'Mon, Wed, Fri, Sat 09:00' },
+    { id: 'deezer_indie_discovery', name: 'Deezer', schedule: 'Fri 11:00' },
     { id: 'listenbrainz_indie_discovery', name: 'ListenBrainz', schedule: 'Mon, Fri 09:00' },
     { id: 'musicbrainz_indie_discovery', name: 'MusicBrainz', schedule: 'Mon, Wed, Fri 09:30' },
+    { id: 'air_charts_discovery', name: 'Air Charts', schedule: 'Mon 16:00' },
+    { id: 'amrap_indie_discovery', name: 'Amrap', schedule: 'Thu 16:00' },
     { id: 'futuremag_indie_discovery', name: 'Futuremag', schedule: 'Fri 09:00' },
     { id: 'roots_mag', name: 'Roots Mag', schedule: 'Fri 09:00' },
     { id: 'triple_j_unearthed_discovery', name: 'Triple J Unearthed', schedule: 'Mon, Wed, Fri 14:00' },
-    { id: 'nialler9_indie_discovery', name: 'Nialler9', schedule: 'Fri 10:00' }
+    { id: 'triple_j_hitlist_discovery', name: 'Triple J Reminder', schedule: 'Fri 12:00' },
+    { id: 'nialler9_indie_discovery', name: 'Nialler9', schedule: 'Fri 10:00' },
+    { id: 'acid_stag_discovery', name: 'Acid Stag (Archived)', schedule: 'Archived' }
 ];
 
 function parseTimestampFromFilename(filename, stats) {

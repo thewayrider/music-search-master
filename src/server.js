@@ -1,7 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const fleetManager = require('./services/fleetManager');
+const { aggregateCrawlerMetrics } = require('./utils/metricsAggregator');
+const { syncMetricsToGist } = require('./utils/gistSync');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -71,6 +74,55 @@ app.get('/api/fleet/recent-discoveries', (req, res) => {
   }
 });
 
+// 6. Crawler Telemetry & Performance Analytics (Android App + Dashboard)
+app.get('/api/analytics', (req, res) => {
+  try {
+    const analytics = aggregateCrawlerMetrics();
+    res.json(analytics);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 7. Sync Telemetry to GitHub Gist
+app.post('/api/analytics/sync', async (req, res) => {
+  try {
+    const analytics = aggregateCrawlerMetrics();
+    const result = await syncMetricsToGist(analytics);
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 8. Schedules API (Compatible with legacy Mission Control schedule editor)
+app.get('/api/crawlers', (req, res) => {
+  const schedulePath = path.resolve(__dirname, '../configs/schedules.json');
+  if (fs.existsSync(schedulePath)) {
+    return res.json(JSON.parse(fs.readFileSync(schedulePath, 'utf8')));
+  }
+  res.status(404).json({ error: 'Schedules file not found' });
+});
+
+app.post('/api/schedule', (req, res) => {
+  try {
+    const { id, days, time } = req.body;
+    const schedulePath = path.resolve(__dirname, '../configs/schedules.json');
+    if (!fs.existsSync(schedulePath)) return res.status(404).json({ error: 'Schedules file not found' });
+    const data = JSON.parse(fs.readFileSync(schedulePath, 'utf8'));
+    const index = data.findIndex(t => t.id === id);
+    if (index > -1) {
+      data[index].days = days;
+      data[index].time = time;
+      fs.writeFileSync(schedulePath, JSON.stringify(data, null, 2));
+      return res.json({ success: true, task: data[index] });
+    }
+    res.status(404).json({ error: 'Task not found' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({
@@ -79,6 +131,15 @@ app.get('/api/health', (req, res) => {
     version: '2.0.0',
     timestamp: new Date().toISOString()
   });
+});
+
+// 9. Static Dashboard Report (Direct HTML view)
+app.get('/dashboard', (req, res) => {
+  const dashPath = path.join(__dirname, '../dashboard.html');
+  if (fs.existsSync(dashPath)) {
+    return res.sendFile(dashPath);
+  }
+  res.redirect('/');
 });
 
 // Fallback for single-page app

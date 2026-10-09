@@ -151,6 +151,43 @@ async function runDailyRadar(options = {}) {
   console.log(`\n[Master DB] Total Cataloged Songs: ${dbStats.totalUniqueSongs} | Sightings: ${dbStats.totalSightings}`);
   console.log("============================================================\n");
 
+  // 4. Update Telemetry & Sync to Gist for Android App
+  if (!isDryRun) {
+    try {
+      const savedSearchesDir = path.resolve(__dirname, '../../saved_searches');
+      const safeRadarId = market === 'US' ? 'us_radar_daily' : 'global_radar_daily';
+      const radarName = market === 'US' ? 'US Edition Radar' : 'Global 24h Radar';
+      const radarDir = path.join(savedSearchesDir, safeRadarId);
+      if (!fs.existsSync(radarDir)) fs.mkdirSync(radarDir, { recursive: true });
+
+      const now = new Date();
+      const ts = now.toISOString().replace(/T/, '_').replace(/:/g, '').split('.')[0];
+      const runFile = path.join(radarDir, `${safeRadarId}_${ts}.json`);
+      fs.writeFileSync(runFile, JSON.stringify(passedNewReleases, null, 2));
+
+      const statusFile = path.join(savedSearchesDir, 'dashboard_status.json');
+      let statusData = {};
+      if (fs.existsSync(statusFile)) {
+        try { statusData = JSON.parse(fs.readFileSync(statusFile, 'utf8')); } catch (_) {}
+      }
+      statusData[safeRadarId] = {
+        name: radarName,
+        lastRun: now.toISOString(),
+        totalSongsFound: rawCandidates.length,
+        newSongsEmailed: passedNewReleases.length,
+        status: "Success"
+      };
+      fs.writeFileSync(statusFile, JSON.stringify(statusData, null, 2));
+
+      const { aggregateCrawlerMetrics } = require('../utils/metricsAggregator');
+      const { syncMetricsToGist } = require('../utils/gistSync');
+      const aggregated = aggregateCrawlerMetrics();
+      await syncMetricsToGist(aggregated);
+    } catch (metricErr) {
+      console.warn('[Telemetry] Notice updating radar telemetry or Gist:', metricErr.message);
+    }
+  }
+
   return {
     rawCount: rawCandidates.length,
     recycledBlocked: recycledSinglesBlocked,
