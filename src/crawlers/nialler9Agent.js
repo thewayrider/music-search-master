@@ -7,7 +7,7 @@ const DEFAULTS = {
   sourceService: "Nialler9",
   defaultCountry: "Ireland",
   userAgent: "music-release-agent/1.0 (+https://kimrampling.com)",
-  maxArticleAgeDays: 14,
+  maxArticleAgeDays: 7,
   perPage: 6
 };
 
@@ -89,11 +89,12 @@ async function runNialler9Agent(config = {}, exclusions = {}) {
     // Check age window
     if (Number.isFinite(pubTime) && pubTime < cutoffTime) return;
 
-    // Filter for release-focused articles
-    const isReleaseFocused = /album|song|track|ep\b|release|review|single|new music|–/i.test(title);
+    // Filter for release-focused articles, skip tours and retroactive album reviews
+    const isReleaseFocused = /album|song|track|ep\b|release|single|new music|–/i.test(title);
     const isGigOrTour = /tour date|free palestine tour|festival lineup|in concert/i.test(title);
+    const isReview = /album\s+review|record\s+review/i.test(title);
 
-    if (!isReleaseFocused || isGigOrTour) return;
+    if (!isReleaseFocused || isGigOrTour || isReview) return;
 
     const dateFormatted = Number.isFinite(pubTime) ? new Date(pubTime).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
     articles.push({ title, link, date: dateFormatted });

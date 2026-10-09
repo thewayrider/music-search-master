@@ -157,10 +157,11 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
     return false;
   }
 
-  // 3c. Reject clear non-English titles (French, Spanish, Portuguese, Turkish stopwords and phrases)
+  // 3c. Reject clear non-English titles (French, Spanish, German, Portuguese, Turkish stopwords and phrases)
   const foreignLanguagePhrases = [
     /\b(quand\s+tu|quand\s+passes|c'est|dans\s+la|avec\s+toi|pour\s+moi|sur\s+la|les\s+yeux|je\s+suis|tu\s+es|mon\s+amour|au\s+revoir|sans\s+toi|d'un|d'une|l'amour)\b/i,
-    /\b(vizinha|gostosa|virado|dias\s+virado|corazon|te\s+quiero|para\s+ti|por\s+favor|sin\s+ti|todo\s+el|lo\s+que|el\s+amor|la\s+vida|los\s+ojos|nada\s+mas|que\s+te|yo\s+no|esta\s+noche|del\s+sur|una\s+vez)\b/i,
+    /\b(vizinha|gostosa|virado|dias\s+virado|corazon|te\s+quiero|para\s+ti|por\s+favor|sin\s+ti|todo\s+el|lo\s+que|el\s+amor|la\s+vida|los\s+ojos|nada\s+mas|que\s+te|yo\s+no|esta\s+noche|del\s+sur|una\s+vez|malos?\s+vicios?|vicios?|buenas\s+noches|buenos\s+dias|cancion|canciones)\b/i,
+    /\b(ich\s+sehe|ich\s+habe|ich\s+bin|ich\s+will|du\s+bist|wir\s+sind|nicht|dich|mich|weltzeituhr|sehe\s+dich|liebe\s+dich|wenn\s+du|mein\s+herz|meine\s+liebe|ohne\s+dich|mit\s+dir|fur\s+immer|für\s+immer|auf\s+wiedersehen|guten\s+morgen|guten\s+abend|alles\s+gut)\b/i,
     /\b(dikenli|değilsin|degilsin|benim|senin|icin|için|nasıl|gibi|kadar|çünkü|böyle|radyo|şarkı|dünya|tel)\b/i,
     /\b(mc\s+[a-z]|speed\s*\+|speed\s*\+\s*grave|grave|mtg|funk\s*bh|funk\s*rj|brega|piseiro)\b/i
   ];

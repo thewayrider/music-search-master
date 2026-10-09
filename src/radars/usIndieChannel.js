@@ -46,8 +46,13 @@ async function harvestUSIndieDaily(config = {}, exclusions = {}) {
 
         if (!title || !link || seenUrls.has(link)) return;
 
-        // Skip non-release article sections (podcasts, radio shows, interviews, festival tours)
-        if (/\/(shows|interviews|radio|podcast|podcasts|events|tour|tours|festival|galleries|photos|contest)\//i.test(link)) {
+        // Skip non-release article sections (podcasts, radio shows, interviews, festival tours, album reviews, archival recordings)
+        if (/\/(shows|interviews|radio|podcast|podcasts|events|tour|tours|festival|galleries|photos|contest|recordings|reviews?|album-review)\//i.test(link)) {
+          return;
+        }
+
+        // Reject retrospective reviews (album reviews are posted weeks/months after street date)
+        if (/\|\s*(album\s+review|track\s+review|review)|album\s+review:|track\s+review:|album-review/i.test(title) || /album-review/i.test(link)) {
           return;
         }
 
@@ -62,7 +67,7 @@ async function harvestUSIndieDaily(config = {}, exclusions = {}) {
         let cleanTitle = title
           .replace(/\s*\([a-z0-9\s&._-]+(?:records|recordings|music|self-released)\)/gi, '')
           .replace(/^(stream|listen\s*to|watch|hear|share)\s+/i, '')
-          .replace(/\s*\|\s*(stream|listen|watch|premiere|video|review|album review).*$/i, '');
+          .replace(/\s*\|\s*(stream|listen|watch|premiere|video|post-trash premiere).*$/i, '');
 
         // Reject podcast / radio show titles
         if (/takeover\s*show|show\s*[—–-]\s*number|episode\s*\d+/i.test(cleanTitle)) {
