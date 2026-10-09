@@ -16,7 +16,8 @@ async function harvestUSIndieDaily(config = {}, exclusions = {}) {
     { name: "Aquarium Drunkard", url: "https://aquariumdrunkard.com/feed/", region: "US (LA/National)" },
     { name: "Austin Town Hall", url: "https://austintownhall.com/feed/", region: "US (Austin Indie)" },
     { name: "Glide Magazine", url: "https://glidemagazine.com/feed/", region: "US (Indie Music)" },
-    { name: "Post-Trash", url: "https://post-trash.com/news?format=rss", region: "US (DIY Underground)" }
+    { name: "Post-Trash", url: "https://post-trash.com/news?format=rss", region: "US (DIY Underground)" },
+    { name: "Under the Radar", url: "https://www.undertheradarmag.com/site/rss", region: "US (National Premieres)" }
   ];
 
   console.log(`[US Indie Channel] Checking ${usFeeds.length} premier US indie rock tastemaker feeds (Window: ${maxHours}h)...`);
@@ -41,13 +42,13 @@ async function harvestUSIndieDaily(config = {}, exclusions = {}) {
       $('item').each((i, el) => {
         const title = $(el).find('title').text().trim();
         const link = $(el).find('link').text().trim();
-        const pubDate = $(el).find('pubDate').text().trim();
+        const pubDate = $(el).find('pubDate').text().trim() || $(el).find('dc\\:date, date').text().trim();
         const desc = $(el).find('description').text().trim();
 
         if (!title || !link || seenUrls.has(link)) return;
 
-        // Skip non-release article sections (podcasts, radio shows, interviews, festival tours, album reviews, archival recordings)
-        if (/\/(shows|interviews|radio|podcast|podcasts|events|tour|tours|festival|galleries|photos|contest|recordings|reviews?|album-review)\//i.test(link)) {
+        // Skip non-release article sections (podcasts, radio shows, interviews, festival tours, album reviews, archival recordings, blogs, books, comics)
+        if (/\/(shows|interviews|radio|podcast|podcasts|events|tour|tours|festival|galleries|photos|contest|recordings|reviews?|album-review|blog|books?|comics?)\//i.test(link)) {
           return;
         }
 
@@ -66,7 +67,8 @@ async function harvestUSIndieDaily(config = {}, exclusions = {}) {
         // Strip label parentheticals e.g. (self-released), (ATOM Records), (Aenaos Records)
         let cleanTitle = title
           .replace(/\s*\([a-z0-9\s&._-]+(?:records|recordings|music|self-released)\)/gi, '')
-          .replace(/^(stream|listen\s*to|watch|hear|share)\s+/i, '')
+          .replace(/^(premiere:\s*|stream\s+|listen\s*to\s+|watch\s+|hear\s+|share\s+)/i, '')
+          .replace(/\s+and\s+(?:announces?|shares?|drops?).*$/i, '')
           .replace(/\s*\|\s*(stream|listen|watch|premiere|video|post-trash premiere).*$/i, '');
 
         // Reject podcast / radio show titles
@@ -78,7 +80,7 @@ async function harvestUSIndieDaily(config = {}, exclusions = {}) {
 
         // Headline regex matching for "Artist shares new single 'Song'"
         if (parsed.artist === "Unknown Artist" && !cleanTitle.includes(" - ") && !cleanTitle.includes(" – ")) {
-          const matchWith = cleanTitle.match(/^(.+?)\s+(?:share|release|announce|drop|debut|unveil)s?\s+(?:new\s+single|new\s+song|new\s+track|new\s+video|single|video)\s+['"“](.+?)['"”]/i);
+          const matchWith = cleanTitle.match(/^(.+?)\s+(?:share|release|announce|drop|debut|unveil|announce\s+new\s+album,\s+share)s?\s+(?:video\s+for\s+new\s+song|new\s+single|new\s+song|new\s+track|new\s+video|single|video|title\s+track)\s+['"“](.+?)['"”]/i);
           if (matchWith) {
             parsed.artist = sanitizeHeadline(matchWith[1]);
             parsed.title = sanitizeHeadline(matchWith[2]);
