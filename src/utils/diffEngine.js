@@ -4,10 +4,15 @@ const { processSongEntry, getMasterStats } = require('./masterDb');
 const { parseArtistTitle, isCleanTrack, slugify } = require('./normalizer');
 
 const EXCLUSIONS_FILE = path.join(__dirname, '../../configs/exclusions.json');
-let cachedExclusions = { keywords: [] };
+let cachedExclusions = { keywords: [], negativeKeywords: [], bannedArtists: [] };
 try {
     if (fs.existsSync(EXCLUSIONS_FILE)) {
-        cachedExclusions = JSON.parse(fs.readFileSync(EXCLUSIONS_FILE, 'utf8'));
+        const raw = JSON.parse(fs.readFileSync(EXCLUSIONS_FILE, 'utf8'));
+        cachedExclusions = {
+            keywords: [...(raw.keywords || []), ...(raw.negativeKeywords || [])],
+            negativeKeywords: [...(raw.negativeKeywords || []), ...(raw.keywords || [])],
+            bannedArtists: [...(raw.bannedArtists || []), ...(raw.artists || [])]
+        };
     }
 } catch (e) {
     // fallback
@@ -94,7 +99,7 @@ function getNewAdditions(currentResults, previousResults = []) {
         const title = item.songTitle || parsed.title;
 
         // Enforce EveryNoise pure track validation
-        if (!isCleanTrack(artist, title, cachedExclusions.keywords || [])) {
+        if (!isCleanTrack(artist, title, cachedExclusions.negativeKeywords, cachedExclusions.bannedArtists)) {
             droppedJunkCount++;
             continue;
         }

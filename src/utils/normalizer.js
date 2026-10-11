@@ -163,6 +163,7 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
     /\b(vizinha|gostosa|virado|dias\s+virado|corazon|te\s+quiero|para\s+ti|por\s+favor|sin\s+ti|todo\s+el|lo\s+que|el\s+amor|la\s+vida|los\s+ojos|nada\s+mas|que\s+te|yo\s+no|esta\s+noche|del\s+sur|una\s+vez|malos?\s+vicios?|vicios?|buenas\s+noches|buenos\s+dias|cancion|canciones)\b/i,
     /\b(ich\s+sehe|ich\s+habe|ich\s+bin|ich\s+will|du\s+bist|wir\s+sind|nicht|dich|mich|weltzeituhr|sehe\s+dich|liebe\s+dich|wenn\s+du|mein\s+herz|meine\s+liebe|ohne\s+dich|mit\s+dir|fur\s+immer|für\s+immer|auf\s+wiedersehen|guten\s+morgen|guten\s+abend|alles\s+gut)\b/i,
     /\b(dikenli|değilsin|degilsin|benim|senin|icin|için|nasıl|gibi|kadar|çünkü|böyle|radyo|şarkı|dünya|tel)\b/i,
+    /\b(dil|muskuraye|bandeya|pyaar|ishq|tere|meri|mera|tujhe|humsafar|zindagi|saath|kaho|suno|tum|hum|aaj|yaad|kahani|geet|gaana|aashiqui|mohabbat|deewana|shreya|arijit|armaan)\b/i,
     /\b(mc\s+[a-z]|speed\s*\+|speed\s*\+\s*grave|grave|mtg|funk\s*bh|funk\s*rj|brega|piseiro)\b/i
   ];
   if (foreignLanguagePhrases.some(rgx => rgx.test(fullText))) {
@@ -181,6 +182,8 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
     /\b(reissue|re-issue|remaster|remastered|deluxe|anniversary|expanded|edition|bootleg)\b/i,
     /\b(soundtrack|ost|score|instrumental|karaoke|tribute)\b/i,
     /\b(podcast|interview|review|track-by-track|q&a|reaction|reactions|reacting)\b/i,
+    /\b(investigating|documentary|video\s+essay|tutorial|how\s+to|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i,
+    /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover))\b/i,
     /\b(radio\s*(show|broadcast|set)?|operator\s*radio|nts\s*(radio|latest)?|dj\s*set|takeover\s*show)\b/i,
     /\b(show\s*[—–-]\s*number|show\s*#|episode\s*\d+|number\s*\d{2,4})\b/i,
     /\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+20\d\d\b/i,
@@ -189,6 +192,11 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
   ];
 
   if (uncleanPatterns.some(rgx => rgx.test(fullText))) {
+    return false;
+  }
+
+  // 4c. Reject clickbait questions and sensationalist punctuation in title (? or !?)
+  if (/\?|!{2,}|\?!|!\?/.test(t)) {
     return false;
   }
 

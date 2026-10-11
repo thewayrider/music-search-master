@@ -21,7 +21,24 @@ async function runDailyRadar(options = {}) {
   const exclusionsPath = path.join(projectRoot, 'configs/exclusions.json');
 
   const config = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
-  const exclusions = fs.existsSync(exclusionsPath) ? JSON.parse(fs.readFileSync(exclusionsPath, 'utf8')) : {};
+  const rawExclusions = fs.existsSync(exclusionsPath) ? JSON.parse(fs.readFileSync(exclusionsPath, 'utf8')) : {};
+
+  const exclusions = {
+    bannedArtists: [
+      ...(rawExclusions.bannedArtists || []),
+      ...(rawExclusions.artists || [])
+    ],
+    negativeKeywords: [
+      ...(rawExclusions.negativeKeywords || []),
+      ...(rawExclusions.keywords || [])
+    ],
+    keywords: [
+      ...(rawExclusions.negativeKeywords || []),
+      ...(rawExclusions.keywords || [])
+    ],
+    bannedGenres: rawExclusions.bannedGenres || []
+  };
+
   config.market = market;
 
   console.log("\n============================================================");
@@ -79,7 +96,7 @@ async function runDailyRadar(options = {}) {
     item.title = parsed.title;
 
     // B. Clean Track Integrity Filter (EveryNoise rule)
-    if (!isCleanTrack(item.artist, item.title, exclusions.negativeKeywords, exclusions.artists)) {
+    if (!isCleanTrack(item.artist, item.title, exclusions.negativeKeywords, exclusions.bannedArtists)) {
       uncleanFiltered++;
       console.log(`  [x] Filtered Unclean Track: "${item.artist} - ${item.title}" [${item.channel}]`);
       continue;

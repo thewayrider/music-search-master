@@ -42,12 +42,25 @@ function isRecentText(uploadedAt, maxDays) {
 }
 
 /**
- * Checks if the given text contains any excluded keywords.
+ * Checks if the given text contains any excluded keywords or banned artists.
  */
-function isExcluded(text, exclusions) {
+function isExcluded(text, exclusions = {}) {
     const lowerText = (text || "").toLowerCase();
-    const keywords = exclusions.keywords || [];
-    return keywords.some(kw => lowerText.includes(kw.toLowerCase()));
+    const allKeywords = [
+        ...(exclusions.keywords || []),
+        ...(exclusions.negativeKeywords || []),
+        ...(exclusions.bannedArtists || []),
+        ...(exclusions.artists || [])
+    ];
+    return allKeywords.some(kw => {
+        const k = (kw || "").toLowerCase().trim();
+        if (!k) return false;
+        if (k.length <= 3) {
+            const reg = new RegExp(`\\b${k.replace('.', '\\.')}\\b`, 'i');
+            return reg.test(lowerText);
+        }
+        return lowerText.includes(k);
+    });
 }
 
 module.exports = {

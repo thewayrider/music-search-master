@@ -30,9 +30,19 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
   if (channelConfig.enabled === false) return [];
 
   const maxHours = config.maxRecencyHours || 36;
-  const negativeKeywords = exclusions.negativeKeywords || [];
+  const negativeKeywords = [
+    ...(exclusions.negativeKeywords || []),
+    ...(exclusions.keywords || [])
+  ];
+  const bannedArtists = [
+    ...(exclusions.bannedArtists || []),
+    ...(exclusions.artists || [])
+  ];
   const discoveries = [];
   const seenUrls = new Set();
+
+  const AI_REGEX = /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover))\b/i;
+  const PODCAST_ESSAY_REGEX = /\b(podcast|investigating|documentary|video\s+essay|tutorial|how\s+to|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i;
 
   console.log(`[SoundCloud Channel] Checking SoundCloud live indie stream drops in the last 24h...`);
 
@@ -69,6 +79,21 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
         const genre = (item.genre || "").toLowerCase();
         const tags = (item.tag_list || "").toLowerCase();
         const fullText = `${uploader} ${rawTitle} ${genre} ${tags}`;
+
+        // Reject banned artists (e.g. Cryptid Park)
+        if (bannedArtists.some(b => fullText.toLowerCase().includes(b.toLowerCase()))) {
+          continue;
+        }
+
+        // Reject AI generated music
+        if (AI_REGEX.test(fullText)) {
+          continue;
+        }
+
+        // Reject podcasts, tutorials, clickbait questions
+        if (PODCAST_ESSAY_REGEX.test(fullText) || /\?|!{2,}|\?!|!\?/.test(rawTitle)) {
+          continue;
+        }
 
         // Reject banned genres (e.g. Hip-hop & Rap, Electronic, EDM, Trap, Dream Pop)
         const genreAndTags = `${genre} ${tags}`;
