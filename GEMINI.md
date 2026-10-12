@@ -104,11 +104,14 @@ npm run command-center                     # Start API server on port 4000
 
 ## 6. Mini PC Git Sync & Collision Resolution
 
-Because the Always-On Mini PC runs crawlers continuously, local telemetry (`saved_searches/crawler_analytics.json`) and untracked lockfiles (`package-lock.json`) can block `git pull origin main`.
+Because the Always-On Mini PC runs crawlers continuously, local telemetry (`saved_searches/crawler_analytics.json`) and untracked lockfiles (`package-lock.json`) previously blocked `git pull origin main`.
 
-**Standard resolution on Mini PC:**
+- **Telemetry Untracked**: `saved_searches/crawler_analytics.json` is now permanently untracked in `.gitignore` so local run history can be updated freely on disk without interfering with Git sync.
+- **Master SQLite Database**: Resides in `data/master_catalog.sqlite` and is strictly ignored by Git. Local DB reads and writes are never affected by Git operations.
+
+**Standard resolution on Mini PC if uncommitted changes occur:**
 ```powershell
-git checkout -- saved_searches/crawler_analytics.json
+git restore saved_searches/crawler_analytics.json
 Remove-Item -Force package-lock.json -ErrorAction SilentlyContinue
 git pull origin main
 ```
@@ -127,8 +130,56 @@ Register-ScheduledTask -TaskName 'MusicSearch_NewReleasesNow' -Action $action -T
 
 ---
 
-## 8. Upcoming Architecture Roadmap
+## 8. Anti-AI Music Defenses & Open Platform Safeguards
+
+Open platforms (YouTube & SoundCloud search feeds) are heavily targeted by solo AI creators and content farms using Suno, Udio, and generative video tools.
+
+### The "Double Fool You" Misdirection Dynamic
+AI farms frequently pair synthetic audio with hyper-stylized female avatars or dramatic cinematic clips (via Sora, Kling, Runway, Flux, Midjourney, Pika) to drive high click-through rates and algorithm recommendations while visually distracting listeners from robotic audio artifacts.
+
+### The DistroKid / `- Topic` / Verified Badge Loophole
+- DistroKid, TuneCore, and RouteNote allow unlimited AI music uploads for cheap, automatically creating YouTube `- Topic` channels.
+- DistroKid allows accounts with a single distributed song to claim an **Official Artist Channel badge** (`AUDIO_BADGE`). 
+- **Rule**: Official Artist Channel badges and `- Topic` channels alone **cannot** be trusted as proof of human music. Auto-generated DistroKid copyright lines (`℗ Records DK`) must be quarantined.
+
+### External Verification Benchmarks
+- **SubmitHub AI Song Checker** (`submithub.com`): Premier free curator benchmark; supports direct SoundCloud/YouTube links and runs dual spectral (8–16 kHz vocoder sheen) and temporal dynamic analysis.
+- **Authio / detect.music**: Forensic-grade label detection engine used across European DSPs.
+
+---
+
+## 9. SoundCloud Credibility & Spam-Farm Filter Rules (`src/radars/soundcloudChannel.js`)
+
+1. **Follower Threshold**: Uploader must have $\ge 50$ followers (`followers_count >= 50`). Drops zero-follower throwaways and new bot accounts.
+2. **Spam Content Farm Ratio**: Rejects accounts with $>40$ tracks and $<150$ followers, or a track-to-follower ratio $>3:1$ (e.g. content farms dumping 700+ tracks with 40 followers).
+3. **Keyword-Stuffed Titles**: Rejects titles ending with algorithmic search bait like `(Indie Rock)` or `(Alternative Rock)`.
+4. **Type Beats Purge**: Rejects `type beat`, `beat pack`, `free beat`, `instrumental beat`.
+5. **Description Scanning**: Includes `item.description` in regex scanning to catch Suno/Udio prompt tags.
+
+---
+
+## 10. Curated YouTube Tastemakers & Label RSS Engine (`src/radars/youtubeTastemakers.js`)
+
+To guarantee 100% human-curated releases without relying entirely on noisy open search, the Global Radar incorporates a dedicated, zero-quota RSS monitor reading 21 premier indie institutions ([`configs/youtube_channels.json`](configs/youtube_channels.json)):
+
+- **Live Sessions & Radio**: KEXP Live, Audiotree Live, NPR Music (Tiny Desk), Paste Magazine Live, COLORS Studios.
+- **Tastemakers & Curators**: David Dean Burkhart, BIRP! Indie, Nice Guys.
+- **Indie Record Labels**: Sub Pop Records, Domino Recording Co, Rough Trade Records, Merge Records, Captured Tracks, Partisan Records, 4AD, Matador Records, Secretly Canadian, Flying Nun Records (NZ), Spinning Top Music (AU), Polyvinyl Records, Saddle Creek.
+- **Filtering**: Automatically strips session/video suffixes (`(Live on KEXP)`, `(Official Video)`), parses `"Artist performs Song"` patterns, and drops full concerts, compilations, and playlists.
+
+---
+
+## 11. Western Latin Diacritic Support in Normalizer (`src/utils/normalizer.js`)
+
+`isCleanTrack` allows standard Western Latin diacritics (`\u00C0-\u017F`) in its character whitelist:
+- Permitted: Accented indie acts like **The Marías**, **Björk**, **Sigur Rós**.
+- Blocked: Cyrillic, South Asian, Arabic, East Asian scripts, and emojis.
+
+---
+
+## 12. Upcoming Architecture Roadmap
 
 - **Integrated In-Process Node Scheduler**: Transition from Windows Task Scheduler to an embedded Node scheduler (`node-cron` in `src/server.js`) driven dynamically by `configs/schedules.json`. This will make scheduling 100% self-contained within Git and eliminate OS-level task registration.
 - **US Indie Sources Onboarding**: Continue single-site technical audits and integrations.
+
 
