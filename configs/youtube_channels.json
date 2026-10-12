@@ -1,0 +1,149 @@
+[
+  {
+    "name": "KEXP Live",
+    "handle": "@kexp",
+    "channelId": "UC3I2GFN_F8WudD_2jUZbojA",
+    "category": "Live Sessions",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC3I2GFN_F8WudD_2jUZbojA"
+  },
+  {
+    "name": "Audiotree Live",
+    "handle": "@AudiotreeLive",
+    "channelId": "UCWjmAUHmajb1-eo5WKk_22A",
+    "category": "Live Sessions",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCWjmAUHmajb1-eo5WKk_22A"
+  },
+  {
+    "name": "NPR Music (Tiny Desk)",
+    "handle": "@nprmusic",
+    "channelId": "UC4eYXhJI4-7wSWc8UNRwD4A",
+    "category": "Live Sessions",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC4eYXhJI4-7wSWc8UNRwD4A"
+  },
+  {
+    "name": "Paste Magazine Live",
+    "handle": "@PasteMagazine",
+    "channelId": "UC_PscE_7n8SiMspieMGMK_A",
+    "category": "Live Sessions",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_PscE_7n8SiMspieMGMK_A"
+  },
+  {
+    "name": "COLORS Studios",
+    "handle": "@COLORSxSTUDIOS",
+    "channelId": "UC2Qw1dzXDBAZPwS7zm37g8g",
+    "category": "Live Sessions",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC2Qw1dzXDBAZPwS7zm37g8g"
+  },
+  {
+    "name": "David Dean Burkhart",
+    "handle": "@DavidDeanBurkhart",
+    "channelId": "UCNYJOAz1J80HEJy2HSM772Q",
+    "category": "Tastemaker / Premiere",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCNYJOAz1J80HEJy2HSM772Q"
+  },
+  {
+    "name": "BIRP! Indie",
+    "handle": "@birp",
+    "channelId": "UC-HHJWCzskrsPdEjYulBg4w",
+    "category": "Tastemaker / Premiere",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC-HHJWCzskrsPdEjYulBg4w"
+  },
+  {
+    "name": "Nice Guys",
+    "handle": "@NiceGuys",
+    "channelId": "UCMmt12UKW571UWtJAgWkWqg",
+    "category": "Tastemaker / Premiere",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCMmt12UKW571UWtJAgWkWqg"
+  },
+  {
+    "name": "Sub Pop Records",
+    "handle": "@subpop",
+    "channelId": "UCsgEkEWaXKQwrhlLHFbcQFw",
+    "category": "Indie Label",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCsgEkEWaXKQwrhlLHFbcQFw"
+  },
+  {
+    "name": "Domino Recording Co",
+    "handle": "@DominoRecordCo",
+    "channelId": "UCA8xMhX1DfxA8UKsfjn9vQg",
+    "category": "Indie Label",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCA8xMhX1DfxA8UKsfjn9vQg"
+  },
+  {
+    "name": "Rough Trade Records",
+    "handle": "@RoughTradeRecords",
+    "channelId": "UCdkAfTtNN2b4JAXKKrxjsHg",
+    "category": "Indie Label",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCdkAfTtNN2b4JAXKKrxjsHg"
+  },
+  {
+    "name": "Merge Records",
+    "handle": "@mergerecords",
+    "channelId": "UC61ntWQBhbZWj3g9Vua3rug",
+    "category": "Indie Label",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC61ntWQBhbZWj3g9Vua3rug"
+  },
+  {
+    "name": "Captured Tracks",
+    "handle": "@capturedtracks",
+    "channelId": "UC9BZkr-rvpe-ph3p3JLCHFw",
+    "category": "Indie Label",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC9BZkr-rvpe-ph3p3JLCHFw"
+  },
+  {
+    "name": "Partisan Records",
+    "handle": "@PartisanRecordsLabel",
+    "channelId": "UCeH5b2aBbpcoYCEt0EOdGWA",
+    "category": "Indie Label",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCeH5b2aBbpcoYCEt0EOdGWA"
+  },
+  {
+    "name": "4AD Records",
+    "handle": "@4AD",
+    "channelId": "UC-T3JrzHtDeHAmspt1Zn40A",
+    "category": "Indie Label",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC-T3JrzHtDeHAmspt1Zn40A"
+  },
+  {
+    "name": "Matador Records",
+    "handle": "@MatadorRecords",
+    "channelId": "UCLGElt2TSebXf1VVJzhLQbw",
+    "category": "Indie Label",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCLGElt2TSebXf1VVJzhLQbw"
+  },
+  {
+    "name": "Secretly Canadian",
+    "handle": "@SecretlyCanadian",
+    "channelId": "UCM_VXaZLzY4zhJCIEHkd9vA",
+    "category": "Indie Label",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCM_VXaZLzY4zhJCIEHkd9vA"
+  },
+  {
+    "name": "Flying Nun Records",
+    "handle": "@FlyingNunRecordsNZ",
+    "channelId": "UCGj7vE2XblTLSp06F0KCQmQ",
+    "category": "Indie Label (NZ/AU)",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCGj7vE2XblTLSp06F0KCQmQ"
+  },
+  {
+    "name": "Spinning Top Music",
+    "handle": "@SpinningTopMusic",
+    "channelId": "UCaLEXQ6GWBJKRnHj1oemJ8A",
+    "category": "Indie Label (AU)",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCaLEXQ6GWBJKRnHj1oemJ8A"
+  },
+  {
+    "name": "Polyvinyl Records",
+    "handle": "@polyvinylrecords",
+    "channelId": "UCrEKPrJOkTbaOxeZJ8q6Dew",
+    "category": "Indie Label",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrEKPrJOkTbaOxeZJ8q6Dew"
+  },
+  {
+    "name": "Saddle Creek",
+    "handle": "@saddlecreekrecords",
+    "channelId": "UCW7MRMCxD5dbOU7TQaCAMLQ",
+    "category": "Indie Label",
+    "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW7MRMCxD5dbOU7TQaCAMLQ"
+  }
+]

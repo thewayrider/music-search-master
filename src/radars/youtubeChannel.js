@@ -15,7 +15,8 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
   const discoveries = [];
   const seenVideoIds = new Set();
 
-  const AI_REGEX = /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover))\b/i;
+  const AI_REGEX = /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer|vocalist|human)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover|video|visualizer|concept|animation|model|art|singer)|sora|veo|hailuo|minimax|hedra|sync\s*labs|flux(\.1)?|leonardo(\.ai)?|riffusion|elevenlabs|midjourney|runway(ml)?|kling(\.ai)?|luma(\.ai)?|pika(\.art)?|comfyui|deforum|stable\s+diffusion|stable\s+audio|neural\s+network|deepfake)\b/i;
+  const TYPE_BEAT_REGEX = /\b(type\s*beat|prod\.\s*|producer\s*beat|instrumental\s*beat|free\s+for\s+profit|beat\s*pack|buy\s*1\s*get|drum\s*kit)\b/i;
   const PODCAST_ESSAY_REGEX = /\b(podcast|investigating|documentary|video\s+essay|tutorial|how\s+to|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i;
   const RETRO_DATE_REGEX = /\b(released|out\s+now|album\s+out|ep\s+out|available\s+since)\s+(on\s+)?(january|february|march|april|may|june|july|august|september)\s+\d{1,2},?\s+20\d\d\b/i;
   const SOUTH_ASIAN_CHANNELS = /\b(india|indian|bollywood|tollywood|kollywood|punjabi|desi|bhangra|t-series|zee\s*music|think\s*music|aditya\s*music|speed\s*records|yrf|tips\s*official)\b/i;
@@ -104,16 +105,32 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
 
           if (!rawTitle) continue;
 
-          // 1c. Reject clickbait question / sensationalist punctuation in title (? or !?)
+          // 1c. Native YouTube "Altered or Synthetic Content" / C2PA detection
+          const rawItemStr = JSON.stringify(item);
+          if (/altered\s+or\s+synthetic|made\s+with\s+ai|howthiswasmade/i.test(rawItemStr)) {
+            continue;
+          }
+
+          // 1d. Reject "type beat" / producer instrumentals / beat packs
+          if (TYPE_BEAT_REGEX.test(rawTitle) || TYPE_BEAT_REGEX.test(descSnippet) || TYPE_BEAT_REGEX.test(channelName)) {
+            continue;
+          }
+
+          // 1e. Reject DistroKid auto-generated Topic dumps (Records DK)
+          if (/-\s*Topic$/i.test(channelName) && (/records\s*dk\b/i.test(descSnippet) || /\bdistrokid\b/i.test(descSnippet))) {
+            continue;
+          }
+
+          // 1f. Reject clickbait question / sensationalist punctuation in title (? or !?)
           if (/\?|!{2,}|\?!|!\?/.test(rawTitle)) continue;
 
-          // 1d. Reject titles that are pure dates (e.g. "Oct 9, 2026")
+          // 1g. Reject titles that are pure dates (e.g. "Oct 9, 2026")
           if (/^\s*(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|september|oct|october|nov|november|dec|december)\s+\d{1,2},?\s*(20\d\d)?\s*$/i.test(rawTitle) ||
               /^\s*\d{1,2}[./-]\d{1,2}([./-]\d{2,4})?\s*$/.test(rawTitle)) {
             continue;
           }
 
-          // 1e. Reject South Asian / Indian mainstream promo channels (Think Music India, T-Series, etc.)
+          // 1h. Reject South Asian / Indian mainstream promo channels (Think Music India, T-Series, etc.)
           if (SOUTH_ASIAN_CHANNELS.test(channelName)) continue;
 
           // 2. Reject negative keywords, AI generated flags, podcasts, and past album releases

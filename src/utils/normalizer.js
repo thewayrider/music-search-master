@@ -209,8 +209,8 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
     return false;
   }
 
-  // 5. EveryNoise / AllMusic Clean Character Whitelist
-  const cleanCharWhitelist = /^[A-Za-z0-9\s'\-.,!?&()"]+$/;
+  // 5. EveryNoise / AllMusic Clean Character Whitelist (including Western Latin accents)
+  const cleanCharWhitelist = /^[A-Za-z0-9\u00C0-\u017F\s'\-.,!?&()"]+$/;
   if (!cleanCharWhitelist.test(a) || !cleanCharWhitelist.test(t)) {
     return false;
   }

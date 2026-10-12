@@ -5,6 +5,7 @@ const { harvestMusicBrainzDaily } = require('./musicbrainzChannel');
 const { harvestBlogsDaily } = require('./blogsChannel');
 const { harvestDeezerDaily } = require('./deezerChannel');
 const { harvestYouTubeDaily } = require('./youtubeChannel');
+const { harvestYouTubeTastemakersDaily } = require('./youtubeTastemakers');
 const { harvestSoundCloudDaily } = require('./soundcloudChannel');
 const { harvestUSIndieDaily } = require('./usIndieChannel');
 const { evaluateCandidateTrack, getMasterStats } = require('../utils/masterDb');
@@ -59,19 +60,20 @@ async function runDailyRadar(options = {}) {
     rawCandidates = usItems;
     console.log(`\n[Radar Engine] Aggregated ${rawCandidates.length} raw US candidates.`);
   } else {
-    // 1. Run all 6 discovery channels in parallel
-    console.log("[Radar Engine] Launching multi-channel open-web discovery (6 channels)...");
-    const [bandcampItems, mbItems, blogItems, deezerItems, youtubeItems, soundcloudItems] = await Promise.all([
+    // 1. Run all 7 discovery channels in parallel
+    console.log("[Radar Engine] Launching multi-channel open-web discovery (7 channels)...");
+    const [bandcampItems, mbItems, blogItems, deezerItems, youtubeItems, ytTastemakerItems, soundcloudItems] = await Promise.all([
       harvestBandcampDaily(config, exclusions).catch(e => { console.error("[Bandcamp] Error:", e.message); return []; }),
       harvestMusicBrainzDaily(config, exclusions).catch(e => { console.error("[MusicBrainz] Error:", e.message); return []; }),
       harvestBlogsDaily(config, exclusions).catch(e => { console.error("[Blogs] Error:", e.message); return []; }),
       harvestDeezerDaily(config, exclusions).catch(e => { console.error("[Deezer] Error:", e.message); return []; }),
       harvestYouTubeDaily(config, exclusions).catch(e => { console.error("[YouTube] Error:", e.message); return []; }),
+      harvestYouTubeTastemakersDaily(config, exclusions).catch(e => { console.error("[YouTube Tastemakers] Error:", e.message); return []; }),
       harvestSoundCloudDaily(config, exclusions).catch(e => { console.error("[SoundCloud] Error:", e.message); return []; })
     ]);
 
-    rawCandidates = [...bandcampItems, ...mbItems, ...blogItems, ...deezerItems, ...youtubeItems, ...soundcloudItems];
-    console.log(`\n[Radar Engine] Aggregated ${rawCandidates.length} raw candidates across all 6 channels.`);
+    rawCandidates = [...bandcampItems, ...mbItems, ...blogItems, ...deezerItems, ...youtubeItems, ...ytTastemakerItems, ...soundcloudItems];
+    console.log(`\n[Radar Engine] Aggregated ${rawCandidates.length} raw candidates across all 7 channels.`);
   }
 
   // 2. Evaluate against Clean Track Integrity & Master SQLite Memory
