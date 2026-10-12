@@ -13,3 +13,7 @@ data/*
 *.log
 npm-debug.log*
 .DS_Store
+
+# Local Crawler Runtime Telemetry
+saved_searches/crawler_analytics.json
+
