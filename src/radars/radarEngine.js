@@ -96,7 +96,11 @@ async function runDailyRadar(options = {}) {
     item.title = parsed.title;
 
     // B. Clean Track Integrity Filter (EveryNoise rule)
-    if (!isCleanTrack(item.artist, item.title, exclusions.negativeKeywords, exclusions.bannedArtists)) {
+    const itemMetadataText = `${item.artist} ${item.title} ${item.channel || ''} ${item.genre || ''} ${item.description || ''}`;
+    const hasBannedGenre = (exclusions.bannedGenres || []).some(bg => itemMetadataText.toLowerCase().includes(bg.toLowerCase()));
+    const hasBannedArtist = (exclusions.bannedArtists || []).some(ba => itemMetadataText.toLowerCase().includes(ba.toLowerCase()));
+
+    if (hasBannedGenre || hasBannedArtist || !isCleanTrack(item.artist, item.title, exclusions.negativeKeywords, exclusions.bannedArtists)) {
       uncleanFiltered++;
       console.log(`  [x] Filtered Unclean Track: "${item.artist} - ${item.title}" [${item.channel}]`);
       continue;

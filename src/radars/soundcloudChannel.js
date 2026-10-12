@@ -95,7 +95,28 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
           continue;
         }
 
-        // Reject banned genres (e.g. Hip-hop & Rap, Electronic, EDM, Trap, Dream Pop)
+        // Reject titles that are pure dates (e.g. "Oct 9, 2026")
+        if (/^\s*(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|september|oct|october|nov|november|dec|december)\s+\d{1,2},?\s*(20\d\d)?\s*$/i.test(rawTitle) ||
+            /^\s*\d{1,2}[./-]\d{1,2}([./-]\d{2,4})?\s*$/.test(rawTitle)) {
+          continue;
+        }
+
+        // Reject radio shows / broadcast announcements
+        if (/\b(operation\s*xray|radio\s*(station|broadcast|announcement|show|set)?|airplay\s*log)\b/i.test(fullText)) {
+          continue;
+        }
+
+        // Reject DarkPop genre
+        if (/\b(dark\s*pop|darkpop)\b/i.test(fullText)) {
+          continue;
+        }
+
+        // Reject vulgarity in title
+        if (/\b(bitch|bitches|fuck|fucking|shit|shitty|nigga|asshole|cunt)\b/i.test(rawTitle)) {
+          continue;
+        }
+
+        // Reject banned genres (e.g. Hip-hop & Rap, Electronic, EDM, Trap, Dream Pop, DarkPop)
         const genreAndTags = `${genre} ${tags}`;
         if (bannedGenres.some(bg => genreAndTags.includes(bg.toLowerCase()))) {
           continue;

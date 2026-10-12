@@ -18,6 +18,36 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
   const AI_REGEX = /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover))\b/i;
   const PODCAST_ESSAY_REGEX = /\b(podcast|investigating|documentary|video\s+essay|tutorial|how\s+to|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i;
   const RETRO_DATE_REGEX = /\b(released|out\s+now|album\s+out|ep\s+out|available\s+since)\s+(on\s+)?(january|february|march|april|may|june|july|august|september)\s+\d{1,2},?\s+20\d\d\b/i;
+  const SOUTH_ASIAN_CHANNELS = /\b(india|indian|bollywood|tollywood|kollywood|punjabi|desi|bhangra|t-series|zee\s*music|think\s*music|aditya\s*music|speed\s*records|yrf|tips\s*official)\b/i;
+
+  function isRetroRelease(text, maxDaysOld = 21) {
+    if (!text) return false;
+    const isoMatch = text.match(/\b(20\d\d)-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])\b/);
+    if (isoMatch) {
+      const d = new Date(isoMatch[0]);
+      if (!isNaN(d.getTime())) {
+        const daysDiff = (Date.now() - d.getTime()) / (1000 * 60 * 60 * 24);
+        if (daysDiff > maxDaysOld) return true;
+      }
+    }
+    const dmyMatch = text.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+(20\d\d)\b/i);
+    if (dmyMatch) {
+      const d = new Date(`${dmyMatch[2]} ${dmyMatch[1]}, ${dmyMatch[3]}`);
+      if (!isNaN(d.getTime())) {
+        const daysDiff = (Date.now() - d.getTime()) / (1000 * 60 * 60 * 24);
+        if (daysDiff > maxDaysOld) return true;
+      }
+    }
+    const mdyMatch = text.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(20\d\d)\b/i);
+    if (mdyMatch) {
+      const d = new Date(`${mdyMatch[1]} ${mdyMatch[2]}, ${mdyMatch[3]}`);
+      if (!isNaN(d.getTime())) {
+        const daysDiff = (Date.now() - d.getTime()) / (1000 * 60 * 60 * 24);
+        if (daysDiff > maxDaysOld) return true;
+      }
+    }
+    return false;
+  }
 
   console.log(`[YouTube Channel] Scanning YouTube live video premieres uploaded in the last 24h...`);
 
@@ -77,7 +107,16 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
           // 1c. Reject clickbait question / sensationalist punctuation in title (? or !?)
           if (/\?|!{2,}|\?!|!\?/.test(rawTitle)) continue;
 
-          // 2. Reject negative keywords, AI generated flags, and podcasts/essays
+          // 1d. Reject titles that are pure dates (e.g. "Oct 9, 2026")
+          if (/^\s*(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|september|oct|october|nov|november|dec|december)\s+\d{1,2},?\s*(20\d\d)?\s*$/i.test(rawTitle) ||
+              /^\s*\d{1,2}[./-]\d{1,2}([./-]\d{2,4})?\s*$/.test(rawTitle)) {
+            continue;
+          }
+
+          // 1e. Reject South Asian / Indian mainstream promo channels (Think Music India, T-Series, etc.)
+          if (SOUTH_ASIAN_CHANNELS.test(channelName)) continue;
+
+          // 2. Reject negative keywords, AI generated flags, podcasts, and past album releases
           const fullText = `${rawTitle} ${channelName} ${descSnippet} ${badges} ${detailedMetadata}`;
 
           // Check banned artists & channels
@@ -86,11 +125,17 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
           // Check built-in AI patterns
           if (AI_REGEX.test(fullText)) continue;
 
+          // Check DarkPop genre
+          if (/\b(dark\s*pop|darkpop)\b/i.test(fullText)) continue;
+
+          // Check radio show / broadcast
+          if (/\b(operation\s*xray|radio\s*(station|broadcast|announcement|show|set)?|airplay\s*log)\b/i.test(fullText)) continue;
+
           // Check built-in podcast/tutorial/video essay patterns
           if (PODCAST_ESSAY_REGEX.test(fullText)) continue;
 
-          // Check retro/past release dates stated in description
-          if (RETRO_DATE_REGEX.test(descSnippet)) continue;
+          // Check retro/past release dates stated in description (> 21 days old)
+          if (isRetroRelease(descSnippet) || RETRO_DATE_REGEX.test(descSnippet)) continue;
 
           // Check negative keywords
           if (hasNegativeKeywords(fullText, negativeKeywords)) continue;

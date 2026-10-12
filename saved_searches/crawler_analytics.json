@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-10-09T16:28:46.343Z",
+  "generatedAt": "2026-10-11T16:43:23.265Z",
   "summary": {
     "totalCrawlers": 13,
-    "systemNewToday": 13,
+    "systemNewToday": 0,
     "systemNewWeek": 150,
     "systemNewAllTime": 713,
     "systemTotalRuns": 81,
@@ -21,8 +21,8 @@
       "lastRunNewAdded": 17,
       "stats": {
         "today": {
-          "runs": 1,
-          "newSongs": 5
+          "runs": 0,
+          "newSongs": 0
         },
         "past7Days": {
           "runs": 1,
@@ -44,7 +44,7 @@
         "badge": "success",
         "recommendation": "Operating normally with consistent discoveries.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 0
+        "daysSinceLastRun": 2
       },
       "recentRunHistory": [
         {
@@ -63,8 +63,8 @@
       "lastRunNewAdded": 15,
       "stats": {
         "today": {
-          "runs": 1,
-          "newSongs": 8
+          "runs": 0,
+          "newSongs": 0
         },
         "past7Days": {
           "runs": 1,
@@ -86,7 +86,7 @@
         "badge": "success",
         "recommendation": "Operating normally with consistent discoveries.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 0
+        "daysSinceLastRun": 2
       },
       "recentRunHistory": [
         {
@@ -113,8 +113,8 @@
           "newSongs": 18
         },
         "past30Days": {
-          "runs": 12,
-          "newSongs": 76
+          "runs": 11,
+          "newSongs": 55
         },
         "allTime": {
           "runs": 15,
@@ -128,7 +128,7 @@
         "badge": "success",
         "recommendation": "High performer! Added 18 new tracks in the past 7 days.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 1
+        "daysSinceLastRun": 3
       },
       "recentRunHistory": [
         {
@@ -186,7 +186,7 @@
         "badge": "success",
         "recommendation": "Operating normally with consistent discoveries.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 1
+        "daysSinceLastRun": 3
       },
       "recentRunHistory": [
         {
@@ -221,8 +221,8 @@
           "newSongs": 68
         },
         "past30Days": {
-          "runs": 9,
-          "newSongs": 263
+          "runs": 7,
+          "newSongs": 202
         },
         "allTime": {
           "runs": 10,
@@ -236,7 +236,7 @@
         "badge": "success",
         "recommendation": "High performer! Added 68 new tracks in the past 7 days.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 1
+        "daysSinceLastRun": 3
       },
       "recentRunHistory": [
         {
@@ -294,7 +294,7 @@
         "badge": "success",
         "recommendation": "Operating normally with consistent discoveries.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 1
+        "daysSinceLastRun": 3
       },
       "recentRunHistory": [
         {
@@ -352,7 +352,7 @@
         "badge": "success",
         "recommendation": "Operating normally with consistent discoveries.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 1
+        "daysSinceLastRun": 3
       },
       "recentRunHistory": [
         {
@@ -395,7 +395,7 @@
           "newSongs": 11
         },
         "past30Days": {
-          "runs": 10,
+          "runs": 9,
           "newSongs": 21
         },
         "allTime": {
@@ -410,7 +410,7 @@
         "badge": "success",
         "recommendation": "High performer! Added 11 new tracks in the past 7 days.",
         "consecutiveZeros": 1,
-        "daysSinceLastRun": 1
+        "daysSinceLastRun": 3
       },
       "recentRunHistory": [
         {
@@ -453,7 +453,7 @@
           "newSongs": 0
         },
         "past30Days": {
-          "runs": 6,
+          "runs": 5,
           "newSongs": 3
         },
         "allTime": {
@@ -468,7 +468,7 @@
         "badge": "info",
         "recommendation": "No new songs this week, but normal for bi-weekly / monthly release patterns.",
         "consecutiveZeros": 1,
-        "daysSinceLastRun": 1
+        "daysSinceLastRun": 3
       },
       "recentRunHistory": [
         {
@@ -511,8 +511,8 @@
           "newSongs": 7
         },
         "past30Days": {
-          "runs": 5,
-          "newSongs": 45
+          "runs": 3,
+          "newSongs": 27
         },
         "allTime": {
           "runs": 5,
@@ -526,7 +526,7 @@
         "badge": "success",
         "recommendation": "Operating normally with consistent discoveries.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 1
+        "daysSinceLastRun": 3
       },
       "recentRunHistory": [
         {
@@ -584,7 +584,7 @@
         "badge": "success",
         "recommendation": "Operating normally with consistent discoveries.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 1
+        "daysSinceLastRun": 3
       },
       "recentRunHistory": [
         {
@@ -638,7 +638,7 @@
         "badge": "success",
         "recommendation": "High performer! Added 17 new tracks in the past 7 days.",
         "consecutiveZeros": 0,
-        "daysSinceLastRun": 1
+        "daysSinceLastRun": 3
       },
       "recentRunHistory": [
         {

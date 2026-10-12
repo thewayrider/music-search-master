@@ -157,13 +157,14 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
     return false;
   }
 
-  // 3c. Reject clear non-English titles (French, Spanish, German, Portuguese, Turkish stopwords and phrases)
+  // 3c. Reject clear non-English titles (French, Spanish, German, Portuguese, Turkish, Dutch, South Asian stopwords and phrases)
   const foreignLanguagePhrases = [
     /\b(quand\s+tu|quand\s+passes|c'est|dans\s+la|avec\s+toi|pour\s+moi|sur\s+la|les\s+yeux|je\s+suis|tu\s+es|mon\s+amour|au\s+revoir|sans\s+toi|d'un|d'une|l'amour)\b/i,
     /\b(vizinha|gostosa|virado|dias\s+virado|corazon|te\s+quiero|para\s+ti|por\s+favor|sin\s+ti|todo\s+el|lo\s+que|el\s+amor|la\s+vida|los\s+ojos|nada\s+mas|que\s+te|yo\s+no|esta\s+noche|del\s+sur|una\s+vez|malos?\s+vicios?|vicios?|buenas\s+noches|buenos\s+dias|cancion|canciones)\b/i,
     /\b(ich\s+sehe|ich\s+habe|ich\s+bin|ich\s+will|du\s+bist|wir\s+sind|nicht|dich|mich|weltzeituhr|sehe\s+dich|liebe\s+dich|wenn\s+du|mein\s+herz|meine\s+liebe|ohne\s+dich|mit\s+dir|fur\s+immer|für\s+immer|auf\s+wiedersehen|guten\s+morgen|guten\s+abend|alles\s+gut)\b/i,
     /\b(dikenli|değilsin|degilsin|benim|senin|icin|için|nasıl|gibi|kadar|çünkü|böyle|radyo|şarkı|dünya|tel)\b/i,
-    /\b(dil|muskuraye|bandeya|pyaar|ishq|tere|meri|mera|tujhe|humsafar|zindagi|saath|kaho|suno|tum|hum|aaj|yaad|kahani|geet|gaana|aashiqui|mohabbat|deewana|shreya|arijit|armaan)\b/i,
+    /\b(dil|muskuraye|bandeya|pyaar|ishq|tere|meri|mera|tujhe|humsafar|zindagi|saath|kaho|suno|tum|hum|aaj|yaad|kahani|geet|gaana|aashiqui|mohabbat|deewana|shreya|arijit|armaan|naqaab|avaam|awaam|bandh|chesko|dasagriva|chalte|raat|kabhi|jaane|nachle|dhol|chupke|desi|bollywood|tollywood)\b/i,
+    /\b(het|een|voor|niet|zijn|naar|over|door|geen|hebben|alle|deze|maar|veel|onze|jullie|waren|wordt|worden|heeft|nederland|vlaams|dutch)\b/i,
     /\b(mc\s+[a-z]|speed\s*\+|speed\s*\+\s*grave|grave|mtg|funk\s*bh|funk\s*rj|brega|piseiro)\b/i
   ];
   if (foreignLanguagePhrases.some(rgx => rgx.test(fullText))) {
@@ -184,9 +185,11 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
     /\b(podcast|interview|review|track-by-track|q&a|reaction|reactions|reacting)\b/i,
     /\b(investigating|documentary|video\s+essay|tutorial|how\s+to|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i,
     /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover))\b/i,
-    /\b(radio\s*(show|broadcast|set)?|operator\s*radio|nts\s*(radio|latest)?|dj\s*set|takeover\s*show)\b/i,
+    /\b(dark\s*pop|darkpop)\b/i,
+    /\b(bitch|bitches|fuck|fucking|shit|shitty|nigga|asshole|cunt)\b/i,
+    /\b(operation\s*xray|radio\s*(station|broadcast|announcement|show|set)?|nts\s*radio|airplay\s*log)\b/i,
     /\b(show\s*[—–-]\s*number|show\s*#|episode\s*\d+|number\s*\d{2,4})\b/i,
-    /\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+20\d\d\b/i,
+    /\b(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|september|oct|october|nov|november|dec|december)\s+\d{1,2},?\s+20\d\d\b/i,
     /\bw\s*\/\s*[a-z0-9]/i,
     /\b(hell-o-ween|halloween|xmas|christmas|holiday edition)\b/i
   ];
@@ -197,6 +200,12 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
 
   // 4c. Reject clickbait questions and sensationalist punctuation in title (? or !?)
   if (/\?|!{2,}|\?!|!\?/.test(t)) {
+    return false;
+  }
+
+  // 4d. Reject titles that are pure dates (e.g. "Oct 9, 2026", "11/10/2026" radio airplay logs)
+  if (/^\s*(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|september|oct|october|nov|november|dec|december)\s+\d{1,2},?\s*(20\d\d)?\s*$/i.test(t) ||
+      /^\s*\d{1,2}[./-]\d{1,2}([./-]\d{2,4})?\s*$/.test(t)) {
     return false;
   }
 
@@ -249,7 +258,7 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
   // 10. Reject internet slang, unspaced run-on words, and textisms
   const slangPatterns = [
     /\b(ur|pls|plz|thx|imma|gimme|wanna|idk|ngl|tbh|saddisfaction)\b/i,
-    /\b(youre|dont|cant|wont|didnt|couldnt|shouldnt|isnt|arent)\b/i,
+    /\b(theyre|youre|dont|cant|wont|didnt|couldnt|shouldnt|isnt|arent|aint)\b/i,
     /\b(mc\s+[a-z]|speed\s*\+|sped\s*up|slowed|reverb|nightcore|grave)\b/i,
     /\b(psalm|gospel|worship|radyo)\b/i,
     /\bby\s+[a-z0-9\s]+$/i,
