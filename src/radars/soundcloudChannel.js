@@ -78,7 +78,34 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
         const uploader = item.user?.username || "";
         const genre = (item.genre || "").toLowerCase();
         const tags = (item.tag_list || "").toLowerCase();
-        const fullText = `${uploader} ${rawTitle} ${genre} ${tags}`;
+        const trackDesc = item.description || "";
+        const fullText = `${uploader} ${rawTitle} ${genre} ${tags} ${trackDesc}`;
+
+        // Credibility check 1: Reject zero/low-follower throwaways and bots (minimum 50 followers)
+        const user = item.user || {};
+        const followers = user.followers_count || 0;
+        const trackCount = user.track_count || 0;
+        const minFollowers = channelConfig.minFollowers !== undefined ? channelConfig.minFollowers : 50;
+
+        if (followers < minFollowers) {
+          continue;
+        }
+
+        // Credibility check 2: Reject spam content farms dumping hundreds of tracks with low following
+        // e.g. 714 tracks with 43 followers (ratio > 3:1 with > 25 tracks, or > 40 tracks with < 150 followers)
+        if ((trackCount > 40 && followers < 150) || (trackCount > 25 && (trackCount / Math.max(1, followers)) > 3)) {
+          continue;
+        }
+
+        // Credibility check 3: Reject keyword-stuffed titles (e.g. "(Indie Rock)" appended)
+        if (/\((indie|alternative|alt|garage|punk|surf|psych|math)\s*rock\)\s*$/i.test(rawTitle)) {
+          continue;
+        }
+
+        // Reject type beats and producer instrumental packs
+        if (/\b(type\s*beat|beat\s*pack|free\s*beat|instrumental\s*beat)\b/i.test(rawTitle)) {
+          continue;
+        }
 
         // Reject banned artists (e.g. Cryptid Park)
         if (bannedArtists.some(b => fullText.toLowerCase().includes(b.toLowerCase()))) {
