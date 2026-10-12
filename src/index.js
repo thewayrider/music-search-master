@@ -7,6 +7,7 @@ const { getPreviousReport, getNewAdditions } = require('./utils/diffEngine');
 const { sendEmailNotification } = require('./utils/emailNotifier');
 const { aggregateCrawlerMetrics } = require('./utils/metricsAggregator');
 const { syncMetricsToGist } = require('./utils/gistSync');
+const { verifyRelease, verifyReleasesBatch } = require('./services/releaseVerifier');
 
 // Resilient on-demand lazy loader for weekly crawler agents
 function loadAgentSafely(agentName, relativePath) {
@@ -46,7 +47,57 @@ async function main() {
         return;
     }
 
-    // 3. Weekly Crawler runner via configuration file
+    // 3. Standalone Verify on existing JSON file
+    if (args.includes('--verify') && !args.some(a => a.startsWith('configs/'))) {
+        const fileTarget = args.find(a => !a.startsWith('--'));
+        if (!fileTarget) {
+            console.log(`
+========================================================
+🔍 TWO-STAGE RELEASE VERIFIER
+========================================================
+Usage:
+  node src/index.js --verify <path-to-saved-search.json>
+Example:
+  node src/index.js --verify saved_searches/amrap_indie_discovery/amrap_indie_discovery_base.json
+Or run unit tests:
+  node testVerifier.js
+========================================================
+`);
+            return;
+        }
+        const targetPath = path.resolve(process.cwd(), fileTarget);
+        if (!fs.existsSync(targetPath)) {
+            console.error(`\nERROR: Target file not found at ${targetPath}\n`);
+            return;
+        }
+        const rawContent = JSON.parse(fs.readFileSync(targetPath, 'utf8'));
+        const items = Array.isArray(rawContent) ? rawContent : [rawContent];
+        console.log(`\n========================================================`);
+        console.log(`🔍 VERIFYING RELEASES: ${path.basename(targetPath)} (${items.length} items)`);
+        console.log(`========================================================\n`);
+        const verifiedItems = await verifyReleasesBatch(items);
+        const passed = verifiedItems.filter(i => i.isVerified);
+        const rejected = verifiedItems.filter(i => !i.isVerified);
+        console.log(`\n========================================================`);
+        console.log(`📊 VERIFICATION REPORT`);
+        console.log(`========================================================`);
+        console.log(`Total Inspected: ${verifiedItems.length}`);
+        console.log(`✅ Passed:        ${passed.length}`);
+        console.log(`❌ Filtered:      ${rejected.length}`);
+        console.log(`========================================================\n`);
+        passed.forEach(p => {
+            console.log(`  ✅ [${p.verification?.country_code || 'PASS'}] ${p.title} (${p.verification?.confidence_note || 'Verified'})`);
+        });
+        if (rejected.length > 0) {
+            console.log(`\nFiltered out:`);
+            rejected.forEach(r => {
+                console.log(`  ❌ ${r.title} — ${r.verification?.confidence_note || 'Rejected'}`);
+            });
+        }
+        return;
+    }
+
+    // 4. Weekly Crawler runner via configuration file
     const configArg = args.find(a => !a.startsWith('--'));
     if (!configArg) {
         console.log(`
@@ -56,14 +107,15 @@ async function main() {
 Usage:
   node src/index.js --radar-global [--dry-run]   Run 24h Global Radar
   node src/index.js --radar-us [--dry-run]       Run 24h US Tastemaker Radar
-  node src/index.js <config-file>                Run a weekly crawler
+  node src/index.js <config-file> [--verify]     Run a weekly crawler (optional verifier)
+  node src/index.js --verify <json-file>         Verify releases in a saved search file
   node src/index.js --stats                      Show master catalog metrics
   node src/server.js                             Start Fleet Command Center
 
 Examples:
-  node src/index.js configs/bandcamp_indie.json
+  node src/index.js configs/bandcamp_indie.json --verify
   node src/index.js configs/amrap_indie.json
-  node src/index.js --radar-global --dry-run
+  node src/index.js --verify saved_searches/amrap_indie_discovery/latest.json
 ========================================================
 `);
         return;
@@ -196,10 +248,23 @@ Examples:
 
     console.log(`[Diff Engine] Found ${newSongs.length} totally new songs since the last run.`);
 
-    const songsToSave = newSongs;
+    let songsToSave = newSongs;
+
+    const shouldVerify = args.includes('--verify') || config.verifyReleases === true;
+    if (shouldVerify && newSongs.length > 0) {
+        console.log(`\n[Verifier] Running Two-Stage Verification on ${newSongs.length} newly detected additions...`);
+        const verifiedSongs = await verifyReleasesBatch(newSongs, {
+            targetRegions: config.targetRegions || ['AU', 'NZ', 'IE'],
+            releaseWindowDays: config.releaseWindowDays || 14
+        });
+        const passedSongs = verifiedSongs.filter(s => s.isVerified);
+        const filteredCount = verifiedSongs.length - passedSongs.length;
+        console.log(`[Verifier] Complete: ${passedSongs.length} verified, ${filteredCount} filtered (reissues/non-target acts).\n`);
+        songsToSave = passedSongs;
+    }
 
     // Send email alert
-    await sendEmailNotification(newSongs, baseHtmlPath, searchName);
+    await sendEmailNotification(songsToSave, baseHtmlPath, searchName);
 
     // Save JSON & HTML
     fs.writeFileSync(jsonPath, JSON.stringify(songsToSave, null, 2));

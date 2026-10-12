@@ -140,6 +140,22 @@ class FleetManager {
         lastDurationMs: null,
         logs: []
       },
+      'triplejunearthed-weekly': {
+        id: 'triplejunearthed-weekly',
+        name: 'Triple J Unearthed',
+        description: 'New Australian indie discoveries and debuts from Triple J Unearthed',
+        market: 'WEEKLY',
+        schedule: 'Mon, Wed, Fri at 02:00 PM',
+        command: 'node',
+        args: ['src/index.js', 'configs/triplej_unearthed_indie.json'],
+        cwd: this.projectRoot,
+        state: 'idle',
+        lastRunStartedAt: null,
+        lastRunFinishedAt: null,
+        lastExitCode: null,
+        lastDurationMs: null,
+        logs: []
+      },
       'aircharts-weekly': {
         id: 'aircharts-weekly',
         name: 'AIR Independent Charts',
@@ -291,11 +307,21 @@ class FleetManager {
     }
   }
 
+  _resolveService(serviceId) {
+    if (!serviceId) return null;
+    if (this.services[serviceId]) return this.services[serviceId];
+    if (this.services[`${serviceId}-weekly`]) return this.services[`${serviceId}-weekly`];
+    if (this.services[`${serviceId}-radar`]) return this.services[`${serviceId}-radar`];
+    const stripped = serviceId.replace(/-weekly$/, '').replace(/-radar$/, '');
+    if (this.services[stripped]) return this.services[stripped];
+    return null;
+  }
+
   getServiceLogs(serviceId) {
-    const service = this.services[serviceId];
+    const service = this._resolveService(serviceId);
     if (!service) return { error: `Service '${serviceId}' not found.` };
     return {
-      serviceId,
+      serviceId: service.id,
       name: service.name,
       state: service.state,
       logs: service.logs
@@ -303,7 +329,7 @@ class FleetManager {
   }
 
   triggerService(serviceId) {
-    const service = this.services[serviceId];
+    const service = this._resolveService(serviceId);
     if (!service) {
       return { success: false, error: `Service '${serviceId}' does not exist.` };
     }
@@ -353,7 +379,7 @@ class FleetManager {
       service.lastRunFinishedAt = new Date().toISOString();
       service.lastExitCode = code;
       service.lastDurationMs = durationMs;
-      this.activeProcesses.delete(serviceId);
+      this.activeProcesses.delete(service.id);
 
       this._addLog(service, `[Command Center] Execution finished with exit code ${code} (Duration: ${(durationMs / 1000).toFixed(1)}s)`);
     });
@@ -361,13 +387,15 @@ class FleetManager {
     child.on('error', err => {
       service.state = 'error';
       service.lastExitCode = -1;
-      this.activeProcesses.delete(serviceId);
+      this.activeProcesses.delete(service.id);
       this._addLog(service, `[Command Center] Process failed to spawn: ${err.message}`);
     });
 
+    this.activeProcesses.set(service.id, child);
+
     return {
       success: true,
-      serviceId,
+      serviceId: service.id,
       name: service.name,
       state: 'running',
       startedAt: service.lastRunStartedAt
@@ -375,20 +403,22 @@ class FleetManager {
   }
 
   stopService(serviceId) {
-    const child = this.activeProcesses.get(serviceId);
+    const service = this._resolveService(serviceId);
+    if (!service) {
+      return { success: false, error: `Service '${serviceId}' not found.` };
+    }
+
+    const child = this.activeProcesses.get(service.id);
     if (!child) {
-      return { success: false, error: `Service '${serviceId}' is not currently running.` };
+      return { success: false, error: `Service '${service.name}' is not currently running.` };
     }
 
     try {
       child.kill('SIGTERM');
-      const service = this.services[serviceId];
-      if (service) {
-        this._addLog(service, `[Command Center] Termination signal sent by user.`);
-        service.state = 'idle';
-      }
-      this.activeProcesses.delete(serviceId);
-      return { success: true, message: `Terminated service '${serviceId}' successfully.` };
+      this._addLog(service, `[Command Center] Termination signal sent by user.`);
+      service.state = 'idle';
+      this.activeProcesses.delete(service.id);
+      return { success: true, message: `Terminated service '${service.name}' successfully.` };
     } catch (e) {
       return { success: false, error: e.message };
     }

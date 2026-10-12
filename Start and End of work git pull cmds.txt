@@ -1,0 +1,20 @@
+Start of work: git pull
+
+(If you ever get a file conflict or pull error, this 2-line reset is the foolproof way to instantly match GitHub):
+
+git fetch origin
+git reset --hard origin/main
+
+----
+
+FINISH working on a PC (End of session)
+
+git add .
+git commit -m "Update site changes"
+git push origin main
+
+
+
+
+
+

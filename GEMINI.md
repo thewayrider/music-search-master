@@ -34,7 +34,9 @@ music-search-master/
 │   │   ├── radarEngine.js
 │   │   └── usIndieChannel.js
 │   ├── services/
-│   │   └── fleetManager.js        # Child process manager & live streaming logs
+│   │   ├── fleetManager.js        # Child process manager & live streaming logs
+│   │   ├── releaseVerifier.js     # Two-Stage Release Verifier engine (Ollama/Gemini)
+│   │   └── verificationTools.js   # MusicBrainz, iTunes history & clue inspection tools
 │   └── utils/
 │       ├── normalizer.js          # EveryNoise Purity Gate & Title-Casing engine
 │       ├── masterDb.js            # Native Node 24 SQLite operations & heat calculation
@@ -45,6 +47,9 @@ music-search-master/
 ├── launch_command_center.bat      # Standalone Edge app window (--disable-extensions)
 ├── run_daily_radar.bat            # 06:30 AM Global Radar runner
 ├── run_us_radar.bat               # 07:00 AM US Radar runner
+├── run_verifier.bat               # Interactive Two-Stage Verifier suite runner
+├── testVerifier.js                # Standalone verifier test harness (5 test cases)
+├── Two-Stage Release Verifier.txt # Plain text user manual
 ├── run_*.bat                      # Individual crawler runners
 └── package.json                   # All dependencies in one place
 ```
@@ -177,9 +182,41 @@ To guarantee 100% human-curated releases without relying entirely on noisy open 
 
 ---
 
-## 12. Upcoming Architecture Roadmap
+## 12. Integrated In-Process Node Scheduler (`src/services/scheduler.js`)
 
-- **Integrated In-Process Node Scheduler**: Transition from Windows Task Scheduler to an embedded Node scheduler (`node-cron` in `src/server.js`) driven dynamically by `configs/schedules.json`. This will make scheduling 100% self-contained within Git and eliminate OS-level task registration.
-- **US Indie Sources Onboarding**: Continue single-site technical audits and integrations.
+The fleet utilizes an embedded in-process scheduler (`node-cron`) initialized directly inside `src/server.js` (Port 4000) that completely eliminates OS-level Windows Task Scheduler dependencies:
+- **100% Git-Versioned Schedules**: Driven dynamically by `configs/schedules.json` (weekly crawlers) and hardcoded daily radar rules (Global Radar at 06:30 AM, US Edition at 07:00 AM).
+- **Hot-Reloading on API Edit**: When schedules are updated via the Command Center web dashboard (`POST /api/schedule`), `scheduler.reload()` dynamically reschedules in-memory cron timers without restarting the server.
+- **Unified Telemetry**: Tasks run through `fleetManager.triggerService(id)` with execution status, durations, exit codes, and live logs streaming to the dashboard.
+- **REST Endpoints**:
+  - `GET /api/schedules`: Returns all 13 active cron schedules with status and execution metadata.
+  - `POST /api/schedules/reload`: Triggers on-demand reload of all cron timers from disk.
+- **Legacy Cleanup**: A one-time script `clean_windows_tasks.ps1` safely unregisters the old Windows Task Scheduler entries.
+
+---
+
+## 13. Two-Stage Release Verifier Architecture (`src/services/releaseVerifier.js`)
+
+To prevent non-target acts, back-catalog album cuts, remasters, and anniversary reissues from cluttering the master catalog, the fleet incorporates a hybrid **Two-Stage Release Verifier**:
+
+### Stage 1: Deterministic Fast Sieve (0 MB RAM / Sub-millisecond)
+- **Known Regional Channels**: Automatically approves tracks from verified single-region channels (Triple J Unearthed, Triple J, AMRAP, Air Charts, Roots Mag NZ, Nialler9) if published within the release window (default: 14 days).
+- **Explicit Catalog/Reissue Quarantine**: Immediately rejects tracks containing `"Remaster"`, `"Anniversary Edition"`, `"Reissue"`, `"Live at"`, or `"Demo 199*"`.
+- **Ambiguous Pass-Through**: Routes unverified/open-web items to Stage 2.
+
+### Stage 2: Dual-Safety Verification Loop
+- **Primary Tier (Local Ollama)**: Queries `${OLLAMA_BASE_URL}/api/chat` with tool-calling (`qwen2.5:3b`, `num_ctx: 2048`, `keep_alive: -1`, capped at 3 turns).
+- **Secondary Tier (Cloud Fallback)**: If Ollama is offline or uninstalled, seamlessly falls back to Gemini Flash (`gemini-flash-latest` via `configs/secrets.json`). Node.js runs tool lookups first, feeding verified ground truth to the model in ~1 second with 0 MB local RAM overhead.
+- **Tool Suite (`src/services/verificationTools.js`)**:
+  1. `check_musicbrainz_artist`: MusicBrainz API search with strict 1.1-second rate-limiting queue, custom User-Agent, and geographic resolution across AU, NZ, IE, US, and UK (including Indigenous place names: *Naarm, Meanjin, Gadigal, Tāmaki Makaurau*).
+  2. `check_itunes_release_history`: iTunes Search API comparison to determine if track has older catalog release dates (>14 days).
+  3. `inspect_source_clues`: Demonym scanner and reissue keyword detector.
+
+### Operating & CLI Usage
+- **Interactive Menu**: Double-click `run_verifier.bat` to launch the menu suite.
+- **CLI Verification on Crawler**: `node src/index.js <config-file> --verify` verifies new candidates before archiving or emailing.
+- **Standalone Report Verification**: `node src/index.js --verify <path-to-json-file>`.
+- **Unit Test Suite**: `node testVerifier.js` tests 5 mock scenarios across AU, NZ, UK, reissues, and fresh releases.
+
 
 

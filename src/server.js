@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const fleetManager = require('./services/fleetManager');
+const scheduler = require('./services/scheduler');
 const { aggregateCrawlerMetrics } = require('./utils/metricsAggregator');
 const { syncMetricsToGist } = require('./utils/gistSync');
 
@@ -115,9 +116,27 @@ app.post('/api/schedule', (req, res) => {
       data[index].days = days;
       data[index].time = time;
       fs.writeFileSync(schedulePath, JSON.stringify(data, null, 2));
+
+      // Hot-reload in-process cron scheduler immediately
+      scheduler.reload();
+
       return res.json({ success: true, task: data[index] });
     }
     res.status(404).json({ error: 'Task not found' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 9. In-Process Node Scheduler Status & Hot-Reload
+app.get('/api/schedules', (req, res) => {
+  res.json(scheduler.getScheduleStatus());
+});
+
+app.post('/api/schedules/reload', (req, res) => {
+  try {
+    scheduler.reload();
+    res.json({ success: true, schedules: scheduler.getScheduleStatus() });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -148,7 +167,7 @@ app.use((req, res) => {
 });
 
 // Start listening on 0.0.0.0 for LAN, Lenovo, and Android access
-app.listen(PORT, '0.0.0.0', () => {
+const serverInstance = app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n========================================================`);
   console.log(`🛰️  UNIFIED FLEET COMMAND CENTER IS ONLINE`);
   console.log(`--------------------------------------------------------`);
@@ -156,4 +175,20 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`📱 LAN/Bridge Mode: http://0.0.0.0:${PORT}`);
   console.log(`💾 Master SQLite:   data/master_catalog.sqlite`);
   console.log(`========================================================\n`);
+
+  // Initialize In-Process Cron Scheduler for all Radars & Crawlers
+  scheduler.init();
 });
+
+// Graceful shutdown
+function shutdown(signal) {
+  console.log(`\n[Server] Received ${signal}. Shutting down in-process scheduler...`);
+  scheduler.stopAll();
+  serverInstance.close(() => {
+    console.log('[Server] HTTP server closed. Goodbye!');
+    process.exit(0);
+  });
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
