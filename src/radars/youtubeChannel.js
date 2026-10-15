@@ -15,9 +15,10 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
   const discoveries = [];
   const seenVideoIds = new Set();
 
-  const AI_REGEX = /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer|vocalist|human)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover|video|visualizer|concept|animation|model|art|singer)|sora|veo|hailuo|minimax|hedra|sync\s*labs|flux(\.1)?|leonardo(\.ai)?|riffusion|elevenlabs|midjourney|runway(ml)?|kling(\.ai)?|luma(\.ai)?|pika(\.art)?|comfyui|deforum|stable\s+diffusion|stable\s+audio|neural\s+network|deepfake)\b/i;
+  const AI_REGEX = /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer|vocalist|human)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover|video|visualizer|concept|animation|model|art|singer|vocals)|synthetic\s+(music|vocals)|ai\s+vocals|bllb|billy\s*bayou|nocturnal\s*(records|studios)|nocturnalstudios|luara|raven\s*astrid|viking\s*(music|metal|folk|songs?|warrior)|nordic\s*(dark\s*)?folk|epic\s*viking|\bebm\b|industrial\s+ebm|create\s+your\s+own\s+music\s+video|ai\s*prompt|prompted\s*by|diff-svc|so-vits-svc|weights\.gg|song\s*visualizer|visualizer\s*ai|sora|veo|hailuo|minimax|hedra|sync\s*labs|flux(\.1)?|leonardo(\.ai)?|riffusion|elevenlabs|midjourney|runway(ml)?|kling(\.ai)?|luma(\.ai)?|pika(\.art)?|comfyui|deforum|stable\s+diffusion|stable\s+audio|neural\s+network|deepfake)\b/i;
+  const TV_TALK_SHOW_REGEX = /\b(the\s+tonight\s+show|tonight\s+show|starring\s+jimmy\s+fallon|jimmy\s+fallon|jimmy\s+kimmel(\s+live)?|late\s+night\s+with\s+seth\s+meyers|seth\s+meyers|the\s+late\s+show\s+with\s+stephen\s+colbert|stephen\s+colbert|the\s+late\s+late\s+show|james\s+corden|the\s+daily\s+show|saturday\s+night\s+live|\bsnl\b|good\s+morning\s+america|\bgma\b|the\s+today\s+show|today\s+show|the\s+kelly\s+clarkson\s+show|kelly\s+clarkson\s+show|the\s+jennifer\s+hudson\s+show|jennifer\s+hudson\s+show|the\s+voice|american\s+idol|america's\s+got\s+talent|\bagt\b|britain's\s+got\s+talent|\bbgt\b|the\s+graham\s+norton\s+show|graham\s+norton|later\s+with\s+jools\s+holland|jools\s+holland|live\s+from\s+the\s+tonight\s+show|live\s+on\s+(fallon|kimmel|colbert|seth\s+meyers|corden|snl))\b/i;
   const TYPE_BEAT_REGEX = /\b(type\s*beat|prod\.\s*|producer\s*beat|instrumental\s*beat|free\s+for\s+profit|beat\s*pack|buy\s*1\s*get|drum\s*kit)\b/i;
-  const PODCAST_ESSAY_REGEX = /\b(podcast|investigating|documentary|video\s+essay|tutorial|how\s+to|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i;
+  const PODCAST_ESSAY_REGEX = /\b(podcast|investigating|documentary|video\s+essay|tutorial|how\s+to|making\s+(an?|the|some)\s+(indie|rock|song|track|beat|album|music)|making\s+of|behind\s+the\s+scenes|in\s+the\s+studio|studio\s+vlog|songwriting\s+vlog|lesson|guitar\s+lesson|drum\s+lesson|bass\s+lesson|chord\s+tutorial|production\s+tutorial|masterclass|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i;
   const RETRO_DATE_REGEX = /\b(released|out\s+now|album\s+out|ep\s+out|available\s+since)\s+(on\s+)?(january|february|march|april|may|june|july|august|september)\s+\d{1,2},?\s+20\d\d\b/i;
   const SOUTH_ASIAN_CHANNELS = /\b(india|indian|bollywood|tollywood|kollywood|punjabi|desi|bhangra|t-series|zee\s*music|think\s*music|aditya\s*music|speed\s*records|yrf|tips\s*official)\b/i;
 
@@ -88,6 +89,15 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
           // 1. Reject future scheduled streams/premieres (e.g. Toyah September 11)
           if (v.upcomingEventData) continue;
 
+          // 1a. Reject YouTube Shorts / vertical handheld videos
+          if (v.navigationEndpoint?.reelWatchEndpoint) continue;
+          const navUrl = v.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url || "";
+          if (navUrl.includes('/shorts/')) continue;
+          if ((v.thumbnailOverlays || []).some(to => to.thumbnailOverlayTimeStatusRenderer?.style === 'SHORTS')) continue;
+          if ((v.badges || []).some(b => /shorts?/i.test(b.metadataBadgeRenderer?.label || ''))) continue;
+          const isVertical = (v.thumbnail?.thumbnails || []).some(t => t.width && t.height && t.height >= t.width);
+          if (isVertical) continue;
+
           // 1b. Reject video length > 10 mins or > 1 hour (podcasts, tutorials, full albums, DJ mixes)
           const lengthText = v.lengthText?.simpleText || "";
           if (lengthText) {
@@ -133,11 +143,24 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
           // 1h. Reject South Asian / Indian mainstream promo channels (Think Music India, T-Series, etc.)
           if (SOUTH_ASIAN_CHANNELS.test(channelName)) continue;
 
+          // 1i. Reject TV talk show clips & broadcast performances (Tonight Show, Kimmel, Colbert, etc.)
+          if (TV_TALK_SHOW_REGEX.test(rawTitle) || TV_TALK_SHOW_REGEX.test(channelName)) {
+            continue;
+          }
+
+          // 1j. Reject live broadcast/stage performance clips (e.g. "Live From The Tonight Show", "Live at KEXP")
+          if (/\b(live\s+from|live\s+at|live\s+on|live\s+performance|acoustic\s+session|live\s+session)\b/i.test(rawTitle)) {
+            continue;
+          }
+
           // 2. Reject negative keywords, AI generated flags, podcasts, and past album releases
           const fullText = `${rawTitle} ${channelName} ${descSnippet} ${badges} ${detailedMetadata}`;
 
           // Check banned artists & channels
           if (bannedArtists.some(b => fullText.toLowerCase().includes(b.toLowerCase()))) continue;
+
+          // Check TV talk shows in fullText (description, badges, snippet)
+          if (TV_TALK_SHOW_REGEX.test(fullText)) continue;
 
           // Check built-in AI patterns
           if (AI_REGEX.test(fullText)) continue;
@@ -162,6 +185,21 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
           if (parsed.artist === "Unknown Artist" && channelName && channelName !== "YouTube") {
             // Use channel name if video title only contains song name
             parsed.artist = channelName.replace(/\s*-\s*Topic$/i, '').trim();
+          }
+
+          // If title was formatted as "Song Title - Artist Name" matching the uploading channel, swap them
+          if (channelName && channelName !== "YouTube" && parsed.title.toLowerCase() === channelName.toLowerCase()) {
+            const originalArtist = parsed.artist;
+            parsed.artist = parsed.title;
+            parsed.title = originalArtist;
+          }
+
+          // Re-check parsed artist & title against banned artists
+          if (bannedArtists.some(b => {
+            const bLow = b.toLowerCase().trim();
+            return bLow && (parsed.artist.toLowerCase().includes(bLow) || parsed.title.toLowerCase().includes(bLow));
+          })) {
+            continue;
           }
 
           // Strip accidental duplicate artist at beginning of song title (e.g. "b side tramps — b side tramps ...")

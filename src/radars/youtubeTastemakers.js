@@ -36,6 +36,13 @@ async function fetchChannelRss(channel, maxHours = 36) {
 
     if (!titleMatch || !pubMatch || !idMatch) continue;
 
+    // Reject YouTube Shorts / vertical handheld format (<link ... href=".../shorts/..."/>)
+    const linkMatch = entry.match(/<link\s+[^>]*href=["']([^"']+)["']/i);
+    const linkUrl = linkMatch ? linkMatch[1] : '';
+    if (linkUrl.includes('/shorts/') || entry.includes('/shorts/')) {
+      continue;
+    }
+
     let title = titleMatch[1]
       .replace(/&quot;/g, '"')
       .replace(/&amp;/g, '&')
@@ -47,6 +54,11 @@ async function fetchChannelRss(channel, maxHours = 36) {
     const publishedDate = pubMatch[1].trim();
     const videoId = idMatch[1].trim();
     const description = descMatch ? descMatch[1].trim() : '';
+
+    // Reject vertical handheld / shorts tags
+    if (/#shorts?\b|#vertical\b|\(shorts?\)/i.test(`${title} ${description}`)) {
+      continue;
+    }
 
     if (!isWithinHours(publishedDate, maxHours)) continue;
 
@@ -104,8 +116,8 @@ async function harvestYouTubeTastemakersDaily(config = {}, exclusions = {}) {
 
     const rawTitle = entry.title;
 
-    // Filter out full interviews, podcasts, documentaries, full concerts/live sets, playlists, compilations
-    if (/\b(full\s+performance|full\s+interview|full\s+set|full\s+session|full\s+album|documentary|behind\s+the\s+scenes|podcast|playlist|compilation|sampler)\b/i.test(rawTitle)) {
+    // Filter out TV talk show appearances, full interviews, podcasts, documentaries, full concerts/live sets, playlists, compilations, tutorials, making-of
+    if (/\b(the\s+tonight\s+show|tonight\s+show|jimmy\s+fallon|jimmy\s+kimmel|stephen\s+colbert|the\s+late\s+show|late\s+night\s+with\s+seth\s+meyers|seth\s+meyers|the\s+late\s+late\s+show|james\s+corden|the\s+daily\s+show|saturday\s+night\s+live|\bsnl\b|good\s+morning\s+america|\bgma\b|the\s+today\s+show|today\s+show|the\s+kelly\s+clarkson\s+show|kelly\s+clarkson\s+show|the\s+voice|american\s+idol|live\s+on\s+(fallon|kimmel|colbert|meyers|corden|snl)|live\s+from\s+the\s+tonight\s+show|full\s+performance|full\s+interview|full\s+set|full\s+session|full\s+album|documentary|behind\s+the\s+scenes|in\s+the\s+studio|studio\s+vlog|songwriting\s+vlog|podcast|playlist|compilation|sampler|making\s+(an?|the|some)\s+(indie|rock|song|track|beat|album|music)|making\s+of|how\s+to|tutorial|lesson)\b/i.test(rawTitle)) {
       continue;
     }
 

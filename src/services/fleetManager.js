@@ -255,6 +255,73 @@ class FleetManager {
     };
 
     this.activeProcesses = new Map();
+    this.statusFilePath = path.join(this.projectRoot, 'saved_searches/dashboard_status.json');
+    this._loadPersistedStatus();
+  }
+
+  _loadPersistedStatus() {
+    if (!fs.existsSync(this.statusFilePath)) return;
+    try {
+      const data = JSON.parse(fs.readFileSync(this.statusFilePath, 'utf8'));
+      const STATUS_KEY_MAP = {
+        'global-radar': 'global_radar_daily',
+        'us-radar': 'us_radar_daily',
+        'bandcamp-weekly': 'bandcamp_indie_discovery',
+        'amrap-weekly': 'amrap_indie_discovery',
+        'listenbrainz-weekly': 'listenbrainz_indie_discovery',
+        'musicbrainz-weekly': 'musicbrainz_indie_discovery',
+        'aircharts-weekly': 'air_charts_discovery',
+        'rootsmag-weekly': 'roots_mag',
+        'futuremag-weekly': 'futuremag_indie_discovery',
+        'deezer-weekly': 'deezer_indie_discovery',
+        'nialler9-weekly': 'nialler9_indie_discovery',
+        'triplejunearthed-weekly': 'triple_j_unearthed_discovery',
+        'newreleasesnow-weekly': 'newreleasesnow_indie_discovery'
+      };
+
+      for (const [serviceId, statusKey] of Object.entries(STATUS_KEY_MAP)) {
+        const service = this.services[serviceId];
+        const statusEntry = data[statusKey];
+        if (service && statusEntry && statusEntry.lastRun) {
+          service.lastRunStartedAt = statusEntry.lastRun;
+          service.lastRunFinishedAt = statusEntry.lastRun;
+          service.lastExitCode = statusEntry.status === 'Success' ? 0 : (statusEntry.status === 'Failed' ? 1 : null);
+        }
+      }
+    } catch (err) {
+      console.warn('[FleetManager] Warning loading persisted status:', err.message);
+    }
+  }
+
+  _persistServiceStatus(service, exitCode) {
+    if (!fs.existsSync(this.statusFilePath)) return;
+    try {
+      const STATUS_KEY_MAP = {
+        'global-radar': 'global_radar_daily',
+        'us-radar': 'us_radar_daily',
+        'bandcamp-weekly': 'bandcamp_indie_discovery',
+        'amrap-weekly': 'amrap_indie_discovery',
+        'listenbrainz-weekly': 'listenbrainz_indie_discovery',
+        'musicbrainz-weekly': 'musicbrainz_indie_discovery',
+        'aircharts-weekly': 'air_charts_discovery',
+        'rootsmag-weekly': 'roots_mag',
+        'futuremag-weekly': 'futuremag_indie_discovery',
+        'deezer-weekly': 'deezer_indie_discovery',
+        'nialler9-weekly': 'nialler9_indie_discovery',
+        'triplejunearthed-weekly': 'triple_j_unearthed_discovery',
+        'newreleasesnow-weekly': 'newreleasesnow_indie_discovery'
+      };
+      const key = STATUS_KEY_MAP[service.id];
+      if (!key) return;
+      const data = JSON.parse(fs.readFileSync(this.statusFilePath, 'utf8'));
+      data[key] = {
+        ...(data[key] || {}),
+        name: service.name,
+        lastRun: service.lastRunFinishedAt || new Date().toISOString(),
+        status: exitCode === 0 ? 'Success' : 'Failed'
+      };
+      fs.writeFileSync(this.statusFilePath, JSON.stringify(data, null, 2));
+    } catch (_) {}
   }
 
   getFleetStatus() {
@@ -380,6 +447,8 @@ class FleetManager {
       service.lastExitCode = code;
       service.lastDurationMs = durationMs;
       this.activeProcesses.delete(service.id);
+
+      this._persistServiceStatus(service, code);
 
       this._addLog(service, `[Command Center] Execution finished with exit code ${code} (Duration: ${(durationMs / 1000).toFixed(1)}s)`);
     });

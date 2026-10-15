@@ -98,9 +98,40 @@ async function runDailyRadar(options = {}) {
     item.title = parsed.title;
 
     // B. Clean Track Integrity Filter (EveryNoise rule)
-    const itemMetadataText = `${item.artist} ${item.title} ${item.channel || ''} ${item.genre || ''} ${item.description || ''}`;
-    const hasBannedGenre = (exclusions.bannedGenres || []).some(bg => itemMetadataText.toLowerCase().includes(bg.toLowerCase()));
-    const hasBannedArtist = (exclusions.bannedArtists || []).some(ba => itemMetadataText.toLowerCase().includes(ba.toLowerCase()));
+    // 1. Reject YouTube Shorts / vertical handheld videos
+    if (item.url && item.url.includes('/shorts/')) {
+      uncleanFiltered++;
+      console.log(`  [x] Filtered YouTube Short (Handheld/Vertical): "${item.artist} - ${item.title}"`);
+      continue;
+    }
+    if (/#shorts?\b|#vertical\b|\(shorts?\)/i.test(`${item.title} ${item.description || ''}`)) {
+      uncleanFiltered++;
+      console.log(`  [x] Filtered Handheld/Shorts Tag: "${item.artist} - ${item.title}"`);
+      continue;
+    }
+
+    // 2. Reject TV talk shows & late night broadcast performances
+    const TV_TALK_SHOW_REGEX = /\b(the\s+tonight\s+show|tonight\s+show|starring\s+jimmy\s+fallon|jimmy\s+fallon|jimmy\s+kimmel|stephen\s+colbert|the\s+late\s+show|late\s+night\s+with\s+seth\s+meyers|seth\s+meyers|the\s+late\s+late\s+show|james\s+corden|the\s+daily\s+show|saturday\s+night\s+live|\bsnl\b|good\s+morning\s+america|\bgma\b|the\s+today\s+show|today\s+show|the\s+kelly\s+clarkson\s+show|kelly\s+clarkson\s+show|the\s+voice|american\s+idol|live\s+on\s+(fallon|kimmel|colbert|meyers|corden|snl)|live\s+from\s+the\s+tonight\s+show)\b/i;
+    const fullItemText = `${item.artist} ${item.title} ${item.channel || ''} ${item.description || ''}`;
+    if (TV_TALK_SHOW_REGEX.test(fullItemText)) {
+      uncleanFiltered++;
+      console.log(`  [x] Filtered TV Talk Show / Broadcast: "${item.artist} - ${item.title}" [${item.channel}]`);
+      continue;
+    }
+
+    const genreMetadata = `${item.genre || ''} ${item.description || ''}`.toLowerCase();
+    const hasBannedGenre = (exclusions.bannedGenres || []).some(bg => {
+      const b = bg.toLowerCase().trim();
+      if (!b) return false;
+      const reg = new RegExp(`(^|\\b|[,/&-])${b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\b|[,/&-]|\$)`, 'i');
+      return reg.test(genreMetadata);
+    });
+
+    const hasBannedArtist = (exclusions.bannedArtists || []).some(ba => {
+      const b = ba.toLowerCase().trim();
+      if (!b) return false;
+      return `${item.artist} ${item.title} ${item.channel || ''}`.toLowerCase().includes(b);
+    });
 
     if (hasBannedGenre || hasBannedArtist || !isCleanTrack(item.artist, item.title, exclusions.negativeKeywords, exclusions.bannedArtists)) {
       uncleanFiltered++;

@@ -38,9 +38,14 @@ function sanitizeHeadline(raw) {
   // Strip trailing upload counters like (1), (2)
   s = s.replace(/\s*\(\d+\)$/, '');
 
-  // Clean conversational parentheticals
-  s = s.replace(/\s*\([a-z\s0-9:;,'"-]{4,}\)$/gi, '');
-  s = s.replace(/\s*\([a-z\s0-9:;,'"-]{15,}\)/gi, '');
+  // Clean conversational parentheticals (only if not containing disqualifying markers that isCleanTrack needs to evaluate)
+  const DISQUALIFYING_PAREN_REGEX = /\b(live|session|sessions|acoustic|unplugged|tonight\s*show|fallon|kimmel|colbert|meyers|corden|snl|gma|reissue|remaster|anniversary|deluxe|expanded|edition|remix|rmx|feat\.?|ft\.?|featuring|cover|instrumental|soundtrack|ost|kexp|audiotree|tiny\s*desk)\b/i;
+  s = s.replace(/\s*\(([a-z\s0-9:;,'"-]{4,})\)$/gi, (match, inner) => {
+    return DISQUALIFYING_PAREN_REGEX.test(inner) ? match : '';
+  });
+  s = s.replace(/\s*\(([a-z\s0-9:;,'"-]{15,})\)/gi, (match, inner) => {
+    return DISQUALIFYING_PAREN_REGEX.test(inner) ? match : '';
+  });
 
   // Strip episode/series numbers
   s = s.replace(/#\d+\b/g, '');
@@ -183,8 +188,10 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
     /\b(reissue|re-issue|remaster|remastered|deluxe|anniversary|expanded|edition|bootleg)\b/i,
     /\b(soundtrack|ost|score|instrumental|karaoke|tribute)\b/i,
     /\b(podcast|interview|review|track-by-track|q&a|reaction|reactions|reacting)\b/i,
-    /\b(investigating|documentary|video\s+essay|tutorial|how\s+to|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i,
-    /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover))\b/i,
+    /\b(investigating|documentary|video\s+essay|tutorial|how\s+to|making\s+(an?|the|some)\s+(indie|rock|song|track|beat|album|music)|making\s+of|behind\s+the\s+scenes|in\s+the\s+studio|studio\s+vlog|songwriting\s+vlog|lesson|guitar\s+lesson|drum\s+lesson|bass\s+lesson|chord\s+tutorial|production\s+tutorial|masterclass|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i,
+    /\b(the\s+tonight\s+show|tonight\s+show|jimmy\s+fallon|jimmy\s+kimmel(\s+live)?|stephen\s+colbert|the\s+late\s+show|late\s+night\s+with\s+seth\s+meyers|seth\s+meyers|the\s+late\s+late\s+show|james\s+corden|the\s+daily\s+show|saturday\s+night\s+live|\bsnl\b|good\s+morning\s+america|\bgma\b|the\s+today\s+show|today\s+show|kelly\s+clarkson|jennifer\s+hudson|the\s+voice|american\s+idol|live\s+on\s+(fallon|kimmel|colbert|meyers|corden|snl))\b/i,
+    /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover|vocals)|synthetic\s+(music|vocals)|ai\s+vocals|bllb|billy\s*bayou|nocturnal\s*(records|studios)|nocturnalstudios|luara|raven\s*astrid|viking\s*(music|metal|folk|songs?|warrior)|nordic\s*(dark\s*)?folk|epic\s*viking|\bebm\b|industrial\s+ebm)\b/i,
+    /\b(#?shorts?\b|#vertical\b|\(shorts?\))\b/i,
     /\b(dark\s*pop|darkpop)\b/i,
     /\b(bitch|bitches|fuck|fucking|shit|shitty|nigga|asshole|cunt)\b/i,
     /\b(operation\s*xray|radio\s*(station|broadcast|announcement|show|set)?|nts\s*radio|airplay\s*log)\b/i,

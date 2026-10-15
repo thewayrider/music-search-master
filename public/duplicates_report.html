@@ -1,0 +1,3542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Search Master — Database Duplicate & Flag Audit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(22, 30, 46, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-amber: #f59e0b;
+      --accent-purple: #a855f7;
+      --glass-blur: blur(12px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.08) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-titles h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      background: linear-gradient(135deg, #fff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .header-titles p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+
+    .timestamp {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.8rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: var(--text-muted);
+    }
+
+    /* Stat Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .stat-total::after { background: var(--accent-blue); }
+    .stat-dupe::after { background: var(--accent-red); }
+    .stat-batch::after { background: var(--accent-purple); }
+    .stat-flagged::after { background: var(--accent-amber); }
+    .stat-clean::after { background: var(--accent-green); }
+
+    .stat-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .stat-val {
+      font-size: 2.25rem;
+      font-weight: 800;
+      margin-top: 0.35rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stat-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Controls Bar */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      background: var(--card-bg);
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+    }
+
+    .filters-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: #fff;
+    }
+
+    .filter-btn.active {
+      background: var(--accent-blue);
+      color: #0b0f19;
+      font-weight: 600;
+      border-color: var(--accent-blue);
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 280px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(11, 15, 25, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.5rem 0.8rem 0.5rem 2.2rem;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Candidate Cards */
+    .tracks-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .track-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: 1.25rem;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .track-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(30, 41, 62, 0.75);
+    }
+
+    .track-card.is-dupe {
+      border-left: 4px solid var(--accent-red);
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    .track-card.is-batch {
+      border-left: 4px solid var(--accent-purple);
+      background: rgba(168, 85, 247, 0.05);
+    }
+
+    .track-card.is-flagged {
+      border-left: 4px solid var(--accent-amber);
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    .track-card.is-clean {
+      border-left: 4px solid var(--accent-green);
+    }
+
+    .track-index {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .track-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .track-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .track-artist {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .track-separator {
+      color: var(--text-muted);
+    }
+
+    .track-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #e2e8f0;
+    }
+
+    .badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.2rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .badge-purple {
+      background: rgba(168, 85, 247, 0.2);
+      color: #d8b4fe;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+    }
+
+    .badge-info {
+      background: rgba(56, 189, 248, 0.2);
+      color: #bae6fd;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.2);
+      color: #86efac;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .track-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 0.25rem;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    /* Comparison Box for Duplicate in DB */
+    .db-comparison-box {
+      margin-top: 0.75rem;
+      background: rgba(11, 15, 25, 0.85);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+    }
+
+    .comparison-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #fca5a5;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .comp-field label {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .comp-field span {
+      font-weight: 600;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Actions Column */
+    .track-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-end;
+    }
+
+    .action-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--accent-blue);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.35rem 0.75rem;
+      background: rgba(56, 189, 248, 0.08);
+      border-radius: 6px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .action-link:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-blue);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .track-card {
+        grid-template-columns: 1fr;
+      }
+      .track-actions {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="header-titles">
+      <h1>🎵 Master Catalog Duplicate & Flag Audit</h1>
+      <p>Automated cross-check against <strong>data/master_catalog.sqlite</strong> (1,278 songs, 1,382 sightings) & EveryNoise Purity Gate</p>
+    </div>
+    <div class="timestamp">
+      Audit Ran: 14/10/2026, 2:30:40 pm
+    </div>
+  </header>
+
+  <!-- Metric Overview Cards -->
+  <div class="stats-grid">
+    <div class="stat-card stat-total">
+      <div class="stat-label">Total Examined</div>
+      <div class="stat-val">86</div>
+      <div class="stat-desc">Candidates in input list</div>
+    </div>
+    <div class="stat-card stat-dupe">
+      <div class="stat-label">Master DB Duplicates</div>
+      <div class="stat-val" style="color: var(--accent-red);">2</div>
+      <div class="stat-desc">Already logged in catalog</div>
+    </div>
+    <div class="stat-card stat-batch">
+      <div class="stat-label">Batch Redundancies</div>
+      <div class="stat-val" style="color: var(--accent-purple);">2</div>
+      <div class="stat-desc">Duplicate variants in this file</div>
+    </div>
+    <div class="stat-card stat-flagged">
+      <div class="stat-label">Flagged / Reissues</div>
+      <div class="stat-val" style="color: var(--accent-amber);">15</div>
+      <div class="stat-desc">Anniversaries, live, or filtered</div>
+    </div>
+    <div class="stat-card stat-clean">
+      <div class="stat-label">Clean New Releases</div>
+      <div class="stat-val" style="color: var(--accent-green);">67</div>
+      <div class="stat-desc">Unique & ready to import</div>
+    </div>
+  </div>
+
+  <!-- Filter & Search Controls -->
+  <div class="controls-bar">
+    <div class="filters-group">
+      <button class="filter-btn active" data-filter="all">All Tracks (86)</button>
+      <button class="filter-btn" data-filter="DUPLICATE_IN_DB">🚨 In Master DB (2)</button>
+      <button class="filter-btn" data-filter="BATCH_VARIANT">🔄 Batch Redundancies (2)</button>
+      <button class="filter-btn" data-filter="FLAGGED_FILTERED">🏷️ Flagged / Reissues (15)</button>
+      <button class="filter-btn" data-filter="NEW_CANDIDATE">✨ Clean New Tracks (67)</button>
+    </div>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search artist, title, or genre...">
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <button class="filter-btn" id="copyCleanBtn" title="Copy clean tracks as JSON">📋 Copy Clean JSON</button>
+      <button class="filter-btn" onclick="window.print()" title="Print report">🖨️ Print</button>
+    </div>
+  </div>
+
+  <!-- Track Cards List -->
+  <div class="tracks-list" id="tracksList">
+    
+      <div class="track-card is-batch" data-status="BATCH_VARIANT" data-search="rachael sage & the sequins under my canopy type: album | genres: adult alternative, indie pop, singer-songwriter">
+        <div class="track-index">#1</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Rachael Sage &amp; The Sequins</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Under My Canopy</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-purple" title="Similar or related item in this file: #13 (&quot;Rachael Sage &amp; The Sequins - Canopy&quot;)">Batch Redundancy</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Adult Alternative, Indie Pop, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Similar or related item in this file: #13 (&quot;Rachael Sage &amp; The Sequins - Canopy&quot;)
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/rachael-sage-the-sequins-under-my-canopy" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="suki waterhouse loveland type: album | genres: adult alternative, indie pop, pop">
+        <div class="track-index">#2</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Suki Waterhouse</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Loveland</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Adult Alternative, Indie Pop, Pop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/suki-waterhouse-loveland" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="malcolm todd do that again type: album | genres: indie pop, pop">
+        <div class="track-index">#3</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Malcolm Todd</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Do That Again</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Indie Pop, Pop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/malcolm-todd-do-that-again" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-dupe" data-status="DUPLICATE_IN_DB" data-search="maisie peters florescence type: album | genres: indie pop, pop">
+        <div class="track-index">#4</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Maisie Peters</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Florescence</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-danger" title="Already present in Master Catalog (ID #1085). First logged on 2026-08-21 via triple j. Heat score: 1.">Exact DB Duplicate</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Indie Pop, Pop</div>
+          </div>
+
+          
+            <div class="db-comparison-box">
+              <div class="comparison-title">
+                ⚠️ MATCHED IN MASTER CATALOG (ID #1085)
+              </div>
+              <div class="comparison-grid">
+                <div class="comp-field">
+                  <label>First Seen In Database</label>
+                  <span>2026-08-21</span>
+                </div>
+                <div class="comp-field">
+                  <label>First Channel</label>
+                  <span>triple j</span>
+                </div>
+                <div class="comp-field">
+                  <label>Consensus Heat Score</label>
+                  <span>1 sources</span>
+                </div>
+                <div class="comp-field">
+                  <label>Total Sightings Logged</label>
+                  <span>1 sighting(s)</span>
+                </div>
+              </div>
+            </div>
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/maisie-peters-florescence" target="_blank" class="action-link">Open Source ↗</a>
+          <a href="Worth checking" target="_blank" class="action-link" style="color: #94a3b8; border-color: rgba(255,255,255,0.1); background: transparent;">Original DB Link ↗</a>
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="underscores u type: album | genres: adult alternative, indie pop, pop, synth pop">
+        <div class="track-index">#5</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Underscores</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">U</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-info" title="Artist &quot;Underscores&quot; has 1 other song(s) in catalog: &quot;Unlimited Love&quot; (All New Indie)">Artist Tracked in DB</span><span class="badge badge-warning" title="Title too short (&lt;2 chars)">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Adult Alternative, Indie Pop, Pop, Synth Pop</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Artist &quot;Underscores&quot; has 1 other song(s) in catalog: &quot;Unlimited Love&quot; (All New Indie) | Title too short (&lt;2 chars)
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/underscores-u" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="lykke li the afterparty type: album | genres: rock, adult alternative, indie pop, pop">
+        <div class="track-index">#6</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Lykke Li</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">The Afterparty</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Adult Alternative, Indie Pop, Pop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/lykke-li-the-afterparty" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="miss grit under my umbrella type: album | genres: adult alternative, electronic, indie pop, synth pop">
+        <div class="track-index">#7</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Miss Grit</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Under My Umbrella</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Adult Alternative, Electronic, Indie Pop, Synth Pop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/miss-grit-under-my-umbrella" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="elizabeth and the catapult responsible friend type: album | genres: adult alternative, indie pop, indie rock">
+        <div class="track-index">#8</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Elizabeth And The Catapult</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Responsible Friend</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Adult Alternative, Indie Pop, Indie Rock</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/elizabeth-and-the-catapult-responsible-friend" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="em beihold tales of a failed shapeshifter type: album | genres: indie pop, pop">
+        <div class="track-index">#9</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Em Beihold</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Tales Of A Failed Shapeshifter</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Indie Pop, Pop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/em-beihold-tales-of-a-failed-shapeshifter" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="bird streets the escape artist type: album | genres: rock, adult alternative, indie pop, indie rock">
+        <div class="track-index">#10</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Bird Streets</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">The Escape Artist</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Adult Alternative, Indie Pop, Indie Rock</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/bird-streets-the-escape-artist" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="cavetown running with scissors type: album | genres: indie folk, indie pop, indie rock">
+        <div class="track-index">#11</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Cavetown</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Running With Scissors</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Indie Folk, Indie Pop, Indie Rock</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/cavetown-running-with-scissors" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="lexxi raine the grief case type: album | genres: indie pop, pop">
+        <div class="track-index">#12</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Lexxi Raine</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">The Grief Case</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Indie Pop, Pop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/lexxi-raine-the-grief-case" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-batch" data-status="BATCH_VARIANT" data-search="rachael sage & the sequins canopy type: album | genres: adult alternative, indie pop, singer-songwriter">
+        <div class="track-index">#13</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Rachael Sage &amp; The Sequins</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Canopy</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-purple" title="Similar or related item in this file: #1 (&quot;Rachael Sage &amp; The Sequins - Under My Canopy&quot;)">Batch Redundancy</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Adult Alternative, Indie Pop, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Similar or related item in this file: #1 (&quot;Rachael Sage &amp; The Sequins - Under My Canopy&quot;)
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/rachael-sage-the-sequins-canopy" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="dodie not for lack of trying type: album | genres: adult alternative, indie pop">
+        <div class="track-index">#14</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">dodie</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Not For Lack Of Trying</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Adult Alternative, Indie Pop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/dodie-not-for-lack-of-trying" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="noah floersch francis aquarius type: album | genres: adult alternative, indie pop, singer-songwriter">
+        <div class="track-index">#15</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Noah Floersch</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Francis Aquarius</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Adult Alternative, Indie Pop, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/noah-floersch-francis-aquarius" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="patrick watson uh oh type: album | genres: indie pop, indie rock, rock, singer-songwriter">
+        <div class="track-index">#16</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Patrick Watson</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Uh Oh</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Indie Pop, Indie Rock, Rock, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/patrick-watson-uh-oh" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="ed sheeran play type: album | genres: indie pop, pop, singer-songwriter">
+        <div class="track-index">#17</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Ed Sheeran</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Play</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Indie Pop, Pop, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/ed-sheeran-play" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="king princess girl violence type: album | genres: indie pop, pop">
+        <div class="track-index">#18</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">King Princess</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Girl Violence</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Indie Pop, Pop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/king-princess-girl-violence" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="tom odell a wonderful life type: album | genres: indie pop, indie rock, rock, singer-songwriter">
+        <div class="track-index">#19</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Tom Odell</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">A Wonderful Life</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Indie Pop, Indie Rock, Rock, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/tom-odell-a-wonderful-life" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="laufey a matter of time type: album | genres: contemporary jazz, indie pop, jazz, jazz vocals">
+        <div class="track-index">#20</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Laufey</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">A Matter Of Time</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Contemporary Jazz, Indie Pop, Jazz, Jazz Vocals</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/laufey-a-matter-of-time" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="the kennedys smoketree type: album | genres: americana, folk, indie folk, contemporary folk">
+        <div class="track-index">#21</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">The Kennedys</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Smoketree</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Folk, Indie Folk, Contemporary Folk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/the-kennedys-smoketree" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="buffalo traffic jam pictures of you type: album | genres: rock, americana, indie folk">
+        <div class="track-index">#22</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Buffalo Traffic Jam</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Pictures Of You</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Americana, Indie Folk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/buffalo-traffic-jam-pictures-of-you" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="bandits on the run rough magic type: album | genres: americana, folk, indie folk">
+        <div class="track-index">#23</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Bandits On The Run</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Rough Magic</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Folk, Indie Folk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/bandits-on-the-run-rough-magic" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="john r. miller the great unknowing type: album | genres: americana, folk, indie folk, singer-songwriter">
+        <div class="track-index">#24</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">John R. Miller</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">The Great Unknowing</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Folk, Indie Folk, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/john-r-miller-the-great-unknowing" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="liz lawrence vespers type: album | genres: americana, folk, indie folk, singer-songwriter">
+        <div class="track-index">#25</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Liz Lawrence</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Vespers</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Folk, Indie Folk, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/liz-lawrence-vespers" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="jobi riccio face the feeling type: album | genres: americana, indie folk, indie rock">
+        <div class="track-index">#26</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Jobi Riccio</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Face The Feeling</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Indie Folk, Indie Rock</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/jobi-riccio-face-the-feeling" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="jesca hoop long wave home type: album | genres: americana, indie folk, singer-songwriter">
+        <div class="track-index">#27</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Jesca Hoop</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Long Wave Home</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Indie Folk, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/jesca-hoop-long-wave-home" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="josiah and the bonnevilles as is type: album | genres: rock, americana, indie folk, singer-songwriter">
+        <div class="track-index">#28</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Josiah And The Bonnevilles</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">As Is</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Americana, Indie Folk, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/josiah-and-the-bonnevilles-as-is" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="dermot kennedy weight of the woods type: album | genres: rock, folk, indie folk, singer-songwriter">
+        <div class="track-index">#29</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Dermot Kennedy</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Weight Of The Woods</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Folk, Indie Folk, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/dermot-kennedy-weight-of-the-woods" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="big harp runs to blue type: album | genres: americana, adult alternative, indie folk">
+        <div class="track-index">#30</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Big Harp</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Runs To Blue</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Adult Alternative, Indie Folk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/big-harp-runs-to-blue" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="bahamas my second last album type: album | genres: americana, indie folk, singer-songwriter">
+        <div class="track-index">#31</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Bahamas</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">My Second Last Album</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Indie Folk, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/bahamas-my-second-last-album" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="ruen brothers awooo type: album | genres: americana, indie folk, singer-songwriter">
+        <div class="track-index">#32</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Ruen Brothers</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Awooo</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Indie Folk, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/ruen-brothers-awooo" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="madison cunningham ace type: album | genres: americana, folk, indie folk, singer-songwriter">
+        <div class="track-index">#33</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Madison Cunningham</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Ace</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Folk, Indie Folk, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/madison-cunningham-ace" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="grant-lee phillips in the hour of dust type: album | genres: americana, indie folk, singer-songwriter">
+        <div class="track-index">#34</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Grant-Lee Phillips</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">In The Hour Of Dust</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Indie Folk, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/grant-lee-phillips-in-the-hour-of-dust" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="kingfishr halcyon type: album | genres: americana, contemporary folk, folk, indie folk">
+        <div class="track-index">#35</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Kingfishr</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Halcyon</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Contemporary Folk, Folk, Indie Folk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/kingfishr-halcyon" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="molly tuttle so long little miss sunshine type: album | genres: adult alternative, americana, indie folk">
+        <div class="track-index">#36</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Molly Tuttle</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">So Long Little Miss Sunshine</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Adult Alternative, Americana, Indie Folk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/molly-tuttle-so-long-little-miss-sunshine" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="ethel cain willoughby tucker, i’ll always love you type: album | genres: americana, indie folk, indie rock, singer-songwriter">
+        <div class="track-index">#37</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Ethel Cain</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Willoughby Tucker, I’ll Always Love You</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Failed EveryNoise Purity Gate">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Indie Folk, Indie Rock, Singer-Songwriter</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Failed EveryNoise Purity Gate
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/ethel-cain-willoughby-tucker-ill-always-love-you" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="ken pomeroy cruel joke type: album | genres: americana, contemporary folk, indie folk">
+        <div class="track-index">#38</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Ken Pomeroy</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Cruel Joke</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Americana, Contemporary Folk, Indie Folk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/ken-pomeroy-cruel-joke" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="lux interna new wilderness gospel type: album | genres: alt folk, americana, indie folk">
+        <div class="track-index">#39</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Lux Interna</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">New Wilderness Gospel</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Failed EveryNoise Purity Gate">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Alt Folk, Americana, Indie Folk</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Failed EveryNoise Purity Gate
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/lux-interna-new-wilderness-gospel" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="kodaline we were only young type: album | genres: rock, alternative, adult alternative">
+        <div class="track-index">#40</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Kodaline</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">We Were Only Young</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Adult Alternative</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/kodaline-we-were-only-young" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="dexter and the moonrocks friends that i don't like type: album | genres: rock, alternative">
+        <div class="track-index">#41</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Dexter And The Moonrocks</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Friends That I Don&#039;t Like</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/dexter-and-the-moonrocks-friends-that-i-dont-like" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="elvis costello my aim is true (49th anniversary edition) type: album | genres: rock, alternative, new wave, reissue, box set">
+        <div class="track-index">#42</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Elvis Costello</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">My Aim Is True (49th Anniversary Edition)</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Detected archival/reissue/live/anniversary/greatest hits keywords in metadata.">Reissue / Catalog Cut</span><span class="badge badge-warning" title="Unresolved parentheticals / brackets">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, New Wave, Reissue, Box Set</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Detected archival/reissue/live/anniversary/greatest hits keywords in metadata. | Unresolved parentheticals / brackets
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/elvis-costello-my-aim-is-true-49th-anniversary-edition" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="fea the nerve type: album | genres: rock, alternative, garage, punk">
+        <div class="track-index">#43</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Fea</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">The Nerve</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Garage, Punk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/fea-the-nerve" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="johnny marr the age of everything type: album | genres: rock, alternative, adult alternative">
+        <div class="track-index">#44</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Johnny Marr</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">The Age Of Everything</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Adult Alternative</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/johnny-marr-the-age-of-everything" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="chelsea wolfe the dark type: album | genres: rock, alternative">
+        <div class="track-index">#45</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Chelsea Wolfe</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">The Dark</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/chelsea-wolfe-the-dark" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="brian fallon & the painkillers not bad for new jersey type: album | genres: rock, alternative, adult alternative, garage">
+        <div class="track-index">#46</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Brian Fallon &amp; The Painkillers</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Not Bad For New Jersey</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Adult Alternative, Garage</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/brian-fallon-the-painkillers-not-bad-for-new-jersey" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="the meffs business type: album | genres: rock, alternative, garage, punk">
+        <div class="track-index">#47</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">The Meffs</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Business</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Garage, Punk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/the-meffs-business" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="movements happier now type: album | genres: rock, alternative">
+        <div class="track-index">#48</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Movements</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Happier Now</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/movements-happier-now" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-dupe" data-status="DUPLICATE_IN_DB" data-search="ecca vandal looking for people to unfollow type: album | genres: rock, alternative, punk">
+        <div class="track-index">#49</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Ecca Vandal</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">LOOKING FOR PEOPLE TO UNFOLLOW</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-danger" title="Already present in Master Catalog (ID #618). First logged on 2026-09-04 via ListenBrainz API. Heat score: 1.">Exact DB Duplicate</span><span class="badge badge-warning" title="Excessive all-caps screaming title">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Punk</div>
+          </div>
+
+          
+            <div class="db-comparison-box">
+              <div class="comparison-title">
+                ⚠️ MATCHED IN MASTER CATALOG (ID #618)
+              </div>
+              <div class="comparison-grid">
+                <div class="comp-field">
+                  <label>First Seen In Database</label>
+                  <span>2026-09-04</span>
+                </div>
+                <div class="comp-field">
+                  <label>First Channel</label>
+                  <span>ListenBrainz API</span>
+                </div>
+                <div class="comp-field">
+                  <label>Consensus Heat Score</label>
+                  <span>1 sources</span>
+                </div>
+                <div class="comp-field">
+                  <label>Total Sightings Logged</label>
+                  <span>1 sighting(s)</span>
+                </div>
+              </div>
+            </div>
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Excessive all-caps screaming title
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/ecca-vandal-looking-for-people-to-unfollow" target="_blank" class="action-link">Open Source ↗</a>
+          <a href="Worth checking" target="_blank" class="action-link" style="color: #94a3b8; border-color: rgba(255,255,255,0.1); background: transparent;">Original DB Link ↗</a>
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="mike d thank you type: album | genres: rock, alternative">
+        <div class="track-index">#50</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Mike D</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Thank You</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/mike-d-thank-you" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="the afghan whigs soft control type: album | genres: rock, alternative">
+        <div class="track-index">#51</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">The Afghan Whigs</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Soft Control</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/the-afghan-whigs-soft-control" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="weezer weezer type: album | genres: rock, alternative, adult alternative">
+        <div class="track-index">#52</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Weezer</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Weezer</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Self-titled duplicate (Artist == Title)">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Adult Alternative</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Self-titled duplicate (Artist == Title)
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/weezer-weezer" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="life in sodom night/day type: album | genres: rock, alternative, post punk, goth">
+        <div class="track-index">#53</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Life In Sodom</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Night/Day</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Contains disallowed characters (/ or \)">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Post Punk, Goth</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Contains disallowed characters (/ or \)
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/life-in-sodom-night-day" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="getdown services massive champion type: album | genres: rock, alternative, garage">
+        <div class="track-index">#54</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Getdown Services</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Massive Champion</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Garage</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/getdown-services-massive-champion" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="big d and the kids table good ole american saturday night type: album | genres: rock, alternative, punk, ska">
+        <div class="track-index">#55</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Big D And The Kids Table</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Good Ole American Saturday Night</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Failed EveryNoise Purity Gate">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Punk, Ska</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Failed EveryNoise Purity Gate
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/big-d-and-the-kids-table-good-ole-american-saturday-night" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="the durutti column renascent type: album | genres: rock, alternative, post punk">
+        <div class="track-index">#56</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">The Durutti Column</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Renascent</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Post Punk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/the-durutti-column-renascent" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="green day nimrods the soundtrack type: album | genres: rock, alternative, punk, soundtrack">
+        <div class="track-index">#57</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Green Day</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Nimrods The Soundtrack</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Detected archival/reissue/live/anniversary/greatest hits keywords in metadata.">Reissue / Catalog Cut</span><span class="badge badge-warning" title="Failed EveryNoise Purity Gate">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Punk, Soundtrack</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Detected archival/reissue/live/anniversary/greatest hits keywords in metadata. | Failed EveryNoise Purity Gate
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/green-day-nimrods-the-soundtrack" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="madball not your kingdom type: album | genres: rock, alternative, hardcore">
+        <div class="track-index">#58</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Madball</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Not Your Kingdom</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Hardcore</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/madball-not-your-kingdom" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="front 242 black out type: album | genres: rock, alternative, live, industrial">
+        <div class="track-index">#59</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Front 242</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Black Out</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Live, Industrial</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/front-242-black-out" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="echo & the bunnymen apples for isaac type: album | genres: rock, adult alternative, new wave, post punk">
+        <div class="track-index">#60</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Echo &amp; The Bunnymen</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Apples For Isaac</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Adult Alternative, New Wave, Post Punk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/echo-the-bunnymen-apples-for-isaac" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="interpol this mirror weighs a ton type: album | genres: rock, adult alternative, post punk">
+        <div class="track-index">#61</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Interpol</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">This Mirror Weighs A Ton</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Adult Alternative, Post Punk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/interpol-this-mirror-weighs-a-ton" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="david j tracks from the attic revisited type: album | genres: rock, alternative, post punk, art rock">
+        <div class="track-index">#62</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">David J</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Tracks From the Attic Revisited</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Post Punk, Art Rock</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/david-j-tracks-from-the-attic-revisited" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="talking heads tentative decisions: demos & live type: album | genres: rock, alternative, post punk, box set">
+        <div class="track-index">#63</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Talking Heads</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Tentative Decisions: Demos &amp; Live</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Detected archival/reissue/live/anniversary/greatest hits keywords in metadata.">Reissue / Catalog Cut</span><span class="badge badge-warning" title="Failed EveryNoise Purity Gate">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Post Punk, Box Set</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Detected archival/reissue/live/anniversary/greatest hits keywords in metadata. | Failed EveryNoise Purity Gate
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/talking-heads-tentative-decisions-demos-live" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="sleaford mods the demise of planet x type: album | genres: rock, alternative, club/dance, post punk">
+        <div class="track-index">#64</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Sleaford Mods</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">The Demise Of Planet X</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Club/Dance, Post Punk</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/sleaford-mods-the-demise-of-planet-x" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="various the well: the independent project records collection ii type: album | genres: rock, alternative, adult alternative, post punk, various artists">
+        <div class="track-index">#65</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Various</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">The Well: The Independent Project Records Collection II</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-info" title="Artist &quot;Various&quot; has 1 other song(s) in catalog: &quot;Wolf Creek Soundtrack&quot; (100% Independent Albums)">Artist Tracked in DB</span><span class="badge badge-warning" title="Failed EveryNoise Purity Gate">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Adult Alternative, Post Punk, Various Artists</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Artist &quot;Various&quot; has 1 other song(s) in catalog: &quot;Wolf Creek Soundtrack&quot; (100% Independent Albums) | Failed EveryNoise Purity Gate
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/various-the-well-the-independent-project-records-collection-ii" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="white lies night light type: album | genres: rock, adult alternative, post punk, art rock">
+        <div class="track-index">#66</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">White Lies</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Night Light</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Adult Alternative, Post Punk, Art Rock</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/white-lies-night-light" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="ashes and diamonds are forever type: album | genres: rock, alternative, post punk, goth">
+        <div class="track-index">#67</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Ashes And Diamonds</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Are Forever</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Rock, Alternative, Post Punk, Goth</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/ashes-and-diamonds-are-forever" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="heatmiser mic city sons (30th anniversary edition) type: album | genres: alternative, post punk, reissue, rock">
+        <div class="track-index">#68</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Heatmiser</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Mic City Sons (30th Anniversary Edition)</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Detected archival/reissue/live/anniversary/greatest hits keywords in metadata.">Reissue / Catalog Cut</span><span class="badge badge-warning" title="Unresolved parentheticals / brackets">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Alternative, Post Punk, Reissue, Rock</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Detected archival/reissue/live/anniversary/greatest hits keywords in metadata. | Unresolved parentheticals / brackets
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/heatmiser-mic-city-sons-30th-anniversary-edition" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="jeffrey runnings piqued type: album | genres: alternative, post punk, rock">
+        <div class="track-index">#69</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Jeffrey Runnings</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Piqued</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Alternative, Post Punk, Rock</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/jeffrey-runnings-piqued" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="house of all house of all souls type: album | genres: alternative, post punk, rock">
+        <div class="track-index">#70</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">House Of All</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">House Of All Souls</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Failed EveryNoise Purity Gate">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Alternative, Post Punk, Rock</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Failed EveryNoise Purity Gate
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/house-of-all-house-of-all-souls" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="new model army live so36 type: album | genres: alternative, live, post punk, rock">
+        <div class="track-index">#71</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">New Model Army</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">LIVE SO36</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Detected archival/reissue/live/anniversary/greatest hits keywords in metadata.">Reissue / Catalog Cut</span><span class="badge badge-warning" title="Excessive all-caps screaming title">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Alternative, Live, Post Punk, Rock</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Detected archival/reissue/live/anniversary/greatest hits keywords in metadata. | Excessive all-caps screaming title
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/new-model-army-live-so36" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="hotwax hot shock type: album | genres: alternative, garage, post punk, rock">
+        <div class="track-index">#72</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">HotWax</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Hot Shock</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Alternative, Garage, Post Punk, Rock</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/hotwax-hot-shock" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="the blue aeroplanes magical realism: best of the blue aeroplanes 1985-2025 type: album | genres: adult alternative, alternative, greatest hits, post punk, rock">
+        <div class="track-index">#73</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">The Blue Aeroplanes</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Magical Realism: Best Of The Blue Aeroplanes 1985-2025</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Detected archival/reissue/live/anniversary/greatest hits keywords in metadata.">Reissue / Catalog Cut</span><span class="badge badge-warning" title="Failed EveryNoise Purity Gate">Quality Gate Flag</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Adult Alternative, Alternative, Greatest Hits, Post Punk, Rock</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Detected archival/reissue/live/anniversary/greatest hits keywords in metadata. | Failed EveryNoise Purity Gate
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/the-blue-aeroplanes-magical-realism-best-of-the-blue-aeroplanes-1985-2025" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="the cure songs of a lost world type: album | genres: alternative, goth, post punk, rock">
+        <div class="track-index">#74</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">The Cure</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Songs Of A Lost World</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Alternative, Goth, Post Punk, Rock</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/the-cure-songs-of-a-lost-world" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="peter perrett the cleansing type: album | genres: adult alternative, post punk, rock">
+        <div class="track-index">#75</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Peter Perrett</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">The Cleansing</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Adult Alternative, Post Punk, Rock</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/peter-perrett-the-cleansing" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="skegss pacific highway music type: album | genres: alternative, garage, post punk, rock">
+        <div class="track-index">#76</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Skegss</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Pacific Highway Music</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Alternative, Garage, Post Punk, Rock</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/skegss-pacific-highway-music" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="maxïmo park stream of life type: album | genres: adult alternative, post punk, rock">
+        <div class="track-index">#77</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Maxïmo Park</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Stream Of Life</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-13</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Adult Alternative, Post Punk, Rock</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/maxïmo-park-stream-of-life" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="tigirlily gold country & midwestern type: album | genres: featured drop">
+        <div class="track-index">#78</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Tigirlily Gold</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Country &amp; Midwestern</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-09</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Featured Drop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/tigirlily-gold-country-midwestern" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="pete francis homemade type: album | genres: featured drop">
+        <div class="track-index">#79</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Pete Francis</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Homemade</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-09</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Featured Drop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/pete-francis-homemade" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="linda sikhakhane linda type: album | genres: featured drop">
+        <div class="track-index">#80</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Linda Sikhakhane</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">LINDA</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-09</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Featured Drop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/linda-sikhakhane-linda" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="remi wolf mud type: album | genres: featured drop">
+        <div class="track-index">#81</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Remi Wolf</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Mud</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-info" title="Artist &quot;Remi Wolf&quot; has 2 other song(s) in catalog: &quot;Bottle&quot; (All New Indie), &quot;Wine Drunk&quot; (YouTube (Remi Wolf))">Artist Tracked in DB</span>
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-09</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Featured Drop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/remi-wolf-mud" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="trippie redd nda type: album | genres: featured drop">
+        <div class="track-index">#82</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Trippie Redd</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">NDA</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-09</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Featured Drop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/trippie-redd-nda" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="the temperance movement new promise land incorporated type: album | genres: featured drop">
+        <div class="track-index">#83</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">The Temperance Movement</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">New Promise Land Incorporated</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-09</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Featured Drop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/the-temperance-movement-new-promise-land-incorporated" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="sherman holmes one step ahead of the blues type: album | genres: featured drop">
+        <div class="track-index">#84</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Sherman Holmes</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">One Step Ahead Of The Blues</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-09</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Featured Drop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/sherman-holmes-one-step-ahead-of-the-blues" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-clean" data-status="NEW_CANDIDATE" data-search="greta van fleet palace for the people type: album | genres: featured drop">
+        <div class="track-index">#85</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Greta Van Fleet</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">Palace For The People</span>
+          </div>
+
+          <div class="badges-row">
+            
+            <span class="badge badge-success">Clean & Fresh</span>
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-09</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Featured Drop</div>
+          </div>
+
+          
+
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/greta-van-fleet-palace-for-the-people" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+      <div class="track-card is-flagged" data-status="FLAGGED_FILTERED" data-search="paul simon the quiet celebration concert type: album | genres: featured drop">
+        <div class="track-index">#86</div>
+        
+        <div class="track-info">
+          <div class="track-title-row">
+            <span class="track-artist">Paul Simon</span>
+            <span class="track-separator">—</span>
+            <span class="track-title">The Quiet Celebration Concert</span>
+          </div>
+
+          <div class="badges-row">
+            <span class="badge badge-warning" title="Detected archival/reissue/live/anniversary/greatest hits keywords in metadata.">Reissue / Catalog Cut</span>
+            
+          </div>
+
+          <div class="track-meta">
+            <div class="meta-item">📅 Sighted: 2026-10-09</div>
+            <div class="meta-item">📡 Source: New Releases Now</div>
+            <div class="meta-item">💿 Type: ALBUM</div>
+            <div class="meta-item" style="color: var(--text-muted); font-size: 0.8rem;">Type: ALBUM | Genres: Featured Drop</div>
+          </div>
+
+          
+
+          
+            <div style="margin-top: 0.4rem; font-size: 0.82rem; color: #fcd34d; background: rgba(245, 158, 11, 0.08); padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+              ℹ️ Detected archival/reissue/live/anniversary/greatest hits keywords in metadata.
+            </div>
+          
+        </div>
+
+        <div class="track-actions">
+          <a href="https://www.newreleasesnow.com/album/paul-simon-the-quiet-celebration-concert" target="_blank" class="action-link">Open Source ↗</a>
+          
+        </div>
+      </div>
+      
+
+    <div class="empty-state" id="emptyState">
+      <h3>No tracks found matching current filter or search criteria</h3>
+    </div>
+  </div>
+</div>
+
+<script>
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  }
+
+  const buttons = document.querySelectorAll('.filter-btn');
+  const searchInput = document.getElementById('searchInput');
+  const cards = document.querySelectorAll('.track-card');
+  const emptyState = document.getElementById('emptyState');
+
+  let currentFilter = 'all';
+
+  function applyFilters() {
+    const query = searchInput.value.toLowerCase().trim();
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const status = card.getAttribute('data-status');
+      const searchData = card.getAttribute('data-search');
+
+      const matchesFilter = (currentFilter === 'all') || (status === currentFilter);
+      const matchesSearch = !query || searchData.includes(query);
+
+      if (matchesFilter && matchesSearch) {
+        card.style.display = 'grid';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    emptyState.style.display = (visibleCount === 0) ? 'block' : 'none';
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.getAttribute('data-filter');
+      applyFilters();
+    });
+  });
+
+  searchInput.addEventListener('input', applyFilters);
+
+  const cleanItems = [{"title":"Suki Waterhouse - Loveland","artist":"Suki Waterhouse","trackTitle":"Loveland","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/suki-waterhouse-loveland","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Adult Alternative, Indie Pop, Pop"},{"title":"Malcolm Todd - Do That Again","artist":"Malcolm Todd","trackTitle":"Do That Again","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/malcolm-todd-do-that-again","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Indie Pop, Pop"},{"title":"Lykke Li - The Afterparty","artist":"Lykke Li","trackTitle":"The Afterparty","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/lykke-li-the-afterparty","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Adult Alternative, Indie Pop, Pop"},{"title":"Miss Grit - Under My Umbrella","artist":"Miss Grit","trackTitle":"Under My Umbrella","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/miss-grit-under-my-umbrella","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Adult Alternative, Electronic, Indie Pop, Synth Pop"},{"title":"Elizabeth And The Catapult - Responsible Friend","artist":"Elizabeth And The Catapult","trackTitle":"Responsible Friend","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/elizabeth-and-the-catapult-responsible-friend","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Adult Alternative, Indie Pop, Indie Rock"},{"title":"Em Beihold - Tales Of A Failed Shapeshifter","artist":"Em Beihold","trackTitle":"Tales Of A Failed Shapeshifter","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/em-beihold-tales-of-a-failed-shapeshifter","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Indie Pop, Pop"},{"title":"Bird Streets - The Escape Artist","artist":"Bird Streets","trackTitle":"The Escape Artist","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/bird-streets-the-escape-artist","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Adult Alternative, Indie Pop, Indie Rock"},{"title":"Cavetown - Running With Scissors","artist":"Cavetown","trackTitle":"Running With Scissors","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/cavetown-running-with-scissors","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Indie Folk, Indie Pop, Indie Rock"},{"title":"Lexxi Raine - The Grief Case","artist":"Lexxi Raine","trackTitle":"The Grief Case","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/lexxi-raine-the-grief-case","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Indie Pop, Pop"},{"title":"dodie - Not For Lack Of Trying","artist":"dodie","trackTitle":"Not For Lack Of Trying","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/dodie-not-for-lack-of-trying","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Adult Alternative, Indie Pop"},{"title":"Noah Floersch - Francis Aquarius","artist":"Noah Floersch","trackTitle":"Francis Aquarius","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/noah-floersch-francis-aquarius","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Adult Alternative, Indie Pop, Singer-Songwriter"},{"title":"Patrick Watson - Uh Oh","artist":"Patrick Watson","trackTitle":"Uh Oh","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/patrick-watson-uh-oh","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Indie Pop, Indie Rock, Rock, Singer-Songwriter"},{"title":"Ed Sheeran - Play","artist":"Ed Sheeran","trackTitle":"Play","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/ed-sheeran-play","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Indie Pop, Pop, Singer-Songwriter"},{"title":"King Princess - Girl Violence","artist":"King Princess","trackTitle":"Girl Violence","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/king-princess-girl-violence","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Indie Pop, Pop"},{"title":"Tom Odell - A Wonderful Life","artist":"Tom Odell","trackTitle":"A Wonderful Life","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/tom-odell-a-wonderful-life","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Indie Pop, Indie Rock, Rock, Singer-Songwriter"},{"title":"Laufey - A Matter Of Time","artist":"Laufey","trackTitle":"A Matter Of Time","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/laufey-a-matter-of-time","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Contemporary Jazz, Indie Pop, Jazz, Jazz Vocals"},{"title":"The Kennedys - Smoketree","artist":"The Kennedys","trackTitle":"Smoketree","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/the-kennedys-smoketree","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Folk, Indie Folk, Contemporary Folk"},{"title":"Buffalo Traffic Jam - Pictures Of You","artist":"Buffalo Traffic Jam","trackTitle":"Pictures Of You","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/buffalo-traffic-jam-pictures-of-you","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Americana, Indie Folk"},{"title":"Bandits On The Run - Rough Magic","artist":"Bandits On The Run","trackTitle":"Rough Magic","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/bandits-on-the-run-rough-magic","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Folk, Indie Folk"},{"title":"John R. Miller - The Great Unknowing","artist":"John R. Miller","trackTitle":"The Great Unknowing","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/john-r-miller-the-great-unknowing","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Folk, Indie Folk, Singer-Songwriter"},{"title":"Liz Lawrence - Vespers","artist":"Liz Lawrence","trackTitle":"Vespers","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/liz-lawrence-vespers","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Folk, Indie Folk, Singer-Songwriter"},{"title":"Jobi Riccio - Face The Feeling","artist":"Jobi Riccio","trackTitle":"Face The Feeling","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/jobi-riccio-face-the-feeling","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Indie Folk, Indie Rock"},{"title":"Jesca Hoop - Long Wave Home","artist":"Jesca Hoop","trackTitle":"Long Wave Home","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/jesca-hoop-long-wave-home","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Indie Folk, Singer-Songwriter"},{"title":"Josiah And The Bonnevilles - As Is","artist":"Josiah And The Bonnevilles","trackTitle":"As Is","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/josiah-and-the-bonnevilles-as-is","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Americana, Indie Folk, Singer-Songwriter"},{"title":"Dermot Kennedy - Weight Of The Woods","artist":"Dermot Kennedy","trackTitle":"Weight Of The Woods","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/dermot-kennedy-weight-of-the-woods","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Folk, Indie Folk, Singer-Songwriter"},{"title":"Big Harp - Runs To Blue","artist":"Big Harp","trackTitle":"Runs To Blue","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/big-harp-runs-to-blue","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Adult Alternative, Indie Folk"},{"title":"Bahamas - My Second Last Album","artist":"Bahamas","trackTitle":"My Second Last Album","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/bahamas-my-second-last-album","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Indie Folk, Singer-Songwriter"},{"title":"Ruen Brothers - Awooo","artist":"Ruen Brothers","trackTitle":"Awooo","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/ruen-brothers-awooo","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Indie Folk, Singer-Songwriter"},{"title":"Madison Cunningham - Ace","artist":"Madison Cunningham","trackTitle":"Ace","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/madison-cunningham-ace","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Folk, Indie Folk, Singer-Songwriter"},{"title":"Grant-Lee Phillips - In The Hour Of Dust","artist":"Grant-Lee Phillips","trackTitle":"In The Hour Of Dust","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/grant-lee-phillips-in-the-hour-of-dust","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Indie Folk, Singer-Songwriter"},{"title":"Kingfishr - Halcyon","artist":"Kingfishr","trackTitle":"Halcyon","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/kingfishr-halcyon","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Contemporary Folk, Folk, Indie Folk"},{"title":"Molly Tuttle - So Long Little Miss Sunshine","artist":"Molly Tuttle","trackTitle":"So Long Little Miss Sunshine","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/molly-tuttle-so-long-little-miss-sunshine","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Adult Alternative, Americana, Indie Folk"},{"title":"Ken Pomeroy - Cruel Joke","artist":"Ken Pomeroy","trackTitle":"Cruel Joke","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/ken-pomeroy-cruel-joke","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Americana, Contemporary Folk, Indie Folk"},{"title":"Kodaline - We Were Only Young","artist":"Kodaline","trackTitle":"We Were Only Young","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/kodaline-we-were-only-young","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative, Adult Alternative"},{"title":"Dexter And The Moonrocks - Friends That I Don't Like","artist":"Dexter And The Moonrocks","trackTitle":"Friends That I Don't Like","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/dexter-and-the-moonrocks-friends-that-i-dont-like","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative"},{"title":"Fea - The Nerve","artist":"Fea","trackTitle":"The Nerve","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/fea-the-nerve","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative, Garage, Punk"},{"title":"Johnny Marr - The Age Of Everything","artist":"Johnny Marr","trackTitle":"The Age Of Everything","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/johnny-marr-the-age-of-everything","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative, Adult Alternative"},{"title":"Chelsea Wolfe - The Dark","artist":"Chelsea Wolfe","trackTitle":"The Dark","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/chelsea-wolfe-the-dark","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative"},{"title":"Brian Fallon & The Painkillers - Not Bad For New Jersey","artist":"Brian Fallon & The Painkillers","trackTitle":"Not Bad For New Jersey","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/brian-fallon-the-painkillers-not-bad-for-new-jersey","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative, Adult Alternative, Garage"},{"title":"The Meffs - Business","artist":"The Meffs","trackTitle":"Business","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/the-meffs-business","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative, Garage, Punk"},{"title":"Movements - Happier Now","artist":"Movements","trackTitle":"Happier Now","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/movements-happier-now","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative"},{"title":"Mike D - Thank You","artist":"Mike D","trackTitle":"Thank You","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/mike-d-thank-you","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative"},{"title":"The Afghan Whigs - Soft Control","artist":"The Afghan Whigs","trackTitle":"Soft Control","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/the-afghan-whigs-soft-control","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative"},{"title":"Getdown Services - Massive Champion","artist":"Getdown Services","trackTitle":"Massive Champion","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/getdown-services-massive-champion","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative, Garage"},{"title":"The Durutti Column - Renascent","artist":"The Durutti Column","trackTitle":"Renascent","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/the-durutti-column-renascent","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative, Post Punk"},{"title":"Madball - Not Your Kingdom","artist":"Madball","trackTitle":"Not Your Kingdom","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/madball-not-your-kingdom","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative, Hardcore"},{"title":"Front 242 - Black Out","artist":"Front 242","trackTitle":"Black Out","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/front-242-black-out","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative, Live, Industrial"},{"title":"Echo & The Bunnymen - Apples For Isaac","artist":"Echo & The Bunnymen","trackTitle":"Apples For Isaac","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/echo-the-bunnymen-apples-for-isaac","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Adult Alternative, New Wave, Post Punk"},{"title":"Interpol - This Mirror Weighs A Ton","artist":"Interpol","trackTitle":"This Mirror Weighs A Ton","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/interpol-this-mirror-weighs-a-ton","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Adult Alternative, Post Punk"},{"title":"David J - Tracks From the Attic Revisited","artist":"David J","trackTitle":"Tracks From the Attic Revisited","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/david-j-tracks-from-the-attic-revisited","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative, Post Punk, Art Rock"},{"title":"Sleaford Mods - The Demise Of Planet X","artist":"Sleaford Mods","trackTitle":"The Demise Of Planet X","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/sleaford-mods-the-demise-of-planet-x","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative, Club/Dance, Post Punk"},{"title":"White Lies - Night Light","artist":"White Lies","trackTitle":"Night Light","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/white-lies-night-light","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Adult Alternative, Post Punk, Art Rock"},{"title":"Ashes And Diamonds - Are Forever","artist":"Ashes And Diamonds","trackTitle":"Are Forever","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/ashes-and-diamonds-are-forever","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Rock, Alternative, Post Punk, Goth"},{"title":"Jeffrey Runnings - Piqued","artist":"Jeffrey Runnings","trackTitle":"Piqued","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/jeffrey-runnings-piqued","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Alternative, Post Punk, Rock"},{"title":"HotWax - Hot Shock","artist":"HotWax","trackTitle":"Hot Shock","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/hotwax-hot-shock","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Alternative, Garage, Post Punk, Rock"},{"title":"The Cure - Songs Of A Lost World","artist":"The Cure","trackTitle":"Songs Of A Lost World","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/the-cure-songs-of-a-lost-world","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Alternative, Goth, Post Punk, Rock"},{"title":"Peter Perrett - The Cleansing","artist":"Peter Perrett","trackTitle":"The Cleansing","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/peter-perrett-the-cleansing","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Adult Alternative, Post Punk, Rock"},{"title":"Skegss - Pacific Highway Music","artist":"Skegss","trackTitle":"Pacific Highway Music","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/skegss-pacific-highway-music","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Alternative, Garage, Post Punk, Rock"},{"title":"Maxïmo Park - Stream Of Life","artist":"Maxïmo Park","trackTitle":"Stream Of Life","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/maxïmo-park-stream-of-life","views":"Worth checking","uploadedAt":"2026-10-13","releaseType":"album","description":"Type: ALBUM | Genres: Adult Alternative, Post Punk, Rock"},{"title":"Tigirlily Gold - Country & Midwestern","artist":"Tigirlily Gold","trackTitle":"Country & Midwestern","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/tigirlily-gold-country-midwestern","views":"Worth checking","uploadedAt":"2026-10-09","releaseType":"album","description":"Type: ALBUM | Genres: Featured Drop"},{"title":"Pete Francis - Homemade","artist":"Pete Francis","trackTitle":"Homemade","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/pete-francis-homemade","views":"Worth checking","uploadedAt":"2026-10-09","releaseType":"album","description":"Type: ALBUM | Genres: Featured Drop"},{"title":"Linda Sikhakhane - LINDA","artist":"Linda Sikhakhane","trackTitle":"LINDA","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/linda-sikhakhane-linda","views":"Worth checking","uploadedAt":"2026-10-09","releaseType":"album","description":"Type: ALBUM | Genres: Featured Drop"},{"title":"Remi Wolf - Mud","artist":"Remi Wolf","trackTitle":"Mud","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/remi-wolf-mud","views":"Worth checking","uploadedAt":"2026-10-09","releaseType":"album","description":"Type: ALBUM | Genres: Featured Drop"},{"title":"Trippie Redd - NDA","artist":"Trippie Redd","trackTitle":"NDA","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/trippie-redd-nda","views":"Worth checking","uploadedAt":"2026-10-09","releaseType":"album","description":"Type: ALBUM | Genres: Featured Drop"},{"title":"The Temperance Movement - New Promise Land Incorporated","artist":"The Temperance Movement","trackTitle":"New Promise Land Incorporated","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/the-temperance-movement-new-promise-land-incorporated","views":"Worth checking","uploadedAt":"2026-10-09","releaseType":"album","description":"Type: ALBUM | Genres: Featured Drop"},{"title":"Sherman Holmes - One Step Ahead Of The Blues","artist":"Sherman Holmes","trackTitle":"One Step Ahead Of The Blues","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/sherman-holmes-one-step-ahead-of-the-blues","views":"Worth checking","uploadedAt":"2026-10-09","releaseType":"album","description":"Type: ALBUM | Genres: Featured Drop"},{"title":"Greta Van Fleet - Palace For The People","artist":"Greta Van Fleet","trackTitle":"Palace For The People","channel":"New Releases Now","url":"https://www.newreleasesnow.com/album/greta-van-fleet-palace-for-the-people","views":"Worth checking","uploadedAt":"2026-10-09","releaseType":"album","description":"Type: ALBUM | Genres: Featured Drop"}];
+  const copyBtn = document.getElementById('copyCleanBtn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(JSON.stringify(cleanItems, null, 2)).then(() => {
+        const originalText = copyBtn.innerText;
+        copyBtn.innerText = '✅ Copied!';
+        setTimeout(() => { copyBtn.innerText = originalText; }, 2000);
+      }).catch(err => {
+        alert('Could not copy to clipboard: ' + err);
+      });
+    });
+  }
+</script>
+
+</body>
+</html>

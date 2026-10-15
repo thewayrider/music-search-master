@@ -61,6 +61,34 @@ function runDeterministicSieve(item, options = {}) {
     };
   }
 
+  // 1b. Explicit TV Talk Show / Broadcast Performance Reject Rules
+  const talkShowRegex = /\b(the\s+tonight\s+show|tonight\s+show|jimmy\s+fallon|jimmy\s+kimmel|stephen\s+colbert|the\s+late\s+show|late\s+night\s+with\s+seth\s+meyers|seth\s+meyers|the\s+late\s+late\s+show|james\s+corden|the\s+daily\s+show|saturday\s+night\s+live|\bsnl\b|good\s+morning\s+america|\bgma\b|the\s+today\s+show|today\s+show|the\s+kelly\s+clarkson\s+show|kelly\s+clarkson\s+show|the\s+voice|american\s+idol|live\s+on\s+(fallon|kimmel|colbert|meyers|corden|snl)|live\s+from\s+the\s+tonight\s+show)\b/i;
+  if (talkShowRegex.test(rawTitle) || talkShowRegex.test(item.description || '') || talkShowRegex.test(item.channel || '')) {
+    return {
+      passed: false,
+      verified_origin: null,
+      country_code: 'UNKNOWN',
+      verified_new_release: false,
+      earliest_release_date: null,
+      verification_stage: 'deterministic',
+      confidence_note: 'Rejected: TV talk show, broadcast live performance, or late-night appearance'
+    };
+  }
+
+  // 1c. Explicit AI / Generative Music & Virtual Artist Reject Rules
+  const aiRegex = /\b(suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover|vocals)|synthetic\s+(music|vocals)|ai\s+vocals|bllb|billy\s*bayou|nocturnal\s*(records|studios)|nocturnalstudios|luara|raven\s*astrid|viking\s*(music|metal|folk|warrior)|nordic\s*(dark\s*)?folk|epic\s*viking|\bebm\b|industrial\s+ebm)\b/i;
+  if (aiRegex.test(rawTitle) || aiRegex.test(item.description || '') || aiRegex.test(item.channel || '')) {
+    return {
+      passed: false,
+      verified_origin: null,
+      country_code: 'UNKNOWN',
+      verified_new_release: false,
+      earliest_release_date: null,
+      verification_stage: 'deterministic',
+      confidence_note: 'Rejected: AI-generated music, synthetic vocals, or virtual creator studio detected'
+    };
+  }
+
   // 2. Known Single-Region Sources Check
   const channel = (item.channel || item.sourceService || '').toLowerCase();
   let sourceCountry = null;

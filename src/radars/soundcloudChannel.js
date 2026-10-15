@@ -41,8 +41,8 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
   const discoveries = [];
   const seenUrls = new Set();
 
-  const AI_REGEX = /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover))\b/i;
-  const PODCAST_ESSAY_REGEX = /\b(podcast|investigating|documentary|video\s+essay|tutorial|how\s+to|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i;
+  const AI_REGEX = /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover|vocals)|synthetic\s+(music|vocals)|ai\s+vocals|bllb|billy\s*bayou)\b/i;
+  const PODCAST_ESSAY_REGEX = /\b(podcast|investigating|documentary|video\s+essay|tutorial|how\s+to|making\s+(an?|the|some)\s+(indie|rock|song|track|beat|album|music)|making\s+of|behind\s+the\s+scenes|in\s+the\s+studio|studio\s+vlog|songwriting\s+vlog|lesson|guitar\s+lesson|drum\s+lesson|bass\s+lesson|chord\s+tutorial|production\s+tutorial|masterclass|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i;
 
   console.log(`[SoundCloud Channel] Checking SoundCloud live indie stream drops in the last 24h...`);
 
@@ -143,9 +143,15 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
           continue;
         }
 
-        // Reject banned genres (e.g. Hip-hop & Rap, Electronic, EDM, Trap, Dream Pop, DarkPop)
-        const genreAndTags = `${genre} ${tags}`;
-        if (bannedGenres.some(bg => genreAndTags.includes(bg.toLowerCase()))) {
+        // Reject banned genres (e.g. Jazz & Blues, Jazz, Blues, Hip-hop, Rap, EDM, Trap, DarkPop, etc.)
+        const genreAndTags = `${genre} ${tags}`.toLowerCase();
+        const isBannedGenre = bannedGenres.some(bg => {
+          const b = bg.toLowerCase().trim();
+          if (!b) return false;
+          const reg = new RegExp(`(^|\\b|[,/&-])${b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\b|[,/&-]|\$)`, 'i');
+          return reg.test(genreAndTags);
+        });
+        if (isBannedGenre) {
           continue;
         }
 
