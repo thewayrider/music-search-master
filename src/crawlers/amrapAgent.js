@@ -1,5 +1,6 @@
 const fs = require("fs/promises");
 const path = require("path");
+const { check_itunes_release_history } = require("../services/verificationTools");
 
 const DEFAULTS = {
   sourceService: "AMRAP",
@@ -36,19 +37,17 @@ const DEFAULTS = {
   // A brand-new debut on a curated AU community-radio chart is a strong signal.
   debutBonus: 1,
 
-  // --- MusicBrainz release-date enrichment ---------------------------------
+  // --- Release-date enrichment & Strict Freshness Gate ----------------------
   enrichReleaseDate: true,
   musicbrainzBase: "https://musicbrainz.org/ws/2",
-  freshWindowDays: 90,        // <= this many days old (vs chart week) = "fresh"
+  freshWindowDays: 28,        // Informational freshness reference
+  filterStale: false,         // Keep as-is: do not drop chart debuts
   mbMinScore: 80,             // min MusicBrainz match score (0-100) to trust
-  maxEnrich: 60,              // max NEW MB lookups per run (debuts are few)
+  maxEnrich: 60,              // max lookups per run
   mbDelayMs: 1100,            // MusicBrainz rate limit (~1 req/sec)
   mbTimeoutMs: 15000,
-  mbCacheFile: path.join(__dirname, "../../saved_searches/cache/amrap-mb-release-date.json"), // null to disable caching
-  // MusicBrainz asks for a descriptive UA with contact info - edit to yours.
+  mbCacheFile: path.join(__dirname, "../../saved_searches/cache/amrap-mb-release-date.json"),
   mbUserAgent: "music-release-agent/1.0 ( https://kimrampling.com )",
-  // Optional: demote back-catalogue re-releases so fresh drops rank above them.
-  // Default 0 = purely informational (flag only, no score change).
   cataloguePenalty: 0,
 
   timeoutMs: 25000,
@@ -109,6 +108,7 @@ async function runAmrapAgent(config = {}, exclusions = {}) {
         releaseType,
         releaseDate: weekEnd || "unknown",
         articleDate: weekEnd || "unknown",
+        chartWeekEnd: weekEnd,
         sourceService: options.sourceService,
         sourceUrl: options.sourceUrl,
         marketsAvailable: inferMarkets(country, exclusions),
@@ -145,22 +145,34 @@ async function runAmrapAgent(config = {}, exclusions = {}) {
     await enrichReleaseDates(deduped, http, options);
   }
 
-  // MAPPING TO UNIFIED AGENT FORMAT
-  const unifiedResults = deduped.map(r => {
-      let description = `Score: ${r.score} | Chart: ${r.chart} (#${r.chartPosition})`;
+  // MAPPING TO UNIFIED AGENT FORMAT (Applying Strict Freshness Gate)
+  const filterStale = options.filterStale !== false;
+  const filteredDebuts = filterStale ? deduped.filter(r => !r.isStale) : deduped;
+
+  console.log(
+    `[AMRAP Agent] Freshness Gate: kept ${filteredDebuts.length} fresh debuts ` +
+    `(filtered ${deduped.length - filteredDebuts.length} stale releases older than ${options.freshWindowDays}d).`
+  );
+
+  const unifiedResults = filteredDebuts.map(r => {
+      let description = `Score: ${r.score} | Chart: ${r.chart} (#${r.chartPosition}, ${r.weeksOnChart === 1 ? "Debut" : r.weeksOnChart + " wks"})`;
       if (r.freshnessNote) description += ` | Note: ${r.freshnessNote}`;
-      if (r.genresMapped && r.genresMapped.length) description += ` | Genres: ${r.genresMapped.join(', ')}`;
+      if (r.genresMapped && r.genresMapped.length) description += ` | Genres: ${r.genresMapped.join(", ")}`;
 
       const trackUrl = r.trackSlug 
           ? `https://amrap.org.au/charts#${r.trackSlug}` 
           : (r.trackId ? `https://amrap.org.au/charts#${r.trackId}` : r.sourceUrl);
+
+      const trueReleaseDate = r.originalReleaseDate || r.chartWeekEnd || r.releaseDate;
 
       return {
           title: `${r.artist} - ${r.title}`,
           channel: "AMRAP Charts",
           url: trackUrl,
           views: r.bucket,
-          uploadedAt: r.releaseDate,
+          uploadedAt: trueReleaseDate,
+          releaseDate: trueReleaseDate,
+          chartWeek: r.chartWeekEnd || null,
           description: description
       };
   });
@@ -197,19 +209,27 @@ async function enrichReleaseDates(items, http, options) {
     const key = `${slugify(item.artist)}::${slugify(item.title)}`;
     let orig = cache.get(key);
 
-    if (orig === undefined) {
+    // If uncached or previously cached as empty string, look up via iTunes / MusicBrainz
+    if (orig === undefined || orig === "") {
       if (newLookups >= options.maxEnrich) {
         applyFreshness(item, null, options, "budget exhausted");
         continue;
       }
       newLookups++;
       try {
-        orig = await mbFirstReleaseDate(item.artist, item.title, http, options);
-      } catch {
+        // Tier 1: Query iTunes Search API (instant, high coverage for AU releases)
+        const itunes = await check_itunes_release_history(item.artist, item.title);
+        if (itunes && itunes.found && itunes.earliestReleaseDate) {
+          orig = itunes.earliestReleaseDate;
+        } else {
+          // Tier 2: Query MusicBrainz API with rate-limiting
+          orig = await mbFirstReleaseDate(item.artist, item.title, http, options);
+          if (newLookups < options.maxEnrich) await sleep(options.mbDelayMs);
+        }
+      } catch (err) {
         orig = undefined;
       }
       if (orig !== undefined) cache.set(key, orig || "");
-      if (newLookups < options.maxEnrich) await sleep(options.mbDelayMs);
     } else {
       hits++;
     }
@@ -221,38 +241,47 @@ async function enrichReleaseDates(items, http, options) {
   await saveCache(options, cache);
   const counts = tallyFreshness(items);
   console.log(
-    `[AMRAP Agent] release-date enrichment | cache hits: ${hits} | new MB lookups: ` +
+    `[AMRAP Agent] release-date enrichment | cache hits: ${hits} | new lookups: ` +
       `${newLookups}/${options.maxEnrich} | cache ${cacheStart}->${cache.size} | ` +
-      `fresh: ${counts.fresh}, catalogue: ${counts.catalogue}, unverified: ${counts.unverified}`
+      `fresh (<= ${options.freshWindowDays}d): ${counts.fresh}, stale (> ${options.freshWindowDays}d): ${counts.catalogue}, unverified: ${counts.unverified}`
   );
 }
 
 function applyFreshness(item, origDate, options, unresolvedReason) {
   item.originalReleaseDate = origDate;
-  const weekEnd = item.releaseDate && item.releaseDate !== "unknown" ? item.releaseDate : null;
+  const weekEnd = item.chartWeekEnd || (item.releaseDate && item.releaseDate !== "unknown" ? item.releaseDate : null);
   const res = classifyFreshness(origDate, weekEnd, options.freshWindowDays, unresolvedReason);
   item.freshness = res.freshness;
   item.freshnessNote = res.note;
-  if (res.freshness === "catalogue" && options.cataloguePenalty) {
-    item.score = Math.round((item.score - options.cataloguePenalty) * 10) / 10;
-    item.bucket = bucketFromScore(item.score);
+  item.ageDays = res.ageDays;
+
+  if (origDate) {
+    item.releaseDate = origDate;
+  }
+
+  if (res.freshness === "catalogue") {
+    item.isStale = true;
+    if (options.cataloguePenalty) {
+      item.score = Math.round((item.score - options.cataloguePenalty) * 10) / 10;
+      item.bucket = bucketFromScore(item.score);
+    }
   }
 }
 
-function classifyFreshness(origDate, weekEnd, windowDays, unresolvedReason) {
+function classifyFreshness(origDate, weekEnd, windowDays = 28, unresolvedReason) {
   if (!origDate) {
-    return { freshness: "unverified", note: unresolvedReason || "no MusicBrainz match" };
+    return { freshness: "unverified", note: unresolvedReason || "no release date found", ageDays: null };
   }
   const orig = parseLooseDate(origDate);
   const ref = weekEnd ? new Date(weekEnd) : new Date();
   if (!orig || Number.isNaN(orig.getTime())) {
-    return { freshness: "unverified", note: `unparseable date ${origDate}` };
+    return { freshness: "unverified", note: `unparseable date ${origDate}`, ageDays: null };
   }
-  const ageDays = (ref.getTime() - orig.getTime()) / (24 * 60 * 60 * 1000);
-  if (ageDays <= windowDays) {
-    return { freshness: "fresh", note: `released ${origDate}` };
+  const ageDays = Math.round((ref.getTime() - orig.getTime()) / (24 * 60 * 60 * 1000));
+  if (ageDays <= windowDays && ageDays >= -7) {
+    return { freshness: "fresh", note: `released ${origDate} (${ageDays}d old at chart debut)`, ageDays };
   }
-  return { freshness: "catalogue", note: `originally ${String(origDate).slice(0, 4)}` };
+  return { freshness: "catalogue", note: `stale: released ${origDate} (${ageDays}d old, exceeds ${windowDays}d limit)`, ageDays };
 }
 
 async function mbFirstReleaseDate(artist, title, http, options) {

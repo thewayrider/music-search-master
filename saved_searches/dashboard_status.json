@@ -22,9 +22,9 @@
   },
   "amrap_indie_discovery": {
     "name": "AMRAP Indie Discovery",
-    "lastRun": "2026-10-08T11:08:18.877Z",
-    "totalSongsFound": 13,
-    "newSongsEmailed": 0,
+    "lastRun": "2026-10-15T16:28:03.572Z",
+    "totalSongsFound": 7,
+    "newSongsEmailed": 6,
     "status": "Success"
   },
   "roots_mag": {
@@ -81,6 +81,13 @@
     "lastRun": "2026-10-08T09:09:07.922Z",
     "totalSongsFound": 25,
     "newSongsEmailed": 17,
+    "status": "Success"
+  },
+  "new_releases_now_indie_discovery": {
+    "name": "New Releases Now Indie Discovery",
+    "lastRun": "2026-10-17T08:53:28.238Z",
+    "totalSongsFound": 9,
+    "newSongsEmailed": 8,
     "status": "Success"
   }
 }

@@ -9,6 +9,7 @@
       "new-alternative-songs",
       "new-post-punk-songs"
     ],
-    "includeRss": true
+    "includeRss": true,
+    "releaseWindowDays": 14
   }
 }

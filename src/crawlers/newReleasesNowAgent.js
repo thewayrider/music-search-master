@@ -13,9 +13,13 @@ const DEFAULTS = {
     "new-alternative-songs",
     "new-post-punk-songs"
   ],
+  releaseWindowDays: 14,
   includeRss: true,
   rssUrl: "https://www.newreleasesnow.com/rss"
 };
+
+const REISSUE_REGEX = /\b(reissue|re-issue|remaster|remastered|deluxe|anniversary|expanded|edition|demo(s)?|live\s*at|live\s*from|live\s*in|best\s*of|greatest\s*hits|anthology|collection|box\s*set|soundtrack|ost)\b/i;
+const REISSUE_URL_REGEX = /(?:-|\/)(reissue|re-issue|remaster|remastered|deluxe|anniversary|expanded|edition|best-of|box-set)(?:-|$|\/)/i;
 
 function cleanText(value) {
   return String(value || "")
@@ -63,11 +67,14 @@ async function fetchHtml(url, options) {
 /**
  * Main New Releases Now Weekly Crawler Agent.
  * Scrapes Friday LP/EP album drops across indie rock, pop, folk, alternative, and post-punk.
+ * Strictly filters out reissues, deluxe editions, and back-catalog older than releaseWindowDays.
  */
 async function runNewReleasesNowAgent(config = {}, exclusions = {}) {
   const options = { ...DEFAULTS, ...config };
-  console.log(`\n[${options.sourceService} Agent] Starting weekly discovery across ${options.genreSlugs.length} genre channels...`);
+  console.log(`\n[${options.sourceService} Agent] Starting weekly discovery across ${options.genreSlugs.length} genre channels (window: ${options.releaseWindowDays} days)...`);
 
+  const now = new Date();
+  const maxAgeMs = options.releaseWindowDays * 24 * 60 * 60 * 1000;
   const candidatesMap = new Map();
   let defaultDate = new Date().toISOString().slice(0, 10);
 
@@ -89,8 +96,37 @@ async function runNewReleasesNowAgent(config = {}, exclusions = {}) {
         link = `${options.baseUrl}${link.startsWith('/') ? '' : '/'}${link}`;
       }
       const genres = $(el).find(".genres a").map((_, g) => cleanText($(g).text())).get().join(", ");
+      const rawDate = cleanText($(el).find(".release-date").text());
 
       if (!artist || !title) return;
+
+      // Reissue / Deluxe / Catalog Quarantine
+      if (REISSUE_REGEX.test(title) || REISSUE_REGEX.test(artist) || REISSUE_URL_REGEX.test(link) || /\breissue\b/i.test(genres)) {
+        return;
+      }
+
+      // Reject Various Artists compilations
+      if (/^various(\s+artists)?$/i.test(artist)) {
+        return;
+      }
+
+      // Parse individual release date from the card
+      let releaseDateIso = null;
+      if (rawDate) {
+        const parsedDate = new Date(rawDate);
+        if (!Number.isNaN(parsedDate.getTime())) {
+          const ageMs = now.getTime() - parsedDate.getTime();
+          // Filter out releases older than releaseWindowDays (e.g. 14 days)
+          if (ageMs > maxAgeMs) {
+            return;
+          }
+          releaseDateIso = parsedDate.toISOString().slice(0, 10);
+        }
+      }
+
+      if (!releaseDateIso) {
+        releaseDateIso = defaultDate;
+      }
 
       // Exclusions check
       if (isExcluded(`${artist} ${title}`, exclusions)) return;
@@ -102,7 +138,7 @@ async function runNewReleasesNowAgent(config = {}, exclusions = {}) {
           title,
           link: link || `${options.baseUrl}/${genreSlug}`,
           genres: genres || "Indie",
-          date: defaultDate,
+          date: releaseDateIso,
           releaseType: "album"
         });
       } else {
@@ -128,7 +164,11 @@ async function runNewReleasesNowAgent(config = {}, exclusions = {}) {
         let pubDateIso = defaultDate;
         if (pubDateStr) {
           const d = new Date(pubDateStr);
-          if (!Number.isNaN(d.getTime())) pubDateIso = d.toISOString().slice(0, 10);
+          if (!Number.isNaN(d.getTime())) {
+            const ageMs = now.getTime() - d.getTime();
+            if (ageMs > maxAgeMs) return;
+            pubDateIso = d.toISOString().slice(0, 10);
+          }
         }
 
         if (rawTitle.includes(" - ")) {
@@ -136,6 +176,15 @@ async function runNewReleasesNowAgent(config = {}, exclusions = {}) {
           if (parts.length >= 2) {
             const artist = parts[0];
             const title = parts.slice(1).join(" - ");
+
+            // Reissue / Deluxe check on RSS items
+            if (REISSUE_REGEX.test(title) || REISSUE_REGEX.test(artist) || REISSUE_URL_REGEX.test(link)) {
+              return;
+            }
+
+            if (/^various(\s+artists)?$/i.test(artist)) {
+              return;
+            }
 
             if (isExcluded(`${artist} ${title}`, exclusions)) return;
 
@@ -165,6 +214,7 @@ async function runNewReleasesNowAgent(config = {}, exclusions = {}) {
       title: `${item.artist} - ${item.title}`,
       artist: item.artist,
       trackTitle: item.title,
+      songTitle: item.title,
       channel: options.sourceService,
       url: item.link,
       views: "Worth checking",

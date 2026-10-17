@@ -63,7 +63,8 @@ async function sendEmailNotification(newSongs, baseHtmlPath, searchName) {
                             <div style="font-size: 0.88rem; color: #475569; margin-bottom: 6px;">
                                 <strong style="color: #334155;">Source:</strong> 
                                 <span style="background-color: #e2e8f0; color: #0f172a; padding: 2px 8px; border-radius: 4px; font-weight: 600;">${song.channel || searchName}</span>
-                                ${song.uploadedAt ? `<span style="color: #94a3b8; margin-left: 8px;">(${song.uploadedAt})</span>` : ''}
+                                ${song.uploadedAt ? `<span style="color: #0284c7; font-weight: 600; margin-left: 8px;">Released: ${song.uploadedAt}</span>` : ''}
+                                ${song.chartWeek && song.chartWeek !== song.uploadedAt ? `<span style="color: #94a3b8; margin-left: 6px; font-size: 0.82rem;">(Chart Week: ${song.chartWeek})</span>` : ''}
                             </div>
                             <div style="font-size: 0.88rem; color: #475569; margin-bottom: 8px; word-break: break-all;">
                                 <strong style="color: #334155;">Source URL:</strong> 
