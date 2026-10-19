@@ -91,9 +91,34 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
           continue;
         }
 
-        // Credibility check 2: Reject spam content farms dumping hundreds of tracks with low following
-        // e.g. 714 tracks with 43 followers (ratio > 3:1 with > 25 tracks, or > 40 tracks with < 150 followers)
-        if ((trackCount > 40 && followers < 150) || (trackCount > 25 && (trackCount / Math.max(1, followers)) > 3)) {
+        // Credibility check 2: Reject spam content farms dumping dozens/hundreds of tracks
+        // Rule A: Hard cap on track count (legitimate discovering indie artists do not have >80 tracks on SoundCloud)
+        if (trackCount > 80) {
+          continue;
+        }
+
+        // Rule B: Low follower / high track farm ratio
+        if ((trackCount > 35 && followers < 150) || (trackCount > 20 && (trackCount / Math.max(1, followers)) > 2)) {
+          continue;
+        }
+
+        // Rule C: Auto-generated numeric bot permalinks (e.g. b-robb-447722922, mirage-748032038, user-129849182)
+        if (/-[0-9]{7,12}$/.test(user.permalink || '') && trackCount > 15) {
+          continue;
+        }
+
+        // Rule D: Content Farm artist names (e.g. BigTroll's Music Factory)
+        if (/\b(music\s*factory|song\s*factory|ai\s*records|studio\s*bot|beat\s*factory)\b/i.test(uploader)) {
+          continue;
+        }
+
+        // Rule E: Suno / Udio prompt tokens in tags or description
+        if (/\b(\d{2,3}\s*bpm|analog\s*bass|cathedral\s*reverb|ethereal\s*pads|female\s*vocals|male\s*vocals|vocal\s*chops|ai\s*generated|ai\s*prompt)\b/i.test(`${tags} ${trackDesc}`)) {
+          continue;
+        }
+
+        // Rule F: AI prompt iteration markers in title (e.g. "_v2", "_v3")
+        if (/\b_v\d+\b/i.test(rawTitle) || /\b(v\d|ver\s*\d)\s*$/i.test(rawTitle)) {
           continue;
         }
 

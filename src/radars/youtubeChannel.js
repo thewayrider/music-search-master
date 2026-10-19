@@ -153,6 +153,26 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
             continue;
           }
 
+          // 1k. Reject keyword-stuffed pipeline genres in title (e.g. "Song | SaijaX | Alternative Rock" or "Song | Italian Alternative Rock")
+          if (/\|\s*.*(indie|alternative|alt|garage|punk|surf|psych|rock|pop|metal|post-punk)\s*$/i.test(rawTitle)) {
+            continue;
+          }
+
+          // 1l. Reject explicit foreign language markers in headline or channel
+          if (/\b(italian|french|spanish|german|portuguese|turkish|hindi|russian|japanese|korean)\s*(indie|rock|alternative|pop|punk|post-punk|metal|music|chanson)\b/i.test(rawTitle)) {
+            continue;
+          }
+
+          // 1m. Reject bot usernames with 3+ trailing digits (e.g. Electrohead66673)
+          if (/[a-zA-Z]{3,}\d{3,}$/.test(channelName) || /[a-zA-Z]{3,}\d{3,}$/.test(rawTitle.split(' - ')[0])) {
+            continue;
+          }
+
+          // 1n. Reject AI prompt iteration markers in title (e.g. "_v2", "_v3")
+          if (/\b_v\d+\b/i.test(rawTitle)) {
+            continue;
+          }
+
           // 2. Reject negative keywords, AI generated flags, podcasts, and past album releases
           const fullText = `${rawTitle} ${channelName} ${descSnippet} ${badges} ${detailedMetadata}`;
 

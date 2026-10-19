@@ -21,9 +21,11 @@ function sanitizeHeadline(raw) {
   // Strip leading tracklist numbering (e.g. "059 ", "01. ", "01 - ")
   s = s.replace(/^\d{2,3}[\s.\-_:]+/, '');
 
-  // Strip common YouTube/SoundCloud trailing pipeline delimiters
-  s = s.replace(/\s*\|\s*(official\s*(music\s*)?video|official\s*audio|visualizer|music\s*video|premiere|intro|outro|album\s*review|track\s*review|ep\s*review|stream|interview|feature|news|announcement|watch|listen|post-trash|clash|the\s*line\s*of\s*best\s*fit|h\s*r\s*khai).*$/i, '');
-  s = s.replace(/\s*\|\s*.*$/i, '');
+  // Strip common YouTube/SoundCloud trailing pipeline delimiters (preserve disqualifying markers so isCleanTrack evaluates them)
+  const DISQUALIFYING_PIPELINE_REGEX = /\b(italian|french|spanish|german|portuguese|turkish|hindi|russian|japanese|korean|ai|suno|udio|type\s*beat|remix|rmx|cover|live|session)\b/i;
+  s = s.replace(/\s*\|\s*(.*)$/i, (match, inner) => {
+    return DISQUALIFYING_PIPELINE_REGEX.test(inner) ? ` ${inner.trim()}` : '';
+  });
 
   // Strip video format brackets & parentheticals
   s = s.replace(/[\[(]\s*(official\s*(music\s*)?video|official\s*audio|official\s*lyric\s*video|lyric\s*video|visualizer|premiere|track\s*premiere|stream|video|audio|album|single|ep|lp|music\s*video\s*\/\s*short\s*film|short\s*film|4k|hd|hq|live\s*clip|clip\s*officiel)\s*[\])}]/gi, '');
@@ -162,17 +164,34 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
     return false;
   }
 
-  // 3c. Reject clear non-English titles (French, Spanish, German, Portuguese, Turkish, Dutch, South Asian stopwords and phrases)
+  // 3c. Reject clear non-English titles (French, Spanish, German, Portuguese, Italian, Turkish, Dutch, South Asian stopwords and phrases)
   const foreignLanguagePhrases = [
-    /\b(quand\s+tu|quand\s+passes|c'est|dans\s+la|avec\s+toi|pour\s+moi|sur\s+la|les\s+yeux|je\s+suis|tu\s+es|mon\s+amour|au\s+revoir|sans\s+toi|d'un|d'une|l'amour)\b/i,
+    /\b(quand\s+tu|quand\s+passes|c'est|dans\s+la|avec\s+toi|pour\s+moi|sur\s+la|les\s+yeux|je\s+suis|tu\s+es|mon\s+amour|au\s+revoir|sans\s+toi|d'un|d'une|l'amour|couronnement|fleuve|chanson|chansons|apprivoise|apprivoisé|lumiere|lumière|regard|coeur|cœur|soleil|toujours|rien|homme|femme|jamais|beau|belle|voix|musique\s+francaise|musique\s+française)\b/i,
     /\b(vizinha|gostosa|virado|dias\s+virado|corazon|te\s+quiero|para\s+ti|por\s+favor|sin\s+ti|todo\s+el|lo\s+que|el\s+amor|la\s+vida|los\s+ojos|nada\s+mas|que\s+te|yo\s+no|esta\s+noche|del\s+sur|una\s+vez|malos?\s+vicios?|vicios?|buenas\s+noches|buenos\s+dias|cancion|canciones)\b/i,
+    /\b(piove|ciao|grazie|amore|notte|giorno|cuore|senza|sempre|tutto|niente|ancora|bello|bella|canzone|canzoni|mondo|vita|tempo|cielo|sole|mare|questo|questa|quando|perche|perché|anche|cosa|come|dove|mio|mia|tuo|tua|nostro|nostra|italiano|italiana)\b/i,
     /\b(ich\s+sehe|ich\s+habe|ich\s+bin|ich\s+will|du\s+bist|wir\s+sind|nicht|dich|mich|weltzeituhr|sehe\s+dich|liebe\s+dich|wenn\s+du|mein\s+herz|meine\s+liebe|ohne\s+dich|mit\s+dir|fur\s+immer|für\s+immer|auf\s+wiedersehen|guten\s+morgen|guten\s+abend|alles\s+gut)\b/i,
     /\b(dikenli|değilsin|degilsin|benim|senin|icin|için|nasıl|gibi|kadar|çünkü|böyle|radyo|şarkı|dünya|tel)\b/i,
-    /\b(dil|muskuraye|bandeya|pyaar|ishq|tere|meri|mera|tujhe|humsafar|zindagi|saath|kaho|suno|tum|hum|aaj|yaad|kahani|geet|gaana|aashiqui|mohabbat|deewana|shreya|arijit|armaan|naqaab|avaam|awaam|bandh|chesko|dasagriva|chalte|raat|kabhi|jaane|nachle|dhol|chupke|desi|bollywood|tollywood)\b/i,
+    /\b(dil|muskuraye|bandeya|pyaar|pyar|ishq|tere|meri|mera|tujhe|humsafar|zindagi|saath|kaho|suno|tum|hum|aaj|yaad|kahani|geet|gaana|aashiqui|mohabbat|deewana|shreya|arijit|armaan|naqaab|avaam|awaam|bandh|chesko|dasagriva|chalte|raat|kabhi|jaane|nachle|dhol|chupke|desi|bollywood|tollywood|safar|musafir|raahi|khuda|rabba|dosti)\b/i,
     /\b(het|een|voor|niet|zijn|naar|over|door|geen|hebben|alle|deze|maar|veel|onze|jullie|waren|wordt|worden|heeft|nederland|vlaams|dutch)\b/i,
-    /\b(mc\s+[a-z]|speed\s*\+|speed\s*\+\s*grave|grave|mtg|funk\s*bh|funk\s*rj|brega|piseiro)\b/i
+    /\b(mc\s+[a-z]|speed\s*\+|speed\s*\+\s*grave|grave|mtg|funk\s*bh|funk\s*rj|brega|piseiro)\b/i,
+    /\b(italian|french|spanish|german|portuguese|turkish|hindi|russian|japanese|korean)\s*(indie|rock|alternative|pop|punk|post-punk|metal|music|chanson)\b/i
   ];
   if (foreignLanguagePhrases.some(rgx => rgx.test(fullText))) {
+    return false;
+  }
+
+  // 3d. Reject bot handles with 3+ appended digits (e.g. Electrohead66673, user12891)
+  if (/[a-zA-Z]{3,}\d{3,}$/.test(a)) {
+    return false;
+  }
+
+  // 3e. Reject AI prompt version markers in title (e.g. "Song Name_v2", "Track v3")
+  if (/\b_v\d+\b/i.test(t) || /\b(v\d|ver\s*\d)\s*$/i.test(t)) {
+    return false;
+  }
+
+  // 3f. Reject Content Farm aliases (e.g. BigTroll's Music Factory)
+  if (/\b(music\s*factory|song\s*factory|ai\s*records|studio\s*bot|beat\s*factory)\b/i.test(a)) {
     return false;
   }
 
@@ -191,6 +210,7 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
     /\b(investigating|documentary|video\s+essay|tutorial|how\s+to|making\s+(an?|the|some)\s+(indie|rock|song|track|beat|album|music)|making\s+of|behind\s+the\s+scenes|in\s+the\s+studio|studio\s+vlog|songwriting\s+vlog|lesson|guitar\s+lesson|drum\s+lesson|bass\s+lesson|chord\s+tutorial|production\s+tutorial|masterclass|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i,
     /\b(the\s+tonight\s+show|tonight\s+show|jimmy\s+fallon|jimmy\s+kimmel(\s+live)?|stephen\s+colbert|the\s+late\s+show|late\s+night\s+with\s+seth\s+meyers|seth\s+meyers|the\s+late\s+late\s+show|james\s+corden|the\s+daily\s+show|saturday\s+night\s+live|\bsnl\b|good\s+morning\s+america|\bgma\b|the\s+today\s+show|today\s+show|kelly\s+clarkson|jennifer\s+hudson|the\s+voice|american\s+idol|live\s+on\s+(fallon|kimmel|colbert|meyers|corden|snl))\b/i,
     /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover|vocals)|synthetic\s+(music|vocals)|ai\s+vocals|bllb|billy\s*bayou|nocturnal\s*(records|studios)|nocturnalstudios|luara|raven\s*astrid|viking\s*(music|metal|folk|songs?|warrior)|nordic\s*(dark\s*)?folk|epic\s*viking|\bebm\b|industrial\s+ebm)\b/i,
+    /\b(\d{2,3}\s*bpm|analog\s*bass|cathedral\s*reverb|ethereal\s*pads)\b/i,
     /\b(#?shorts?\b|#vertical\b|\(shorts?\))\b/i,
     /\b(dark\s*pop|darkpop)\b/i,
     /\b(bitch|bitches|fuck|fucking|shit|shitty|nigga|asshole|cunt)\b/i,

@@ -81,7 +81,7 @@ All candidate releases across all 13 radars and crawlers must pass through `src/
 
 - **Desktop PC**: Primary development and testing environment (`C:\Users\kimra\Desktop\Projects\music-search-master`).
 - **Always-On Mini PC**: 24/7 host running scheduled tasks (`C:\Antigravity Projects\music-search-master`).
-- **Lenovo Googlebook 15**: Mobile development station during travel.
+- **Lenovo Googlebook 15**: Mobile development station during travel. Runs a Debian Linux container sandbox with residential IP routing to eliminate datacenter scraping blocks (see [`ARCHITECTURE_SANDBOX_REPORT.md`](ARCHITECTURE_SANDBOX_REPORT.md)).
 - **Git Protocol**:
   - Author changes on Developer PC $\rightarrow$ `git push origin main`.
   - On Mini PC / Lenovo $\rightarrow$ `git pull origin main`.
@@ -217,6 +217,40 @@ To prevent non-target acts, back-catalog album cuts, remasters, and anniversary 
 - **CLI Verification on Crawler**: `node src/index.js <config-file> --verify` verifies new candidates before archiving or emailing.
 - **Standalone Report Verification**: `node src/index.js --verify <path-to-json-file>`.
 - **Unit Test Suite**: `node testVerifier.js` tests 5 mock scenarios across AU, NZ, UK, reissues, and fresh releases.
+
+---
+
+## 14. New Releases Now Crawler Freshness & Reissue Gate (`src/crawlers/newReleasesNowAgent.js`)
+
+New Releases Now (`newreleasesnow.com`) mixes current Friday album drops with historical backlog catalogs (dating back years) and deluxe reissues:
+1. **Card-Level Date Parsing**: Always parse the `.release-date` element inside each release card. Never fall back to page-level headers which are absent on genre channels.
+2. **Freshness Window Cap**: Enforce `releaseWindowDays: 14` (configured in `configs/newreleasesnow_indie.json`). Drops releases whose card date is $>14$ days old (e.g. dropping 2-year-old albums like Maxïmo Park *Stream Of Life*).
+3. **Strict Reissue Quarantine**: Scans artist, title, genre tags, and URL slugs for:
+   `\b(reissue|re-issue|remaster|remastered|deluxe|anniversary|expanded|edition|demo(s)?|live\s*at|live\s*from|best\s*of|greatest\s*hits|anthology|collection|box\s*set|soundtrack|ost)\b`
+   Blocks catalog reissues (such as Flesh For Lulu *Plastic Fantastic (Deluxe Reissue)*) directly at the scraper stage.
+4. **Compilation Filter**: Drops `Various Artists` compilations.
+
+---
+
+## 15. AI Music Farm Detection & The "Multi-Genre Omnivore" Signature
+
+Open radar channels (such as open YouTube and SoundCloud feeds) are targeted by solo AI creators dumping high-volume Suno/Udio tracks. The fleet employs forensic heuristics to quarantine these channels:
+1. **The "Multi-Genre Omnivore" Signature**: Channels advertising original music spanning wildly incompatible genres under a single artist alias (e.g., *"powerful rock, cinematic soundscapes, electronic ballads, ambient, pop, and everything in between"* like Northern Music Project). Real human bands do not operate with this sonic profile.
+2. **The "Digital Ghost" Discrepancy**: A channel with 10–50 uploads but **0 presence** in MusicBrainz, Discogs, or registered publishing credits.
+3. **Automated DistroKid / TuneCore Footprints**: Copyright lines marked `℗ Records DK` or automated `- Topic` accounts with zero human performance credits.
+
+---
+
+## 16. Workspace Triage Skill (`/scraper-check`)
+
+To triage alert emails and audit suspicious discoveries in chat, the workspace includes an automated skill at `.agents/skills/scraper-check/`:
+- **Summon in Chat**: Type `/scraper-check` or simply `"scraper check"` followed by pasted email text or track titles.
+- **Integrated Audit Capabilities**:
+  1. **AI Forensic Detector**: Probes YouTube channel descriptions and video metadata for multi-genre farms, AI keywords (`suno`, `udio`, `midjourney`), and digital ghost footprints.
+  2. **Master SQLite Brain Query**: Cross-checks `data/master_catalog.sqlite` for prior sightings, historical channels, and Heat Scores (e.g. identifying prior Fontaines D.C. singles).
+  3. **Reissue & Deluxe Filter**: Flags remasters, anniversary editions, and catalog re-releases.
+  4. **Earliest Release Year Lookup**: Queries iTunes & MusicBrainz to detect true original release years.
+
 
 
 

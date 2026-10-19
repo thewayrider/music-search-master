@@ -1,0 +1,26 @@
+How to do it in Antigravity on your Lenovo:
+
+When your laptop arrives and you launch Antigravity:
+
+Method 1: The Antigravity UI (1-Click)
+On the Antigravity Welcome screen, click "Clone Git Repository..." (or press Ctrl + Shift + P and type Git: Clone).
+Paste your repository URL: https://github.com/thewayrider/bookmark-sync.git
+Pick your local projects folder on the laptop.
+Antigravity will clone it and pop up a prompt: "Would you like to open the cloned repository?" → Click Open.
+Method 2: The Integrated Terminal
+Open Antigravity and press Ctrl + ` (backtick) to open the terminal.
+Run:
+bash
+git clone https://github.com/thewayrider/bookmark-sync.git
+Click File → Open Folder and select bookmark-sync.
+
+-----
+
+Loading into Comet/Browser on the Lenovo:
+
+Once cloned:
+
+In Comet (or Chrome) on the Lenovo, go to chrome://extensions and turn on Developer mode.
+Click Load unpacked.
+Point it to your newly cloned bookmark-sync/extension folder.
+Click the icon, save your URL and key once, and you are immediately running with the exact same 1-click button!
