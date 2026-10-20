@@ -59,7 +59,8 @@ music-search-master/
 ## 2. EveryNoise "Pure Track" Mandate
 
 All candidate releases across all 13 radars and crawlers must pass through `src/utils/normalizer.js`:
-- **Title-Casing & Clean Capitalization**: First character must be capitalized. Rejects all-lowercase bedroom aesthetics (`black cockatoo`, `now youre mine`) and long all-caps screaming titles.
+- **Title-Casing & Clean Capitalization**: First character must be capitalized. Rejects all-lowercase bedroom aesthetics (`black cockatoo`, `now youre mine`), long all-caps screaming titles, and all-caps screaming artist sentences (`I LOVE YOU MY LOVE`).
+- **Promotional Spam Filter**: Automatically rejects promotional and aggregation channels ending in `hits` (`/^[a-z]+hits$/i` e.g., `RASELHITS`, `TopHits`).
 - **Clean Character Whitelist**: Strictly `A-Za-z0-9` and clean punctuation (`'`, `-`, `.`, `,`, `!`, `?`, `&`). Rejects ugly symbols (`_`, `/`, `\`, `|`, `@`, `#`, `~`, `+`, `$`, `%`, `^`, `*`, `{}`, `[]`).
 - **Concise Word & Length Caps**: 1–6 words (max 45 chars) for titles; 1–5 words (max 40 chars) for artists.
 - **Foreign Language & Stopword Shields**: Automatically blocks French, Spanish, Portuguese, Turkish, and Brazilian funk edits.
@@ -148,6 +149,7 @@ AI farms frequently pair synthetic audio with hyper-stylized female avatars or d
 - **Rule**: Official Artist Channel badges and `- Topic` channels alone **cannot** be trusted as proof of human music. Auto-generated DistroKid copyright lines (`℗ Records DK`) must be quarantined.
 
 ### External Verification Benchmarks
+- **Visual AI Artwork & Video Heuristics**: Generative AI releases almost invariably feature AI-generated cover art or video loops (Midjourney plastic sheen, anime/cyberpunk avatars, surreal impossible landscapes, or 3-second repetitive loops via Kling/Runway/Pika/Sora). Stage 2 verifiers evaluate artwork URLs via Gemini Flash Vision for ambiguous candidates.
 - **SubmitHub AI Song Checker** (`submithub.com`): Premier free curator benchmark; supports direct SoundCloud/YouTube links and runs dual spectral (8–16 kHz vocoder sheen) and temporal dynamic analysis.
 - **Authio / detect.music**: Forensic-grade label detection engine used across European DSPs.
 
