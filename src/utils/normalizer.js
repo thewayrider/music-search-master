@@ -257,6 +257,16 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
     return false;
   }
 
+  // Reject all-caps screaming artist names with spaces (e.g. "I LOVE YOU MY LOVE")
+  if (a === a.toUpperCase() && a.length > 6 && a.includes(' ')) {
+    return false;
+  }
+
+  // Reject promotional spam keywords in artist name (e.g. "RASELHITS", "TopHits")
+  if (/\b(hits|hit\s*music|records\s*dk|music\s*factory|beat\s*factory)\b/i.test(a) || /^[a-z]+hits$/i.test(a)) {
+    return false;
+  }
+
   // 7. Strict Length & Word Count
   const titleWords = t.split(/\s+/).filter(Boolean);
   const artistWords = a.split(/\s+/).filter(Boolean);

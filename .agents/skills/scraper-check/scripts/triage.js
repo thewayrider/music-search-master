@@ -36,9 +36,10 @@ function extractItemsFromText(rawText) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     
-    // Check if line looks like "Artist - Title"
-    if (line.includes(' - ') && !line.startsWith('http') && !line.startsWith('[') && !line.toLowerCase().startsWith('source:')) {
-      const parts = line.split(' - ');
+    // Check if line looks like "Artist - Title" or "Artist — Title"
+    const dashMatch = line.match(/\s+[—–-]\s+/);
+    if (dashMatch && !line.startsWith('http') && !line.startsWith('[') && !line.toLowerCase().startsWith('source:')) {
+      const parts = line.split(/\s+[—–-]\s+/);
       const artist = parts[0].replace(/^[-*•\d.]+\s*/, '').trim();
       let title = parts.slice(1).join(' - ').trim();
       
@@ -53,7 +54,7 @@ function extractItemsFromText(rawText) {
       if (!url) {
         for (let j = i + 1; j <= Math.min(i + 3, lines.length - 1); j++) {
           const nextLine = lines[j];
-          if (nextLine.includes(' - ') && !nextLine.toLowerCase().startsWith('source:')) {
+          if (/\s+[—–-]\s+/.test(nextLine) && !nextLine.toLowerCase().startsWith('source:')) {
             break;
           }
           if (nextLine.includes('http://') || nextLine.includes('https://')) {
@@ -145,8 +146,13 @@ async function triageTrack(item) {
   const db = getDb();
 
   // 1. Database Check
-  if (db && item.artist) {
-    const songMatches = db.prepare(`SELECT * FROM songs WHERE artist LIKE ? OR title LIKE ?`).all(`%${item.artist}%`, `%${item.title}%`);
+  if (db && item.artist && item.artist.trim().length > 1) {
+    let songMatches = [];
+    if (item.title && item.title.trim().length > 1) {
+      songMatches = db.prepare(`SELECT * FROM songs WHERE artist LIKE ? OR title LIKE ? LIMIT 15`).all(`%${item.artist.trim()}%`, `%${item.title.trim()}%`);
+    } else {
+      songMatches = db.prepare(`SELECT * FROM songs WHERE artist LIKE ? LIMIT 15`).all(`%${item.artist.trim()}%`);
+    }
     if (songMatches.length > 0) {
       songMatches.forEach(m => {
         report.catalogHistory.push(`Found "${m.artist} - ${m.title}" (First seen: ${m.first_seen_at} on ${m.first_channel})`);

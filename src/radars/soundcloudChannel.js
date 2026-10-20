@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const { isWithinHours, hasNegativeKeywords, parseArtistTitle } = require('../utils/normalizer');
 
 let _cachedClientId = null;
@@ -5,7 +7,7 @@ let _cachedClientId = null;
 async function getSoundCloudClientId() {
   if (_cachedClientId) return _cachedClientId;
   try {
-    const pageUrl = "https://soundcloud.com/search/sounds?q=indie%20rock&filter.created_at=last_day";
+    const pageUrl = "https://soundcloud.com/search/sounds?q=indie";
     const res = await fetch(pageUrl, {
       headers: { "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
       signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
@@ -25,6 +27,12 @@ async function getSoundCloudClientId() {
   }
 }
 
+/**
+ * Curated SoundCloud Harvester:
+ * Instead of noisy open keyword search, monitors verified, reputable indie record
+ * labels (Sub Pop, Domino, Rough Trade, Merge, 4AD, Captured Tracks, Secretly Canadian, etc.)
+ * and premiere tastemakers for fresh 24h official audio drops.
+ */
 async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
   const channelConfig = config.channels?.soundcloud || { enabled: true };
   if (channelConfig.enabled === false) return [];
@@ -38,13 +46,25 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
     ...(exclusions.bannedArtists || []),
     ...(exclusions.artists || [])
   ];
-  const discoveries = [];
-  const seenUrls = new Set();
+  const bannedGenres = exclusions.bannedGenres || [];
 
-  const AI_REGEX = /\b(ai|a\.i\.|artificial\s+intelligence|suno(\.ai)?|udio(\.com)?|chatgpt|generative\s+ai|virtual\s+(band|artist|singer)|ai\s+(generated|technology|creation|music|song|rock|pop|metal|indie|cover|vocals)|synthetic\s+(music|vocals)|ai\s+vocals|bllb|billy\s*bayou)\b/i;
-  const PODCAST_ESSAY_REGEX = /\b(podcast|investigating|documentary|video\s+essay|tutorial|how\s+to|making\s+(an?|the|some)\s+(indie|rock|song|track|beat|album|music)|making\s+of|behind\s+the\s+scenes|in\s+the\s+studio|studio\s+vlog|songwriting\s+vlog|lesson|guitar\s+lesson|drum\s+lesson|bass\s+lesson|chord\s+tutorial|production\s+tutorial|masterclass|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i;
+  const projectRoot = path.resolve(__dirname, '../../');
+  const channelsPath = path.join(projectRoot, 'configs/soundcloud_channels.json');
 
-  console.log(`[SoundCloud Channel] Checking SoundCloud live indie stream drops in the last 24h...`);
+  if (!fs.existsSync(channelsPath)) {
+    console.log("[SoundCloud Channel] configs/soundcloud_channels.json not found. Skipping.");
+    return [];
+  }
+
+  let curatedChannels = [];
+  try {
+    curatedChannels = JSON.parse(fs.readFileSync(channelsPath, 'utf8'));
+  } catch (e) {
+    console.error("[SoundCloud Channel] Error parsing soundcloud_channels.json:", e.message);
+    return [];
+  }
+
+  console.log(`[SoundCloud Channel] Checking ${curatedChannels.length} curated indie label feeds for 24h drops...`);
 
   const clientId = await getSoundCloudClientId();
   if (!clientId) {
@@ -52,15 +72,31 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
     return [];
   }
 
-  const bannedGenres = exclusions.bannedGenres || [];
-  const queries = ["indie rock", "post-punk", "alternative rock", "garage rock"];
+  const discoveries = [];
+  const seenUrls = new Set();
 
-  for (const q of queries) {
+  for (const ch of curatedChannels) {
     try {
-      const apiUrl = `https://api-v2.soundcloud.com/search/tracks?q=${encodeURIComponent(q)}&filter.created_at=last_day&limit=20&client_id=${clientId}`;
+      let userId = ch.userId;
+
+      // Fallback resolve if userId is missing
+      if (!userId && ch.permalink) {
+        const rRes = await fetch(`https://api-v2.soundcloud.com/resolve?url=https://soundcloud.com/${ch.permalink}&client_id=${clientId}`, {
+          headers: { "user-agent": "Mozilla/5.0" },
+          signal: AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined
+        });
+        if (rRes.ok) {
+          const u = await rRes.json();
+          userId = u.id;
+        }
+      }
+
+      if (!userId) continue;
+
+      const apiUrl = `https://api-v2.soundcloud.com/users/${userId}/tracks?limit=5&client_id=${clientId}`;
       const res = await fetch(apiUrl, {
         headers: { "user-agent": "Mozilla/5.0" },
-        signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined
+        signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
       });
 
       if (!res.ok) continue;
@@ -71,104 +107,33 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
       for (const item of items) {
         if (!item.permalink_url || seenUrls.has(item.permalink_url)) continue;
 
-        // Check strict recency
+        // 1. Strict recency check (last 24-36h)
         if (!isWithinHours(item.created_at, maxHours)) continue;
 
         const rawTitle = item.title || "";
-        const uploader = item.user?.username || "";
+        const trackDesc = item.description || "";
         const genre = (item.genre || "").toLowerCase();
         const tags = (item.tag_list || "").toLowerCase();
-        const trackDesc = item.description || "";
-        const fullText = `${uploader} ${rawTitle} ${genre} ${tags} ${trackDesc}`;
+        const fullText = `${ch.name} ${rawTitle} ${genre} ${tags} ${trackDesc}`;
 
-        // Credibility check 1: Reject zero/low-follower throwaways and bots (minimum 50 followers)
-        const user = item.user || {};
-        const followers = user.followers_count || 0;
-        const trackCount = user.track_count || 0;
-        const minFollowers = channelConfig.minFollowers !== undefined ? channelConfig.minFollowers : 50;
-
-        if (followers < minFollowers) {
+        // 2. Reject non-song audio: must be complete track between 1m30s and 7m30s
+        const duration = item.duration || 0;
+        if (duration > 0 && (duration < 90000 || duration > 450000)) {
           continue;
         }
 
-        // Credibility check 2: Reject spam content farms dumping dozens/hundreds of tracks
-        // Rule A: Hard cap on track count (legitimate discovering indie artists do not have >80 tracks on SoundCloud)
-        if (trackCount > 80) {
+        // 3. Reject podcasts, interviews, teasers, previews, radio shows
+        if (/\b(podcast|interview|teaser|preview|sampler|promo\s*clip|snippet|trailer)\b/i.test(rawTitle) ||
+            /\b(operation\s*xray|radio\s*(station|broadcast|announcement|show|set)?|airplay\s*log)\b/i.test(fullText)) {
           continue;
         }
 
-        // Rule B: Low follower / high track farm ratio
-        if ((trackCount > 35 && followers < 150) || (trackCount > 20 && (trackCount / Math.max(1, followers)) > 2)) {
+        // 4. Reject reissues, remasters, anniversary editions
+        if (/\b(reissue|re-issue|remaster|remastered|deluxe|anniversary|expanded|edition|demo(s)?|live\s*at|live\s*from)\b/i.test(rawTitle)) {
           continue;
         }
 
-        // Rule C: Auto-generated numeric bot permalinks (e.g. b-robb-447722922, mirage-748032038, user-129849182)
-        if (/-[0-9]{7,12}$/.test(user.permalink || '') && trackCount > 15) {
-          continue;
-        }
-
-        // Rule D: Content Farm artist names (e.g. BigTroll's Music Factory)
-        if (/\b(music\s*factory|song\s*factory|ai\s*records|studio\s*bot|beat\s*factory)\b/i.test(uploader)) {
-          continue;
-        }
-
-        // Rule E: Suno / Udio prompt tokens in tags or description
-        if (/\b(\d{2,3}\s*bpm|analog\s*bass|cathedral\s*reverb|ethereal\s*pads|female\s*vocals|male\s*vocals|vocal\s*chops|ai\s*generated|ai\s*prompt)\b/i.test(`${tags} ${trackDesc}`)) {
-          continue;
-        }
-
-        // Rule F: AI prompt iteration markers in title (e.g. "_v2", "_v3")
-        if (/\b_v\d+\b/i.test(rawTitle) || /\b(v\d|ver\s*\d)\s*$/i.test(rawTitle)) {
-          continue;
-        }
-
-        // Credibility check 3: Reject keyword-stuffed titles (e.g. "(Indie Rock)" appended)
-        if (/\((indie|alternative|alt|garage|punk|surf|psych|math)\s*rock\)\s*$/i.test(rawTitle)) {
-          continue;
-        }
-
-        // Reject type beats and producer instrumental packs
-        if (/\b(type\s*beat|beat\s*pack|free\s*beat|instrumental\s*beat)\b/i.test(rawTitle)) {
-          continue;
-        }
-
-        // Reject banned artists (e.g. Cryptid Park)
-        if (bannedArtists.some(b => fullText.toLowerCase().includes(b.toLowerCase()))) {
-          continue;
-        }
-
-        // Reject AI generated music
-        if (AI_REGEX.test(fullText)) {
-          continue;
-        }
-
-        // Reject podcasts, tutorials, clickbait questions
-        if (PODCAST_ESSAY_REGEX.test(fullText) || /\?|!{2,}|\?!|!\?/.test(rawTitle)) {
-          continue;
-        }
-
-        // Reject titles that are pure dates (e.g. "Oct 9, 2026")
-        if (/^\s*(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|september|oct|october|nov|november|dec|december)\s+\d{1,2},?\s*(20\d\d)?\s*$/i.test(rawTitle) ||
-            /^\s*\d{1,2}[./-]\d{1,2}([./-]\d{2,4})?\s*$/.test(rawTitle)) {
-          continue;
-        }
-
-        // Reject radio shows / broadcast announcements
-        if (/\b(operation\s*xray|radio\s*(station|broadcast|announcement|show|set)?|airplay\s*log)\b/i.test(fullText)) {
-          continue;
-        }
-
-        // Reject DarkPop genre
-        if (/\b(dark\s*pop|darkpop)\b/i.test(fullText)) {
-          continue;
-        }
-
-        // Reject vulgarity in title
-        if (/\b(bitch|bitches|fuck|fucking|shit|shitty|nigga|asshole|cunt)\b/i.test(rawTitle)) {
-          continue;
-        }
-
-        // Reject banned genres (e.g. Jazz & Blues, Jazz, Blues, Hip-hop, Rap, EDM, Trap, DarkPop, etc.)
+        // 5. Reject banned genres
         const genreAndTags = `${genre} ${tags}`.toLowerCase();
         const isBannedGenre = bannedGenres.some(bg => {
           const b = bg.toLowerCase().trim();
@@ -176,40 +141,47 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
           const reg = new RegExp(`(^|\\b|[,/&-])${b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\b|[,/&-]|\$)`, 'i');
           return reg.test(genreAndTags);
         });
-        if (isBannedGenre) {
-          continue;
+        if (isBannedGenre) continue;
+
+        // 6. Reject negative keywords & banned artists
+        if (hasNegativeKeywords(fullText, negativeKeywords)) continue;
+        if (bannedArtists.some(b => fullText.toLowerCase().includes(b.toLowerCase()))) continue;
+
+        // 7. Parse artist and title
+        let parsed = parseArtistTitle(rawTitle);
+
+        // If artist couldn't be parsed from title, check publisher_metadata or description
+        if (parsed.artist === "Unknown Artist" && item.publisher_metadata?.artist) {
+          parsed.artist = item.publisher_metadata.artist;
         }
 
-        // Reject negative keywords (type beats, remixes, loops)
-        if (hasNegativeKeywords(fullText, negativeKeywords)) continue;
-
-        // Parse artist and title
-        let parsed = parseArtistTitle(rawTitle);
-        if (parsed.artist === "Unknown Artist" && uploader) {
-          parsed.artist = uploader;
+        // If still unknown, skip to prevent uncredited clutter
+        if (!parsed.artist || parsed.artist === "Unknown Artist" || !parsed.title) {
+          continue;
         }
 
         seenUrls.add(item.permalink_url);
         discoveries.push({
           artist: parsed.artist,
           title: parsed.title,
-          channel: "SoundCloud",
+          channel: `SoundCloud (${ch.name})`,
           url: item.permalink_url,
           releaseDate: new Date(item.created_at).toISOString().slice(0, 10),
           releaseType: "single",
-          genre: item.genre || q,
-          description: `SoundCloud Drop | Uploader: ${uploader} | Tag: ${item.genre || q}`
+          genre: item.genre || "Indie",
+          description: `Curated Label Drop | Label: ${ch.name} | Category: ${ch.category || 'Indie Label'}`
         });
       }
     } catch (e) {
-      // Continue quietly
+      // Continue next channel
     }
   }
 
-  console.log(`[SoundCloud Channel] Found ${discoveries.length} candidates.`);
+  console.log(`[SoundCloud Channel] Harvested ${discoveries.length} verified 24h drop(s) from curated label accounts.`);
   return discoveries;
 }
 
 module.exports = {
-  harvestSoundCloudDaily
+  harvestSoundCloudDaily,
+  getSoundCloudClientId
 };

@@ -153,13 +153,15 @@ AI farms frequently pair synthetic audio with hyper-stylized female avatars or d
 
 ---
 
-## 9. SoundCloud Credibility & Spam-Farm Filter Rules (`src/radars/soundcloudChannel.js`)
+## 9. Curated SoundCloud Indie Label Harvester (`src/radars/soundcloudChannel.js`)
 
-1. **Follower Threshold**: Uploader must have $\ge 50$ followers (`followers_count >= 50`). Drops zero-follower throwaways and new bot accounts.
-2. **Spam Content Farm Ratio**: Rejects accounts with $>40$ tracks and $<150$ followers, or a track-to-follower ratio $>3:1$ (e.g. content farms dumping 700+ tracks with 40 followers).
-3. **Keyword-Stuffed Titles**: Rejects titles ending with algorithmic search bait like `(Indie Rock)` or `(Alternative Rock)`.
-4. **Type Beats Purge**: Rejects `type beat`, `beat pack`, `free beat`, `instrumental beat`.
-5. **Description Scanning**: Includes `item.description` in regex scanning to catch Suno/Udio prompt tags.
+To eliminate low-fidelity bedroom noise, raw loops, and AI search spam, the Global Radar no longer queries SoundCloud's public search feed. Instead, it directly monitors **22 premier indie record labels and tastemakers** via [`configs/soundcloud_channels.json`](configs/soundcloud_channels.json):
+1. **Prestige Indie Labels**: Sub Pop Records, Domino Recording Co, Rough Trade Records, Merge Records, Captured Tracks, Partisan Records, Secretly Canadian, Jagjaguwar, Polyvinyl Records, Saddle Creek, Bella Union, Heavenly Recordings, Flying Nun Records (NZ), Spinning Top Music (AU), Fire Records, Fat Possum Records, Mute Records, Ghostly International, Mom + Pop Music.
+2. **Tastemakers & Sessions**: BIRP! Indie, Gorilla vs. Bear, KEXP Live.
+3. **Filtering & Duration Gates**:
+   - Enforces strict track duration between **1m 30s and 7m 30s** (drops snippets, loops, and DJ sets).
+   - Rejects podcasts, interviews, teasers, reissues, and remasters.
+   - Preserves silence (yields 0) if no curated label dropped a release in the last 24–36h.
 
 ---
 
