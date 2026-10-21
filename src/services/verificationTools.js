@@ -196,12 +196,25 @@ async function check_musicbrainz_artist(artistName) {
     }
 
     // Select the best match based on score & exact/close name
-    let best = artists[0];
+    let best = null;
+    const cleanLower = cleanArtist.toLowerCase().trim();
+    const cleanAlpha = cleanLower.replace(/[^a-z0-9]/g, '');
+
     for (const a of artists) {
-      if (a.name && a.name.toLowerCase() === cleanArtist.toLowerCase()) {
+      if (!a.name) continue;
+      const aLower = a.name.toLowerCase().trim();
+      if (aLower === cleanLower) {
         best = a;
         break;
       }
+    }
+
+    if (!best) {
+      return {
+        found: false,
+        artist: cleanArtist,
+        confidenceNote: `No exact artist match found on MusicBrainz for "${cleanArtist}"`
+      };
     }
 
     const countryRaw = best.country || null;
