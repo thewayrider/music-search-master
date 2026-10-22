@@ -127,7 +127,21 @@ class FleetScheduler {
       }
     ];
 
+    const radarConfigPath = path.join(this.projectRoot, 'configs/radar_config.json');
+    let radarConfig = {};
+    if (fs.existsSync(radarConfigPath)) {
+      try { radarConfig = JSON.parse(fs.readFileSync(radarConfigPath, 'utf8')); } catch (_) {}
+    }
+
     for (const radar of dailyRadars) {
+      if (radar.id === 'global-radar' && radarConfig.globalRadarEnabled === false) {
+        console.log(`[Scheduler] ⏸️  Global Daily Radar is paused in configs/radar_config.json. Skipping schedule.`);
+        continue;
+      }
+      if (radar.id === 'us-radar' && radarConfig.usRadarEnabled === false) {
+        console.log(`[Scheduler] ⏸️  US Daily Radar is paused in configs/radar_config.json. Skipping schedule.`);
+        continue;
+      }
       this._registerJob(radar);
     }
 

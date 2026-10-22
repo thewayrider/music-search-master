@@ -7,7 +7,7 @@ This document serves as the permanent system architecture reference, discovery r
 ## 1. Unified Project Mission & Structure
 
 `music-search-master` is the unified single-repository codebase combining:
-1. **The 24/7 Rapid Response Radars** (Global & US Edition) — daily 36-hour release detection at 06:30 and 07:00 AM (includes Under the Radar Magazine).
+1. **The 24/7 Rapid Response Radars** (Global & US Edition) — daily 36-hour release detection at 06:30 and 07:00 AM (includes Under the Radar Magazine). *Note: Global Radar is paused awaiting Googlebook Linux sandbox migration; US Radar remains active.*
 2. **The 12 Weekly Tastemaker Crawlers** (Bandcamp, AMRAP, Triple J Unearthed, ListenBrainz, MusicBrainz, Deezer, Futuremag, Roots Mag, Air Charts, Nialler9, New Releases Now).
 3. **The Unified Fleet Command Center** — Express REST API daemon (Port 4000) and dedicated standalone App-Mode window.
 4. **The Master SQLite Brain** (`data/master_catalog.sqlite`) — single shared database for all sightings and Tastemaker Heat consensus tracking.
@@ -16,6 +16,7 @@ This document serves as the permanent system architecture reference, discovery r
 ```text
 music-search-master/
 ├── configs/                       # All crawler configurations, exclusions, and schedules
+│   ├── radar_config.json          # Radar master switches (Global paused / US active)
 │   ├── schedules.json             # 14 automated tasks definitions
 │   ├── exclusions.json            # Keyword exclusions
 │   └── secrets.json               # Email & API credentials (ignored by git)

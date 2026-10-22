@@ -1,0 +1,9 @@
+{
+  "globalRadarEnabled": false,
+  "usRadarEnabled": true,
+  "statusNote": "Global Radar paused awaiting Lenovo Googlebook Linux sandbox rebuild. US Radar remains active.",
+  "maxRecencyHours": 36,
+  "maxTracksPerArtist": 2,
+  "maxSoundCloudTracks": 5,
+  "maxTracksPerChannel": 8
+}

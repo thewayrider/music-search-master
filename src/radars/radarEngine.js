@@ -51,6 +51,17 @@ async function runDailyRadar(options = {}) {
   console.log(`Timestamp:      ${new Date().toISOString()}`);
   console.log("------------------------------------------------------------\n");
 
+  if (market === 'GLOBAL' && config.globalRadarEnabled === false) {
+    console.log("⏸️  [Radar Engine] Global Daily Radar is PAUSED (awaiting Linux Googlebook sandbox migration).");
+    console.log("    Preserving silence. All open-web harvesters skipped, no emails dispatched.\n");
+    return [];
+  }
+
+  if (market === 'US' && config.usRadarEnabled === false) {
+    console.log("⏸️  [Radar Engine] US Daily Radar is PAUSED. Preserving silence.\n");
+    return [];
+  }
+
   let rawCandidates = [];
 
   if (market === 'US') {
