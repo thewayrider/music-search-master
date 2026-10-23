@@ -125,15 +125,13 @@ git pull origin main
 
 ---
 
-## 7. Windows Task Scheduler Standard (PowerShell 5.1 Native)
+## 7. Single Auto-Start Daemon on Mini PC (`MusicSearch_FleetCommandCenter_AutoStart`)
 
-Because paths contain spaces (`C:\Antigravity Projects\music-search-master`), `schtasks.exe` quote escaping breaks in Windows PowerShell 5.1. Always use pure PowerShell cmdlets to register tasks on Windows:
-
-```powershell
-$action = New-ScheduledTaskAction -Execute 'C:\Antigravity Projects\music-search-master\run_newreleasesnow.bat'
-$trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Saturday -At 09:30AM
-Register-ScheduledTask -TaskName 'MusicSearch_NewReleasesNow' -Action $action -Trigger $trigger -Force
-```
+Individual crawler and radar tasks in Windows Task Scheduler are **fully obsolete and retired**. The Mini PC relies on a single background task created by `setup_minipc_autostart.ps1`:
+- **Task Name**: `MusicSearch_FleetCommandCenter_AutoStart`
+- **Action**: Launches `node src/server.js` on user logon.
+- **In-Process Control**: All 13 discovery crawlers and daily radars are scheduled and executed entirely in-process by `src/services/scheduler.js`.
+- **Operating Rule**: **Never** register, modify, or disable individual crawler tasks in Windows Task Scheduler. All pauses and schedule changes are managed 100% in Git via `configs/radar_config.json` and `configs/schedules.json`. A simple `git pull origin main` on the Mini PC is all that is ever required.
 
 ---
 
