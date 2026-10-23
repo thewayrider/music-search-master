@@ -14,6 +14,9 @@ data/*
 npm-debug.log*
 .DS_Store
 
-# Local Crawler Runtime Telemetry
+# Local Crawler Runtime Telemetry & Reports
 saved_searches/crawler_analytics.json
+saved_searches/dashboard_status.json
+saved_searches/cache/
+dashboard.html
 

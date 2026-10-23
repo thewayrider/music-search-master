@@ -111,17 +111,19 @@ npm run command-center                     # Start API server on port 4000
 
 ## 6. Mini PC Git Sync & Collision Resolution
 
-Because the Always-On Mini PC runs crawlers continuously, local telemetry (`saved_searches/crawler_analytics.json`) and untracked lockfiles (`package-lock.json`) previously blocked `git pull origin main`.
+Because the Always-On Mini PC runs crawlers continuously, runtime reports (`dashboard.html`, `saved_searches/dashboard_status.json`, cache files) and telemetry dynamically update on disk. A standard `git pull` will silently abort if these files diverge.
 
-- **Telemetry Untracked**: `saved_searches/crawler_analytics.json` is now permanently untracked in `.gitignore` so local run history can be updated freely on disk without interfering with Git sync.
 - **Master SQLite Database**: Resides in `data/master_catalog.sqlite` and is strictly ignored by Git. Local DB reads and writes are never affected by Git operations.
+- **Secrets Protected**: `configs/secrets.json` is strictly ignored by Git.
 
-**Standard resolution on Mini PC if uncommitted changes occur:**
+**Standard 1-Click Sync Protocol on Mini PC:**
+To pull updates without ever getting blocked by crawler-generated reports:
 ```powershell
-git restore saved_searches/crawler_analytics.json
-Remove-Item -Force package-lock.json -ErrorAction SilentlyContinue
-git pull origin main
+git fetch origin main
+git reset --hard origin/main
+git clean -fd
 ```
+*(This safely aligns the Mini PC to latest `origin/main` and discards ephemeral generated reports without touching `data/` or `configs/secrets.json`).*
 
 ---
 
