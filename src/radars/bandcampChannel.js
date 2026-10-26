@@ -51,6 +51,10 @@ async function harvestBandcampDaily(config = {}, exclusions = {}) {
           if (!item.artist || !item.title) continue;
           if (seenUrls.has(item.url)) continue;
 
+          // Drop Silent Pre-Orders & Pre-Orders
+          if (!item.featured_track || !item.featured_track.stream_url) continue;
+          if (item.is_album_preorder || item.is_preorder) continue;
+
           // Check strict recency (released within the last 24-36h)
           const releaseDate = item.release_date || item.publish_date;
           if (!isWithinHours(releaseDate, maxHours)) continue;

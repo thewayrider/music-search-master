@@ -7,6 +7,8 @@ const DEFAULTS = {
   maxItems: 120,
   requestDelayMs: 700,
   timeoutMs: 25000,
+  allowPreorders: false,
+  maxFutureHours: 36,
   userAgent:
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
 
@@ -153,7 +155,7 @@ async function harvestDiscover(http, options) {
 
         const { results, cursor: nextCursor } = parseDiscoverResponse(data);
         for (const raw of results) {
-          const card = toCard(raw, location, genre);
+          const card = toCard(raw, location, genre, options);
           if (!card) continue;
           const key = `${slugify(card.artist)}::${slugify(card.title)}`;
           if (seen.has(key)) continue;
@@ -197,10 +199,29 @@ function parseDiscoverResponse(data) {
   return { results: Array.isArray(results) ? results : [], cursor };
 }
 
-function toCard(raw, locationCtx, queryGenre) {
+function toCard(raw, locationCtx, queryGenre, options = {}) {
   const artist = firstDefined(raw, ["band_name", "artist", "artist_name", "band"]);
   const title = firstDefined(raw, ["title", "album_title", "name", "item_title"]);
   if (!artist || !title) return null;
+
+  // 1. Drop Silent Pre-Orders / Unstreamable Items:
+  // Must have a streamable featured track to preview
+  const hasStreamableAudio = Boolean(raw.featured_track && raw.featured_track.stream_url);
+  if (!hasStreamableAudio) return null;
+
+  // 2. Pre-Order Quarantine:
+  // Drop pre-orders if allowPreorders is false (default)
+  const isPreorder = Boolean(raw.is_album_preorder || raw.is_preorder);
+  if (!options.allowPreorders && isPreorder) return null;
+
+  // 3. Release Date Guard (Future-Dated Releases):
+  // Filter out tracks set to release beyond a reasonable timezone buffer (default: 36 hours)
+  const rawDateStr = firstDefined(raw, ["release_date", "new_date", "publish_date", "added_date"]);
+  if (rawDateStr) {
+    const parsedMs = new Date(rawDateStr).getTime();
+    const maxFutureMs = Date.now() + (options.maxFutureHours || 36) * 60 * 60 * 1000;
+    if (!Number.isNaN(parsedMs) && parsedMs > maxFutureMs) return null;
+  }
 
   let url = firstDefined(raw, ["item_url_path", "tralbum_url", "url", "item_url"]);
   if (!url) {
@@ -341,15 +362,18 @@ function bucketFromScore(score) {
   return "Manual review";
 }
 
-function dedupeAndSort(items, filters) {
+function dedupeAndSort(items, filters = {}) {
   const runWindowDays = filters.runWindowDays || 14;
   const cutoff = Date.now() - runWindowDays * 24 * 60 * 60 * 1000;
+  const maxFutureMs = Date.now() + (filters.maxFutureHours || 36) * 60 * 60 * 1000;
   const map = new Map();
 
   for (const item of items) {
     const parsed = new Date(item.releaseDate).getTime();
     const dateOk =
-      item.releaseDate === "unknown" || Number.isNaN(parsed) || parsed >= cutoff;
+      item.releaseDate === "unknown" ||
+      Number.isNaN(parsed) ||
+      (parsed >= cutoff && parsed <= maxFutureMs);
     if (!dateOk) continue;
 
     const key = `${slugify(item.artist)}::${slugify(item.title)}`;
