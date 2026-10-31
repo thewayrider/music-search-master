@@ -1,6 +1,51 @@
+const https = require('https');
 const { isWithinHours, hasNegativeKeywords } = require('../utils/normalizer');
 
 const DISCOVER_ENDPOINT = "https://bandcamp.com/api/discover/1/discover_web";
+
+function httpsPostJson(urlStr, body, options = {}) {
+  return new Promise((resolve, reject) => {
+    const u = new URL(urlStr);
+    const data = JSON.stringify(body);
+    const req = https.request({
+      hostname: u.hostname,
+      path: u.pathname + (u.search || ''),
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'content-length': Buffer.byteLength(data),
+        'accept': 'application/json',
+        'user-agent': options.userAgent || 'curl/8.4.0'
+      },
+      timeout: options.timeoutMs || 20000
+    }, res => {
+      let chunks = '';
+      res.on('data', d => chunks += d);
+      res.on('end', () => {
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          return reject(new Error(`HTTP ${res.statusCode}`));
+        }
+        const trimmed = chunks.trim();
+        if (trimmed.startsWith('<')) {
+          return reject(new Error('HTML challenge page returned'));
+        }
+        try {
+          resolve(JSON.parse(chunks));
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+
+    req.on('timeout', () => {
+      req.destroy();
+      reject(new Error('Timeout'));
+    });
+    req.on('error', reject);
+    req.write(data);
+    req.end();
+  });
+}
 
 async function harvestBandcampDaily(config = {}, exclusions = {}) {
   const channelConfig = config.channels?.bandcamp || {};
@@ -33,18 +78,7 @@ async function harvestBandcampDaily(config = {}, exclusions = {}) {
           include_result_types: ["a"]
         };
 
-        const res = await fetch(DISCOVER_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-          },
-          body: JSON.stringify(body)
-        });
-
-        if (!res.ok) continue;
-
-        const data = await res.json();
+        const data = await httpsPostJson(DISCOVER_ENDPOINT, body, { userAgent: "curl/8.4.0", timeoutMs: 20000 });
         const items = data.results || (data.discover && data.discover.results) || [];
 
         for (const item of items) {

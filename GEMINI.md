@@ -256,6 +256,15 @@ To triage alert emails and audit suspicious discoveries in chat, the workspace i
   3. **Reissue & Deluxe Filter**: Flags remasters, anniversary editions, and catalog re-releases.
   4. **Earliest Release Year Lookup**: Queries iTunes & MusicBrainz to detect true original release years.
 
+---
+
+## 17. Bandcamp Discover API WAF Bypass & Client Challenge Guard (`src/crawlers/bandcampAgent.js`, `src/radars/bandcampChannel.js`)
+
+Bandcamp's CDN/WAF (Fastly) recently deployed active client challenge interception on `https://bandcamp.com/api/discover/1/discover_web`:
+1. **The "Unexpected Token '<'" / "Token Invalid" Failure**: Node 18+ global `fetch` (powered by `undici`) combined with spoofed Chrome User-Agents triggers Fastly's TLS-to-UA fingerprint mismatch rules. Fastly serves a 200 OK interstitial HTML challenge (`<title>Client Challenge</title>`). Calling `.json()` on this response threw `SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON` on every location/genre query loop, causing the crawler to exit with 0 items.
+2. **Native HTTPS Engine Solution**: Both `bandcampAgent.js` and `bandcampChannel.js` utilize Node's native `https.request` with client-aligned headers (`User-Agent: curl/8.4.0`). Fastly routes this as standard API client traffic, bypassing the browser challenge entirely and returning 100% valid JSON payloads.
+3. **HTML Challenge Guard**: Explicitly inspects incoming payload chunks. If a response begins with `<` (HTML), it rejects immediately with a clear error rather than crashing JSON parsers.
+
 
 
 

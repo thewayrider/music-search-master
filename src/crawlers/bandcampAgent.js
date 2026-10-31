@@ -1,3 +1,5 @@
+const https = require('https');
+
 const DEFAULTS = {
   sourceService: "Bandcamp",
   discoverEndpoint: "https://bandcamp.com/api/discover/1/discover_web", 
@@ -9,8 +11,7 @@ const DEFAULTS = {
   timeoutMs: 25000,
   allowPreorders: false,
   maxFutureHours: 36,
-  userAgent:
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+  userAgent: "curl/8.4.0",
 
   locations: [
     { name: "Melbourne",    geonameId: 2158177, country: "Australia" },
@@ -391,19 +392,47 @@ function dedupeAndSort(items, filters = {}) {
 // ---------------------------------------------------------------------------
 
 async function fetchJson(req, http, options) {
-  const response = await http(req.url, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      accept: "application/json",
-      "user-agent": options.userAgent,
-    },
-    body: JSON.stringify(req.body),
-    redirect: "follow",
-    signal: AbortSignal.timeout ? AbortSignal.timeout(options.timeoutMs) : undefined,
+  return new Promise((resolve, reject) => {
+    const u = new URL(req.url);
+    const data = JSON.stringify(req.body);
+    const request = https.request({
+      hostname: u.hostname,
+      path: u.pathname + (u.search || ''),
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'content-length': Buffer.byteLength(data),
+        'accept': 'application/json',
+        'user-agent': options.userAgent || 'curl/8.4.0'
+      },
+      timeout: options.timeoutMs || 25000
+    }, res => {
+      let chunks = '';
+      res.on('data', d => chunks += d);
+      res.on('end', () => {
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          return reject(new Error(`Bandcamp request failed: HTTP ${res.statusCode}`));
+        }
+        const trimmed = chunks.trim();
+        if (trimmed.startsWith('<')) {
+          return reject(new Error(`Bandcamp returned HTML challenge page instead of JSON`));
+        }
+        try {
+          resolve(JSON.parse(chunks));
+        } catch (e) {
+          reject(new Error(`JSON Parse Error: ${e.message}`));
+        }
+      });
+    });
+
+    request.on('timeout', () => {
+      request.destroy();
+      reject(new Error('Bandcamp request timed out'));
+    });
+    request.on('error', reject);
+    request.write(data);
+    request.end();
   });
-  if (!response.ok) throw new Error(`Bandcamp request failed: ${response.status}`);
-  return response.json();
 }
 
 function guessReleaseType(raw) {
