@@ -1,6 +1,7 @@
 const fs = require("fs/promises");
 const path = require("path");
 const { check_itunes_release_history } = require("../services/verificationTools");
+const { getJsonHeaders, LINUX_CHROME_UA } = require("../utils/browserHeaders");
 
 const DEFAULTS = {
   sourceService: "AMRAP",
@@ -188,7 +189,10 @@ async function fetchWeekly(http, options) {
   let url = options.weeklyEndpoint;
   if (options.date) url += `?date=${encodeURIComponent(options.date)}`;
   const res = await http(url, {
-    headers: { accept: "application/json", "user-agent": options.userAgent },
+    headers: getJsonHeaders({
+      "User-Agent": options.userAgent || LINUX_CHROME_UA,
+      "Referer": "https://amrap.org.au/charts"
+    }),
     signal: AbortSignal.timeout ? AbortSignal.timeout(options.timeoutMs) : undefined,
   });
   if (!res.ok) throw new Error(`AMRAP request failed: ${res.status}`);

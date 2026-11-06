@@ -201,41 +201,42 @@ function parseDiscoverResponse(data) {
 }
 
 function toCard(raw, locationCtx, queryGenre, options = {}) {
-  const artist = firstDefined(raw, ["band_name", "artist", "artist_name", "band"]);
-  const title = firstDefined(raw, ["title", "album_title", "name", "item_title"]);
+  const artist = firstDefined(raw, ["bandName", "band_name", "artist", "artist_name", "band", "albumArtist"]);
+  const title = firstDefined(raw, ["title", "album_title", "name", "item_title", "itemTitle"]);
   if (!artist || !title) return null;
 
   // 1. Drop Silent Pre-Orders / Unstreamable Items:
   // Must have a streamable featured track to preview
-  const hasStreamableAudio = Boolean(raw.featured_track && raw.featured_track.stream_url);
+  const trackObj = raw.featuredTrack || raw.featured_track;
+  const hasStreamableAudio = Boolean(trackObj && (trackObj.streamUrl || trackObj.stream_url));
   if (!hasStreamableAudio) return null;
 
   // 2. Pre-Order Quarantine:
   // Drop pre-orders if allowPreorders is false (default)
-  const isPreorder = Boolean(raw.is_album_preorder || raw.is_preorder);
+  const isPreorder = Boolean(raw.isAlbumPreorder || raw.is_album_preorder || raw.is_preorder);
   if (!options.allowPreorders && isPreorder) return null;
 
   // 3. Release Date Guard (Future-Dated Releases):
   // Filter out tracks set to release beyond a reasonable timezone buffer (default: 36 hours)
-  const rawDateStr = firstDefined(raw, ["release_date", "new_date", "publish_date", "added_date"]);
+  const rawDateStr = firstDefined(raw, ["releaseDate", "release_date", "new_date", "publish_date", "added_date"]);
   if (rawDateStr) {
     const parsedMs = new Date(rawDateStr).getTime();
     const maxFutureMs = Date.now() + (options.maxFutureHours || 36) * 60 * 60 * 1000;
     if (!Number.isNaN(parsedMs) && parsedMs > maxFutureMs) return null;
   }
 
-  let url = firstDefined(raw, ["item_url_path", "tralbum_url", "url", "item_url"]);
+  let url = firstDefined(raw, ["itemUrl", "item_url_path", "tralbum_url", "url", "item_url"]);
   if (!url) {
-    const bandUrl = firstDefined(raw, ["band_url"]);
-    const path = firstDefined(raw, ["item_url", "slug"]);
+    const bandUrl = firstDefined(raw, ["bandUrl", "band_url"]);
+    const path = firstDefined(raw, ["itemUrl", "item_url", "slug"]);
     if (bandUrl && path) {
       url = String(bandUrl).replace(/\/$/, "") + "/" + String(path).replace(/^\//, "");
     }
   }
 
-  const rawLocation = firstDefined(raw, ["band_location", "location", "geo"]);
+  const rawLocation = firstDefined(raw, ["bandLocation", "band_location", "location", "geo"]);
   const releaseDate = normalizeDate(
-    firstDefined(raw, ["release_date", "new_date", "publish_date", "added_date"])
+    firstDefined(raw, ["releaseDate", "release_date", "new_date", "publish_date", "added_date"])
   );
 
   return {
@@ -245,7 +246,7 @@ function toCard(raw, locationCtx, queryGenre, options = {}) {
     location: rawLocation || (locationCtx ? locationCtx.name : null),
     hasOwnLocation: !!rawLocation,
     queryLocationCountry: locationCtx ? locationCtx.country : null,
-    genreTag: firstDefined(raw, ["genre", "primary_genre", "tag"]) || null,
+    genreTag: firstDefined(raw, ["genre", "primary_genre", "tag", "bandGenreId"]) || null,
     queryGenre,
     releaseDate,
     releaseType: guessReleaseType(raw),

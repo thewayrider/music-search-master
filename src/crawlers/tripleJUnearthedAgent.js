@@ -1,10 +1,11 @@
 const cheerio = require("cheerio");
 const { extractReleasesWithAI } = require("../utils/aiScraper");
+const { getBrowserHeaders, LINUX_CHROME_UA } = require("../utils/browserHeaders");
 
 const DEFAULTS = {
   baseUrl: "https://www.abc.net.au/triplejunearthed",
   sourceService: "Triple J Unearthed",
-  userAgent: "music-release-agent/1.0 ( https://kimrampling.com )",
+  userAgent: LINUX_CHROME_UA,
 };
 
 // The strict genre combinations requested by the user, converted to Sets for order-agnostic matching.

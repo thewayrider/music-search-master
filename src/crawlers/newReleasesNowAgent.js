@@ -1,10 +1,11 @@
 const cheerio = require("cheerio");
 const { isExcluded } = require("../utils/filterEngine");
+const { getBrowserHeaders, LINUX_CHROME_UA } = require("../utils/browserHeaders");
 
 const DEFAULTS = {
   baseUrl: "https://www.newreleasesnow.com",
   sourceService: "New Releases Now",
-  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  userAgent: LINUX_CHROME_UA,
   timeoutMs: 15000,
   genreSlugs: [
     "new-indie-rock-songs",
@@ -47,10 +48,10 @@ function parsePageDate(html) {
 async function fetchHtml(url, options) {
   try {
     const res = await fetch(url, {
-      headers: {
-        "User-Agent": options.userAgent,
+      headers: getBrowserHeaders({
+        "User-Agent": options.userAgent || LINUX_CHROME_UA,
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-      },
+      }),
       signal: AbortSignal.timeout ? AbortSignal.timeout(options.timeoutMs) : undefined
     });
     if (!res.ok) {

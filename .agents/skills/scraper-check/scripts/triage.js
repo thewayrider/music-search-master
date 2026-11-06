@@ -1,7 +1,16 @@
 const fs = require('fs');
 const path = require('path');
-const { DatabaseSync } = require('node:sqlite');
 const cheerio = require('cheerio');
+
+// Resilient SQLite engine loader
+let DatabaseEngine = null;
+try {
+  DatabaseEngine = require('node:sqlite').DatabaseSync;
+} catch (_) {
+  try {
+    DatabaseEngine = require('better-sqlite3');
+  } catch (_) {}
+}
 const { parseArtistTitle, isCleanTrack } = require('../../../../src/utils/normalizer');
 const { check_musicbrainz_artist, check_itunes_release_history } = require('../../../../src/services/verificationTools');
 
@@ -25,8 +34,8 @@ const AI_TOOL_KEYWORDS = [
 ];
 
 function getDb() {
-  if (!fs.existsSync(DB_PATH)) return null;
-  return new DatabaseSync(DB_PATH);
+  if (!fs.existsSync(DB_PATH) || !DatabaseEngine) return null;
+  return new DatabaseEngine(DB_PATH);
 }
 
 function extractItemsFromText(rawText) {

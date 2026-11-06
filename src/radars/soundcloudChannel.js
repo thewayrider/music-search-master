@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { isWithinHours, hasNegativeKeywords, parseArtistTitle } = require('../utils/normalizer');
+const { getBrowserHeaders, getJsonHeaders } = require('../utils/browserHeaders');
 
 let _cachedClientId = null;
 
@@ -9,7 +10,7 @@ async function getSoundCloudClientId() {
   try {
     const pageUrl = "https://soundcloud.com/search/sounds?q=indie";
     const res = await fetch(pageUrl, {
-      headers: { "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
+      headers: getBrowserHeaders(),
       signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
     });
     if (!res.ok) return null;
@@ -82,7 +83,7 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
       // Fallback resolve if userId is missing
       if (!userId && ch.permalink) {
         const rRes = await fetch(`https://api-v2.soundcloud.com/resolve?url=https://soundcloud.com/${ch.permalink}&client_id=${clientId}`, {
-          headers: { "user-agent": "Mozilla/5.0" },
+          headers: getJsonHeaders(),
           signal: AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined
         });
         if (rRes.ok) {
@@ -95,7 +96,7 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
 
       const apiUrl = `https://api-v2.soundcloud.com/users/${userId}/tracks?limit=5&client_id=${clientId}`;
       const res = await fetch(apiUrl, {
-        headers: { "user-agent": "Mozilla/5.0" },
+        headers: getJsonHeaders(),
         signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
       });
 

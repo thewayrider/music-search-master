@@ -1,12 +1,13 @@
 const cheerio = require("cheerio");
 const { extractReleasesWithAI } = require("../utils/aiScraper");
+const { getBrowserHeaders, getRssHeaders, LINUX_CHROME_UA } = require("../utils/browserHeaders");
 
 const DEFAULTS = {
   baseUrl: "https://nialler9.com",
   rssUrl: "https://nialler9.com/feed/",
   sourceService: "Nialler9",
   defaultCountry: "Ireland",
-  userAgent: "music-release-agent/1.0 (+https://kimrampling.com)",
+  userAgent: LINUX_CHROME_UA,
   maxArticleAgeDays: 7,
   perPage: 6
 };
@@ -24,7 +25,9 @@ function slugify(s) {
 
 async function fetchArticleHtml(url, userAgent) {
   try {
-    const res = await fetch(url, { headers: { "User-Agent": userAgent } });
+    const res = await fetch(url, {
+      headers: getBrowserHeaders({ "User-Agent": userAgent || LINUX_CHROME_UA })
+    });
     if (!res.ok) return null;
     return await res.text();
   } catch {
@@ -67,7 +70,7 @@ async function runNialler9Agent(config = {}, exclusions = {}) {
   let xmlText = "";
   try {
     const res = await fetch(options.rssUrl, {
-      headers: { "User-Agent": options.userAgent, Accept: "application/rss+xml, application/xml, text/xml" }
+      headers: getRssHeaders({ "User-Agent": options.userAgent || LINUX_CHROME_UA })
     });
     if (!res.ok) throw new Error(`Feed request failed (${res.status})`);
     xmlText = await res.text();

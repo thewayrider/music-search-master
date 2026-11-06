@@ -1,9 +1,10 @@
 const cheerio = require("cheerio");
+const { getBrowserHeaders, getRssHeaders, LINUX_CHROME_UA } = require("../utils/browserHeaders");
 
 const DEFAULTS = {
   baseUrl: "https://www.rootsmag.nz/new-music-",
   sourceService: "Roots Mag",
-  userAgent: "music-release-agent/1.0 (+https://kimrampling.com)",
+  userAgent: LINUX_CHROME_UA,
   timeoutMs: 10000,
   enableNzMusician: true,
   nzMusicianFeedUrl: "https://nzmusician.co.nz/category/music/feed/",
@@ -45,10 +46,10 @@ function candidateSlugs(referenceDate = new Date()) {
 
 async function fetchText(url, options) {
   const response = await fetch(url, {
-    headers: {
-      "user-agent": options.userAgent,
-      accept: "text/html,application/xhtml+xml",
-    },
+    headers: getBrowserHeaders({
+      "User-Agent": options.userAgent || LINUX_CHROME_UA,
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+    }),
     redirect: "follow",
     signal: AbortSignal.timeout ? AbortSignal.timeout(options.timeoutMs) : undefined,
   });
@@ -73,10 +74,9 @@ async function fetchNzMusicianReleases(options = {}) {
   let xmlText = "";
   try {
     const res = await fetch(feedUrl, {
-      headers: {
-        "user-agent": options.userAgent || DEFAULTS.userAgent,
-        accept: "application/rss+xml, application/xml, text/xml"
-      },
+      headers: getRssHeaders({
+        "User-Agent": options.userAgent || LINUX_CHROME_UA
+      }),
       signal: AbortSignal.timeout ? AbortSignal.timeout(options.timeoutMs || 10000) : undefined
     });
     if (!res.ok) {

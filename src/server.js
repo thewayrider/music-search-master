@@ -1,3 +1,14 @@
+// Auto-trampoline to standalone Node 22+ if running in Linux VM environment
+if (parseInt(process.versions.node.split('.')[0], 10) < 22) {
+  const fs = require('fs');
+  const cacheNode = '/home/droid/.cache/node-v22/bin/node';
+  if (fs.existsSync(cacheNode)) {
+    const { spawnSync } = require('child_process');
+    const result = spawnSync(cacheNode, [__filename, ...process.argv.slice(2)], { stdio: 'inherit' });
+    process.exit(result.status !== null ? result.status : 1);
+  }
+}
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');

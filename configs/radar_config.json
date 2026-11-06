@@ -1,7 +1,7 @@
 {
-  "globalRadarEnabled": false,
+  "globalRadarEnabled": true,
   "usRadarEnabled": true,
-  "statusNote": "Global Radar paused awaiting Lenovo Googlebook Linux sandbox rebuild. US Radar remains active.",
+  "statusNote": "Global and US Radars active on Lenovo Googlebook Debian Linux environment.",
   "maxRecencyHours": 36,
   "maxTracksPerArtist": 2,
   "maxSoundCloudTracks": 5,

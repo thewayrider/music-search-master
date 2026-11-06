@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const { LINUX_CHROME_UA } = require('../utils/browserHeaders');
 
 async function runAirChartAgent(config, exclusions) {
     console.log(`[AIR Chart Agent] Starting extraction from AIR Charts...`);
@@ -6,8 +7,18 @@ async function runAirChartAgent(config, exclusions) {
     let browser;
     const results = [];
     try {
-        browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
+        browser = await puppeteer.launch({
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--single-process'
+            ]
+        });
         const page = await browser.newPage();
+        await page.setUserAgent(LINUX_CHROME_UA);
         
         console.log(`[AIR Chart Agent] Navigating to https://air.org.au/charts`);
         await page.goto('https://air.org.au/charts', { waitUntil: 'networkidle2' });

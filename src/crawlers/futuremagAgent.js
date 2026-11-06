@@ -1,5 +1,6 @@
 const cheerio = require("cheerio");
 const { extractReleasesWithAI } = require("../utils/aiScraper");
+const { getJsonHeaders, getBrowserHeaders, LINUX_CHROME_UA } = require("../utils/browserHeaders");
 
 const DEFAULTS = {
   baseUrl: "https://futuremagmusic.com",
@@ -7,7 +8,7 @@ const DEFAULTS = {
   perPage: 5,
   sourceService: "Futuremag Music",
   defaultCountry: "Australia", 
-  userAgent: "music-release-agent/1.0 ( https://kimrampling.com )",
+  userAgent: LINUX_CHROME_UA,
 
   fallbackGenreLabels: {
     "garage rock": "Indie Rock",
@@ -49,7 +50,7 @@ async function runFuturemagAgent(config = {}, exclusions = {}) {
     `${options.baseUrl}/wp-json/wp/v2/article` +
     `?per_page=${options.perPage}&_fields=id,date,link,title,content`;
 
-  const headers = { "User-Agent": options.userAgent, Accept: "application/json" };
+  const headers = getJsonHeaders({ "User-Agent": options.userAgent || LINUX_CHROME_UA });
   const postsMap = new Map();
 
   try {

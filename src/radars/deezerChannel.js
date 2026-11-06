@@ -1,4 +1,5 @@
 const { isWithinHours, hasNegativeKeywords } = require('../utils/normalizer');
+const { getJsonHeaders } = require('../utils/browserHeaders');
 
 async function harvestDeezerDaily(config = {}, exclusions = {}) {
   const channelConfig = config.channels?.deezer || {};
@@ -17,7 +18,7 @@ async function harvestDeezerDaily(config = {}, exclusions = {}) {
     try {
       const url = `https://api.deezer.com/search/album?q=${encodeURIComponent(q)}&order=RELEASE_DATE_DESC&limit=25`;
       const res = await fetch(url, {
-        headers: { "user-agent": "Mozilla/5.0" },
+        headers: getJsonHeaders(),
         signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined
       });
 

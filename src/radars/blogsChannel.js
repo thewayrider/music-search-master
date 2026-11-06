@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const { isWithinHours, hasNegativeKeywords, parseArtistTitle } = require('../utils/normalizer');
+const { getRssHeaders } = require('../utils/browserHeaders');
 
 async function harvestBlogsDaily(config = {}, exclusions = {}) {
   const channelConfig = config.channels?.blogs || {};
@@ -24,9 +25,7 @@ async function harvestBlogsDaily(config = {}, exclusions = {}) {
   for (const feed of feeds) {
     try {
       const res = await fetch(feed.url, {
-        headers: {
-          "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
-        },
+        headers: getRssHeaders(),
         signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined
       });
 

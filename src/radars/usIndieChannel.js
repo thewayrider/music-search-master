@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const { isWithinHours, hasNegativeKeywords, parseArtistTitle, sanitizeHeadline } = require('../utils/normalizer');
+const { getRssHeaders } = require('../utils/browserHeaders');
 
 async function harvestUSIndieDaily(config = {}, exclusions = {}) {
   // On Mondays, expand window to 72h to capture Friday afternoon/weekend US drops
@@ -28,9 +29,7 @@ async function harvestUSIndieDaily(config = {}, exclusions = {}) {
   for (const feed of usFeeds) {
     try {
       const res = await fetch(feed.url, {
-        headers: {
-          "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        },
+        headers: getRssHeaders(),
         signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined
       });
 

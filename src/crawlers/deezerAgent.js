@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { verifyArtistOriginWithAI } = require('../utils/aiScraper');
+const { getJsonHeaders } = require('../utils/browserHeaders');
 
 // rate-limiter.js
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -8,7 +9,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 async function findPlaylistId(playlistName) {
     const url = `https://api.deezer.com/search/playlist?q=${encodeURIComponent(playlistName)}`;
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, { headers: getJsonHeaders() });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         
@@ -33,7 +34,7 @@ async function fetchPlaylistTracks(playlistId) {
 
     while (url) {
         try {
-            const response = await fetch(url);
+            const response = await fetch(url, { headers: getJsonHeaders() });
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
             
@@ -61,7 +62,7 @@ async function verifyOrigin(track) {
     // Deezer playlist track objects sometimes omit the ISRC, so fetch track details if missing
     if (!isrc) {
         await delay(120);
-        const trackRes = await fetch(`https://api.deezer.com/track/${track.id}`);
+        const trackRes = await fetch(`https://api.deezer.com/track/${track.id}`, { headers: getJsonHeaders() });
         const trackData = await trackRes.json();
         isrc = trackData.isrc || "";
     }

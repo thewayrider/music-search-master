@@ -1,4 +1,5 @@
 const { hasNegativeKeywords, parseArtistTitle } = require('../utils/normalizer');
+const { getBrowserHeaders } = require('../utils/browserHeaders');
 
 async function harvestYouTubeDaily(config = {}, exclusions = {}) {
   const channelConfig = config.channels?.youtube || { enabled: true };
@@ -64,10 +65,7 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
     try {
       const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}&sp=EgIIAg%253D%253D`;
       const res = await fetch(searchUrl, {
-        headers: {
-          "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-          "accept-language": "en-US,en;q=0.9"
-        },
+        headers: getBrowserHeaders(),
         signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined
       });
 

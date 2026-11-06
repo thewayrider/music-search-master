@@ -265,6 +265,45 @@ Bandcamp's CDN/WAF (Fastly) recently deployed active client challenge intercepti
 2. **Native HTTPS Engine Solution**: Both `bandcampAgent.js` and `bandcampChannel.js` utilize Node's native `https.request` with client-aligned headers (`User-Agent: curl/8.4.0`). Fastly routes this as standard API client traffic, bypassing the browser challenge entirely and returning 100% valid JSON payloads.
 3. **HTML Challenge Guard**: Explicitly inspects incoming payload chunks. If a response begins with `<` (HTML), it rejects immediately with a clear error rather than crashing JSON parsers.
 
+---
+
+## 18. Lenovo Googlebook Debian Linux Migration & 13-Crawler Stabilization Protocol
+
+### Background & Anti-Bot Mandate
+Crawlers developed on Windows / cloud environments suffer severe degradation from target site anti-bot defenses (Cloudflare consent walls, stripped DOMs, silent timeouts, 403s). Migrating to the Lenovo Googlebook OS Debian Linux container leverages the laptop's live residential IP connection, eliminating datacenter/cloud shadow-banning and dramatically improving release hit rates.
+
+### Diagnosis of Recent Accuracy Degradation
+1. **Stale Bot User-Agents**: Several crawlers (`rootsMagAgent.js`, `nialler9Agent.js`, `futuremagAgent.js`, `tripleJUnearthedAgent.js`) sent `music-release-agent/1.0`, triggering immediate WAF / Cloudflare blocks.
+2. **Missing Post-Crawl Triage**: Lack of regular audits allowed reissues, remasters, and AI generative tracks (Suno/Udio) to slip past without Two-Stage Verifier filtering.
+3. **Paused Global Radar**: Global 24h Radar was paused in `configs/radar_config.json` pending this rebuild.
+
+### Technical Environment Guardrails
+- **Node.js & SQLite Requirement**: `data/master_catalog.sqlite` via `src/utils/masterDb.js` requires Node 22.5+ for `node:sqlite` (`DatabaseSync`). The Debian VM currently has Node v20.20.2; `masterDb.js` must be made resilient across Node versions, or Node upgraded to v22/v24 LTS.
+- **I/O Cache Redirection**: Always redirect npm/build caches to VM local ext4 (`$HOME/.cache/...`) to avoid FUSE metadata overhead on `/storage/emulated/10`.
+- **Puppeteer on Debian**: AIR Charts scraper (`airChartAgent.js`) must pass `--no-sandbox`, `--disable-setuid-sandbox`, and `--disable-dev-shm-usage`.
+
+### The 13 Active Fleet Discovery Services
+1. **Global 24h Radar** (`--radar-global`) — Multi-channel 24h open web.
+2. **US Edition Radar** (`--radar-us`) — Curated US tastemaker RSS/HTML.
+3. **Bandcamp Discover** (`configs/bandcamp_indie.json`) — AU/NZ city-filtered discover API.
+4. **AMRAP Community Radio** (`configs/amrap_indie.json`) — Australian community radio chart debuts.
+5. **ListenBrainz Explorer** (`configs/listenbrainz_indie.json`) — ListenBrainz fresh stream + MusicBrainz origin cache.
+6. **MusicBrainz Tag Registry** (`configs/musicbrainz_indie.json`) — Lucene 7-day query for indie rock releases.
+7. **Triple J Unearthed** (`configs/triplej_unearthed_indie.json`) — New Australian indie discoveries.
+8. **AIR Independent Charts** (`configs/air_charts.json`) — Headless Puppeteer scraper for 100% AU indie charts.
+9. **Deezer Editorial Playlists** (`configs/deezer_indie.json`) — Editorial playlists with ISRC verification.
+10. **Futuremag Music Blog** (`configs/futuremag_indie.json`) — AU blog with Gemini AI extraction.
+11. **Roots Mag & NZ Musician** (`configs/rootsmag_indie.json`) — Curated NZ indie releases.
+12. **Nialler9 Irish Indie** (`configs/nialler9_indie.json`) — Irish/EU indie with Gemini AI extraction.
+13. **New Releases Now** (`configs/newreleasesnow_indie.json`) — 5 genre channels with 14-day card-level date parsing.
+
+### 5-Step Execution Roadmap
+- **Phase 1**: Runtime & SQLite compatibility in `src/utils/masterDb.js` and dependency installation.
+- **Phase 2**: Modernize request headers & User-Agents across all crawlers to authentic Linux Chrome/Firefox signatures.
+- **Phase 3**: Enforce Two-Stage Release Verifier (`verifyReleases: true`) to catch reissues and AI tracks.
+- **Phase 4**: Sandbox dry-run verification of each of the 13 crawlers individually.
+- **Phase 5**: Linux bash runner scripts (`.sh`), unpause Global Radar, and start Command Center daemon on port 4000.
+
 
 
 

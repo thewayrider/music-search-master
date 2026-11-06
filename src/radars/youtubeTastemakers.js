@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { isWithinHours, hasNegativeKeywords, parseArtistTitle } = require('../utils/normalizer');
+const { getRssHeaders } = require('../utils/browserHeaders');
 
 const CHANNELS_CONFIG_PATH = path.join(__dirname, '../../configs/youtube_channels.json');
 
@@ -18,7 +19,7 @@ function loadCuratedChannels() {
 async function fetchChannelRss(channel, maxHours = 36) {
   const url = channel.rssUrl || `https://www.youtube.com/feeds/videos.xml?channel_id=${channel.channelId}`;
   const res = await fetch(url, {
-    headers: { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+    headers: getRssHeaders(),
     signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
   });
 

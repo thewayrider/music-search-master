@@ -1,3 +1,14 @@
+// Auto-trampoline to standalone Node 22+ if running in Linux VM environment
+if (parseInt(process.versions.node.split('.')[0], 10) < 22) {
+    const fs = require('fs');
+    const cacheNode = '/home/droid/.cache/node-v22/bin/node';
+    if (fs.existsSync(cacheNode)) {
+        const { spawnSync } = require('child_process');
+        const result = spawnSync(cacheNode, [__filename, ...process.argv.slice(2)], { stdio: 'inherit' });
+        process.exit(result.status !== null ? result.status : 1);
+    }
+}
+
 const fs = require('fs');
 const path = require('path');
 const { getMasterStats } = require('./utils/masterDb');
@@ -261,6 +272,18 @@ Examples:
         const filteredCount = verifiedSongs.length - passedSongs.length;
         console.log(`[Verifier] Complete: ${passedSongs.length} verified, ${filteredCount} filtered (reissues/non-target acts).\n`);
         songsToSave = passedSongs;
+    }
+
+    if (isDryRun) {
+        console.log(`\n========================================================`);
+        console.log(`🧪 DRY-RUN SUMMARY FOR: ${searchName}`);
+        console.log(`========================================================`);
+        console.log(`Total Scraped Candidates: ${results.length}`);
+        console.log(`New Additions (vs prior): ${newSongs.length}`);
+        console.log(`Verified Releases:       ${songsToSave.length}`);
+        console.log(`[Dry Run] Skipping email dispatch, file save, and telemetry sync.`);
+        console.log(`========================================================\n`);
+        return;
     }
 
     // Send email alert

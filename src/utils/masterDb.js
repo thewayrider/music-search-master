@@ -1,7 +1,19 @@
 const fs = require('fs');
 const path = require('path');
-const { DatabaseSync } = require('node:sqlite');
 const { normalizeKey, parseArtistTitle, slugify } = require('./normalizer');
+
+// Resilient SQLite engine loader: supports Node 22.5+ native 'node:sqlite'
+// and gracefully falls back to 'better-sqlite3' for Node 20 environments.
+let DatabaseEngine = null;
+try {
+  DatabaseEngine = require('node:sqlite').DatabaseSync;
+} catch (_) {
+  try {
+    DatabaseEngine = require('better-sqlite3');
+  } catch (_) {
+    // Handled in getDatabase()
+  }
+}
 
 const DATA_DIR = path.resolve(__dirname, '../../data');
 const DB_PATH = path.join(DATA_DIR, 'master_catalog.sqlite');
@@ -15,7 +27,22 @@ function getDatabase() {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
 
-  _dbInstance = new DatabaseSync(DB_PATH);
+  if (!DatabaseEngine) {
+    try {
+      DatabaseEngine = require('node:sqlite').DatabaseSync;
+    } catch (_) {
+      try {
+        DatabaseEngine = require('better-sqlite3');
+      } catch (err) {
+        throw new Error(
+          "SQLite engine unavailable: Neither native 'node:sqlite' (Node 22.5+) nor 'better-sqlite3' could be loaded. " +
+          "Please run 'npm install' or run under Node 22+."
+        );
+      }
+    }
+  }
+
+  _dbInstance = new DatabaseEngine(DB_PATH);
 
   _dbInstance.exec(`
     PRAGMA journal_mode = WAL;
