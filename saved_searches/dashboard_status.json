@@ -1,8 +1,8 @@
 {
   "global_radar_daily": {
     "name": "Global 24h Radar",
-    "lastRun": "2026-10-23T04:30:17.305Z",
-    "totalSongsFound": 32,
+    "lastRun": "2026-11-06T13:29:46.922Z",
+    "totalSongsFound": 26,
     "newSongsEmailed": 16,
     "status": "Success"
   },
