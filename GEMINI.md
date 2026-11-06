@@ -304,6 +304,57 @@ Crawlers developed on Windows / cloud environments suffer severe degradation fro
 - **Phase 4**: Sandbox dry-run verification of each of the 13 crawlers individually.
 - **Phase 5**: Linux bash runner scripts (`.sh`), unpause Global Radar, and start Command Center daemon on port 4000.
 
+---
+
+## 19. Multi-Device Fleet Operational Protocol (Mini PC 24/7 Host vs. Lenovo Googlebook)
+
+### Device Division of Labor
+- **Always-On Geekom Mini PC (Lugano, Switzerland)**: Permanent 24/7 discovery host. Plugged into wall power, fixed on `Europe/Zurich` (CET/CEST), never sleeps. Runs `node src/server.js` via the `MusicSearch_FleetCommandCenter_AutoStart` logon task. Guarantees 06:30 AM Global Radar and 07:00 AM US Radar trigger without fail.
+- **Lenovo Googlebook 15 (Workstation & Travel)**: Mobile testing, development, and on-demand dry-run sandbox. Because laptop lids close, power-saving sleep suspends processes, and travel alters timezones, it must **never** be relied upon as the 24/7 cron runner.
+
+### Collision Guard: Single Active Daemon Rule
+- **Strict Rule**: Never run `server.js` simultaneously on both the Mini PC and Lenovo Googlebook. Running both will trigger duplicate scrapes, redundant rate-limiting, and double email dispatches.
+- To test crawlers on the Lenovo Googlebook without colliding with the Mini PC, use on-demand CLI dry-runs (`node src/index.js <config> --dry-run`).
+
+### 100% Git-Driven Schedule Synchronization
+- Schedules and timings are **never** configured in Windows Task Scheduler. All schedules live in Git (`configs/schedules.json` and `configs/radar_config.json`).
+- Updating the Mini PC requires zero manual Task Scheduler intervention. The 1-click update command on the Mini PC:
+  ```powershell
+  cd "C:\Antigravity Projects\music-search-master"
+  git fetch origin main
+  git reset --hard origin/main
+  ```
+
+---
+
+## 20. Cross-Platform Node 22+ Auto-Trampoline Architecture
+
+### The Environment Constraint
+- Android Terminal VM ships with system Node v20.20.2 which lacks native `node:sqlite` (`DatabaseSync`).
+- Portable Node v22.14.0 LTS resides on local ext4 at `/home/droid/.cache/node-v22/bin/node`.
+
+### Universal Entrypoint Trampoline
+To ensure `package.json` scripts (`"start": "node src/index.js"`, `"command-center": "node src/server.js"`, etc.) work identically on Windows (Node 24 LTS) and Debian VM (Node 20):
+- Entrypoints ([`src/index.js`](src/index.js) and [`src/server.js`](src/server.js)) include an auto-trampoline at line 1:
+  ```javascript
+  if (parseInt(process.versions.node.split('.')[0], 10) < 22) {
+    const fs = require('fs');
+    const cacheNode = '/home/droid/.cache/node-v22/bin/node';
+    if (fs.existsSync(cacheNode)) {
+      const { spawnSync } = require('child_process');
+      const result = spawnSync(cacheNode, [__filename, ...process.argv.slice(2)], { stdio: 'inherit' });
+      process.exit(result.status !== null ? result.status : 1);
+    }
+  }
+  ```
+- **Windows Behavior**: Windows runs Node 24, bypassing the check with zero overhead.
+- **Linux Behavior**: VM automatically re-executes itself under portable Node 22 LTS with full native SQLite support.
+
+### Android Terminal Sandbox Git Constraint
+- `/storage/emulated/10/Projects/music-search-master/.git` is mounted read-only (`ro`) in standard sandbox mode.
+- Git operations modifying `.git` (`git add`, `git commit`, `git checkout`, `git rebase`, `git push`) must be executed with elevated permission (`BypassSandbox: true`).
+
+
 
 
 
