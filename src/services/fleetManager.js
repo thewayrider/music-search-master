@@ -328,6 +328,7 @@ class FleetManager {
   }
 
   getFleetStatus() {
+    this._loadPersistedStatus();
     let dbStats = { totalUniqueSongs: 0, totalSightings: 0, consensusSongsCount: 0 };
     try {
       dbStats = getMasterStats();

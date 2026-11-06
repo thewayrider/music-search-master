@@ -1,93 +1,93 @@
 {
   "global_radar_daily": {
     "name": "Global 24h Radar",
-    "lastRun": "2026-10-13T14:03:43.239Z",
-    "totalSongsFound": 47,
-    "newSongsEmailed": 24,
+    "lastRun": "2026-10-23T04:30:17.305Z",
+    "totalSongsFound": 32,
+    "newSongsEmailed": 16,
     "status": "Success"
   },
   "us_radar_daily": {
     "name": "US Edition Radar",
-    "lastRun": "2026-10-09T07:00:00.000Z",
-    "totalSongsFound": 15,
-    "newSongsEmailed": 15,
+    "lastRun": "2026-11-06T05:00:09.406Z",
+    "totalSongsFound": 13,
+    "newSongsEmailed": 7,
     "status": "Success"
   },
   "triple_j_unearthed_discovery": {
-    "name": "Triple J Unearthed Discovery",
-    "lastRun": "2026-10-08T09:09:48.497Z",
-    "totalSongsFound": 3,
+    "name": "Triple J Unearthed",
+    "lastRun": "2026-11-06T13:00:35.452Z",
+    "totalSongsFound": 4,
     "newSongsEmailed": 1,
     "status": "Success"
   },
   "amrap_indie_discovery": {
-    "name": "AMRAP Indie Discovery",
-    "lastRun": "2026-10-15T16:28:03.572Z",
-    "totalSongsFound": 7,
-    "newSongsEmailed": 6,
+    "name": "Amrap",
+    "lastRun": "2026-11-05T15:00:14.009Z",
+    "totalSongsFound": 9,
+    "newSongsEmailed": 5,
     "status": "Success"
   },
   "roots_mag": {
     "name": "Roots Mag",
-    "lastRun": "2026-10-08T09:09:14.035Z",
-    "totalSongsFound": 8,
-    "newSongsEmailed": 7,
+    "lastRun": "2026-11-06T08:00:10.019Z",
+    "totalSongsFound": 19,
+    "newSongsEmailed": 8,
     "status": "Success"
   },
   "bandcamp_indie_discovery": {
-    "name": "Bandcamp Indie Discovery",
-    "lastRun": "2026-10-08T08:36:58.446Z",
-    "totalSongsFound": 37,
-    "newSongsEmailed": 18,
+    "name": "Bandcamp",
+    "lastRun": "2026-11-06T08:03:32.252Z",
+    "totalSongsFound": 0,
+    "newSongsEmailed": 0,
     "status": "Success"
   },
   "futuremag_indie_discovery": {
-    "name": "Futuremag Indie Discovery",
-    "lastRun": "2026-10-08T08:45:23.257Z",
+    "name": "Futuremag",
+    "lastRun": "2026-11-06T12:44:15.881Z",
     "totalSongsFound": 0,
     "newSongsEmailed": 0,
     "status": "Success"
   },
   "listenbrainz_indie_discovery": {
-    "name": "ListenBrainz Indie Discovery",
-    "lastRun": "2026-10-08T09:07:50.867Z",
-    "totalSongsFound": 110,
-    "newSongsEmailed": 68,
+    "name": "ListenBrainz",
+    "lastRun": "2026-11-06T08:39:59.156Z",
+    "totalSongsFound": 120,
+    "newSongsEmailed": 28,
     "status": "Success"
   },
   "air_charts_discovery": {
-    "name": "AIR Charts Discovery",
-    "lastRun": "2026-10-08T08:36:45.466Z",
-    "totalSongsFound": 16,
+    "name": "Air Charts",
+    "lastRun": "2026-11-02T15:00:23.895Z",
+    "totalSongsFound": 17,
     "newSongsEmailed": 2,
     "status": "Success"
   },
   "musicbrainz_indie_discovery": {
-    "name": "MusicBrainz Indie Discovery",
-    "lastRun": "2026-10-08T09:07:59.913Z",
-    "totalSongsFound": 14,
-    "newSongsEmailed": 8,
+    "name": "MusicBrainz",
+    "lastRun": "2026-11-06T08:30:11.177Z",
+    "totalSongsFound": 20,
+    "newSongsEmailed": 2,
     "status": "Success"
   },
   "deezer_indie_discovery": {
-    "name": "Deezer Indie Discovery",
-    "lastRun": "2026-10-08T08:45:20.638Z",
-    "totalSongsFound": 5,
-    "newSongsEmailed": 5,
+    "name": "Deezer",
+    "lastRun": "2026-11-06T10:30:22.767Z",
+    "totalSongsFound": 11,
+    "newSongsEmailed": 3,
     "status": "Success"
   },
   "nialler9_indie_discovery": {
-    "name": "Nialler9 Indie Discovery",
-    "lastRun": "2026-10-08T09:09:07.922Z",
-    "totalSongsFound": 25,
-    "newSongsEmailed": 17,
+    "name": "Nialler9",
+    "lastRun": "2026-11-06T09:01:40.590Z",
+    "totalSongsFound": 5,
+    "newSongsEmailed": 2,
     "status": "Success"
   },
   "new_releases_now_indie_discovery": {
-    "name": "New Releases Now Indie Discovery",
-    "lastRun": "2026-10-17T08:53:28.238Z",
-    "totalSongsFound": 9,
-    "newSongsEmailed": 8,
+    "name": "New Releases Now",
+    "lastRun": "2026-10-31T08:30:06.466Z",
+    "totalSongsFound": 10,
+    "newSongsEmailed": 5,
     "status": "Success"
   }
 }

@@ -165,8 +165,47 @@ async function syncMetricsToGist(metricsData) {
     }
 }
 
+async function syncGistToLocal() {
+    const { gistId, token } = getGistConfig();
+    if (!gistId) return null;
+    try {
+        const gistData = await fetchCurrentGistData(gistId, token);
+        if (!gistData || !gistData.crawlers) return null;
+
+        const savedSearchesDir = path.join(__dirname, '..', '..', 'saved_searches');
+        const dashboardStatusPath = path.join(savedSearchesDir, 'dashboard_status.json');
+        let statusData = {};
+        if (fs.existsSync(dashboardStatusPath)) {
+            try { statusData = JSON.parse(fs.readFileSync(dashboardStatusPath, 'utf8')); } catch (_) {}
+        }
+
+        for (const crawler of gistData.crawlers) {
+            const current = statusData[crawler.id];
+            const currentRunTime = current && current.lastRun ? new Date(current.lastRun).getTime() : 0;
+            const gistRunTime = crawler.lastRun ? new Date(crawler.lastRun).getTime() : 0;
+
+            if (gistRunTime > currentRunTime || !current) {
+                statusData[crawler.id] = {
+                    name: crawler.name,
+                    lastRun: crawler.lastRun,
+                    totalSongsFound: crawler.lastRunFoundTotal || 0,
+                    newSongsEmailed: crawler.lastRunNewAdded || 0,
+                    status: crawler.status || 'Success'
+                };
+            }
+        }
+
+        fs.writeFileSync(dashboardStatusPath, JSON.stringify(statusData, null, 2));
+        return { success: true, updatedCount: gistData.crawlers.length };
+    } catch (e) {
+        console.warn('[Gist Sync] Error syncing Gist to local status:', e.message);
+        return { success: false, error: e.message };
+    }
+}
+
 module.exports = {
     syncMetricsToGist,
+    syncGistToLocal,
     getGistConfig,
     fetchCurrentGistData,
     mergeMetrics

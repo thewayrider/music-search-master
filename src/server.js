@@ -16,7 +16,7 @@ const fs = require('fs');
 const fleetManager = require('./services/fleetManager');
 const scheduler = require('./services/scheduler');
 const { aggregateCrawlerMetrics } = require('./utils/metricsAggregator');
-const { syncMetricsToGist } = require('./utils/gistSync');
+const { syncMetricsToGist, syncGistToLocal } = require('./utils/gistSync');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -99,6 +99,7 @@ app.get('/api/analytics', (req, res) => {
 // 7. Sync Telemetry to GitHub Gist
 app.post('/api/analytics/sync', async (req, res) => {
   try {
+    await syncGistToLocal();
     const analytics = aggregateCrawlerMetrics();
     const result = await syncMetricsToGist(analytics);
     res.json({ success: true, result });
@@ -189,6 +190,9 @@ const serverInstance = app.listen(PORT, '0.0.0.0', () => {
 
   // Initialize In-Process Cron Scheduler for all Radars & Crawlers
   scheduler.init();
+
+  // Sync latest fleet telemetry from GitHub Gist into local status
+  syncGistToLocal().catch(() => {});
 });
 
 // Graceful shutdown
