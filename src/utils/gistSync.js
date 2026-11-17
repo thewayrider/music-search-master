@@ -75,16 +75,21 @@ function mergeMetrics(localMetrics, gistMetrics) {
         const gistDate = gistCrawler.lastRun ? new Date(gistCrawler.lastRun).getTime() : 0;
 
         if (gistDate > localDate) {
-            // Ensure daysSinceLastRun and Inactive status is dynamically updated for old Gist data
+            // Ensure daysSinceLastRun, Inactive status, and current schedule label stay up to date
             const now = new Date();
             const daysSince = gistCrawler.lastRun ? Math.floor((now - gistDate) / (1000 * 60 * 60 * 24)) : 999;
-            gistCrawler.health.daysSinceLastRun = daysSince;
-            if (gistCrawler.schedule !== 'Manual' && daysSince > 10) {
-                gistCrawler.health.healthStatus = 'Inactive';
-                gistCrawler.health.badge = 'danger';
-                gistCrawler.health.recommendation = `No runs detected in ${daysSince} days. Check Windows Task Scheduler.`;
+            const mergedCrawler = {
+                ...gistCrawler,
+                name: localCrawler.name,
+                schedule: localCrawler.schedule,
+                health: { ...(gistCrawler.health || {}), daysSinceLastRun: daysSince }
+            };
+            if (localCrawler.schedule !== 'Manual' && daysSince > 10) {
+                mergedCrawler.health.healthStatus = 'Inactive';
+                mergedCrawler.health.badge = 'danger';
+                mergedCrawler.health.recommendation = `No runs detected in ${daysSince} days. Check Fleet Scheduler.`;
             }
-            mergedCrawlers.push(gistCrawler);
+            mergedCrawlers.push(mergedCrawler);
         } else {
             mergedCrawlers.push(localCrawler);
         }

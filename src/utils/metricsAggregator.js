@@ -2,19 +2,19 @@ const fs = require('fs');
 const path = require('path');
 
 const AGENTS = [
-    { id: 'global_radar_daily', name: 'Global 24h Radar', schedule: 'Daily 06:30' },
-    { id: 'us_radar_daily', name: 'US Edition Radar', schedule: 'Daily 07:00' },
-    { id: 'bandcamp_indie_discovery', name: 'Bandcamp', schedule: 'Mon, Wed, Fri, Sat 09:00' },
-    { id: 'deezer_indie_discovery', name: 'Deezer', schedule: 'Fri 11:00' },
-    { id: 'listenbrainz_indie_discovery', name: 'ListenBrainz', schedule: 'Mon, Fri 09:00' },
-    { id: 'musicbrainz_indie_discovery', name: 'MusicBrainz', schedule: 'Mon, Wed, Fri 09:30' },
-    { id: 'air_charts_discovery', name: 'Air Charts', schedule: 'Mon 16:00' },
-    { id: 'amrap_indie_discovery', name: 'Amrap', schedule: 'Thu 16:00' },
-    { id: 'futuremag_indie_discovery', name: 'Futuremag', schedule: 'Fri 09:00' },
-    { id: 'roots_mag', name: 'Roots Mag', schedule: 'Fri 09:00' },
-    { id: 'triple_j_unearthed_discovery', name: 'Triple J Unearthed', schedule: 'Mon, Wed, Fri 14:00' },
-    { id: 'nialler9_indie_discovery', name: 'Nialler9', schedule: 'Fri 10:00' },
-    { id: 'new_releases_now_indie_discovery', name: 'New Releases Now', schedule: 'Sat 09:30' }
+    { id: 'global_radar_daily', name: 'Global 24h Radar', schedule: 'Daily 08:00 MYT' },
+    { id: 'us_radar_daily', name: 'US Edition Radar', schedule: 'Daily 08:15 MYT' },
+    { id: 'bandcamp_indie_discovery', name: 'Bandcamp', schedule: 'Mon, Wed, Fri, Sat 09:00 MYT' },
+    { id: 'musicbrainz_indie_discovery', name: 'MusicBrainz', schedule: 'Mon, Wed, Fri 09:10 MYT' },
+    { id: 'triple_j_unearthed_discovery', name: 'Triple J Unearthed', schedule: 'Mon, Wed, Fri 09:20 MYT' },
+    { id: 'listenbrainz_indie_discovery', name: 'ListenBrainz', schedule: 'Mon, Fri 09:30 MYT' },
+    { id: 'air_charts_discovery', name: 'Air Charts', schedule: 'Mon 09:40 MYT' },
+    { id: 'amrap_indie_discovery', name: 'Amrap', schedule: 'Thu 09:40 MYT' },
+    { id: 'futuremag_indie_discovery', name: 'Futuremag', schedule: 'Fri 09:40 MYT' },
+    { id: 'roots_mag', name: 'Roots Mag', schedule: 'Fri 09:50 MYT' },
+    { id: 'nialler9_indie_discovery', name: 'Nialler9', schedule: 'Fri 10:00 MYT' },
+    { id: 'deezer_indie_discovery', name: 'Deezer', schedule: 'Fri 10:10 MYT' },
+    { id: 'new_releases_now_indie_discovery', name: 'New Releases Now', schedule: 'Sat 09:30 MYT' }
 ];
 
 function parseTimestampFromFilename(filename, stats) {
@@ -60,7 +60,7 @@ function calculateHealth(agent, runHistory, statusData) {
     } else if (agent.schedule !== 'Manual' && daysSinceLastRun > 10) {
         healthStatus = 'Inactive';
         badge = 'danger';
-        recommendation = `No runs detected in ${daysSinceLastRun} days. Check Windows Task Scheduler.`;
+        recommendation = `No runs detected in ${daysSinceLastRun} days. Check Fleet Scheduler / systemd service.`;
     } else if (consecutiveZeros >= 4 || (past7DaysRuns.length >= 3 && past7DaysNew === 0)) {
         healthStatus = 'Needs Review';
         badge = 'warning';

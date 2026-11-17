@@ -3,11 +3,13 @@
 let currentActiveDrawerService = null;
 let logPollInterval = null;
 let cachedDiscoveries = [];
+let cachedSchedulesMap = new Map();
 
 // DOM Elements
 const serverStatusPill = document.getElementById('server-status-pill');
 const serverStatusText = document.getElementById('server-status-text');
 const uptimeDisplay = document.getElementById('uptime-display');
+const timezoneDisplay = document.getElementById('timezone-display');
 const kpiUniqueSongs = document.getElementById('kpi-unique-songs');
 const kpiSightings = document.getElementById('kpi-sightings');
 const kpiConsensus = document.getElementById('kpi-consensus');
@@ -34,19 +36,39 @@ function formatDuration(ms) {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
-// Format relative date
+// Format relative date in Malaysia Time (UTC+8)
 function formatDate(isoString) {
   if (!isoString) return 'Never';
   const d = new Date(isoString);
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  if (Number.isNaN(d.getTime())) return isoString;
+  return d.toLocaleString('en-GB', {
+    timeZone: 'Asia/Kuala_Lumpur',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }) + ' MYT';
 }
 
-// 1. Fetch Fleet Status
+// 1. Fetch Fleet Status & Schedules
 async function fetchFleetStatus() {
   try {
-    const res = await fetch('/api/fleet/status');
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    const [statusRes, schedRes] = await Promise.all([
+      fetch('/api/fleet/status'),
+      fetch('/api/schedules').catch(() => null)
+    ]);
+    if (!statusRes.ok) throw new Error(`HTTP ${statusRes.status}`);
+    const data = await statusRes.json();
+
+    if (schedRes && schedRes.ok) {
+      const schedList = await schedRes.json();
+      cachedSchedulesMap = new Map(schedList.map(item => [item.serviceId, item]));
+      const activeTz = schedList[0]?.timezone;
+      if (timezoneDisplay && activeTz) {
+        timezoneDisplay.textContent = activeTz === 'Asia/Kuala_Lumpur' ? 'MYT (Asia/Kuala_Lumpur)' : activeTz;
+      }
+    }
 
     // Update Telemetry Header
     serverStatusPill.className = 'telemetry-pill live';
@@ -82,6 +104,8 @@ function renderServices(services) {
     card.className = `service-card ${s.state === 'running' ? 'running' : ''}`;
 
     const isRunning = s.state === 'running';
+    const schedInfo = cachedSchedulesMap.get(s.id);
+    const isQueued = Boolean(schedInfo && schedInfo.queuedForCatchUp);
     const exitStatus = s.lastExitCode === 0 ? '✓ Clean Exit' : s.lastExitCode !== null ? `✗ Exit ${s.lastExitCode}` : 'Idle';
 
     card.innerHTML = `
@@ -90,6 +114,7 @@ function renderServices(services) {
           <div class="service-badge-group">
             <span class="market-badge">${s.market || 'RADAR'}</span>
             <span class="state-badge ${s.state}">${s.state}</span>
+            ${isQueued ? '<span class="badge badge-warning">⏳ Catch-Up Queued</span>' : ''}
           </div>
           <button class="btn-terminal" onclick="openDrawer('${s.id}', '${s.name}')" title="Inspect Terminal">
             📟 Logs (${s.logCount})
@@ -103,6 +128,7 @@ function renderServices(services) {
       <div class="service-meta">
         <div><strong>Schedule:</strong> ${s.schedule}</div>
         <div><strong>Last Run:</strong> ${formatDate(s.lastRunStartedAt)} (${formatDuration(s.lastDurationMs)})</div>
+        ${schedInfo?.lastHandledSlotLocal ? `<div><strong>Last Slot:</strong> ${schedInfo.lastHandledSlotLocal}</div>` : ''}
         <div><strong>Result:</strong> ${exitStatus}</div>
       </div>
 
@@ -298,7 +324,7 @@ function renderAnalytics(data) {
       ? 'badge-success'
       : (c.health.badge === 'warning' ? 'badge-warning' : (c.health.badge === 'danger' ? 'badge-danger' : 'badge-neutral'));
 
-    const lastRunText = c.lastRun ? new Date(c.lastRun).toLocaleString() : 'Never';
+    const lastRunText = c.lastRun ? formatDate(c.lastRun) : 'Never';
 
     tr.innerHTML = `
       <td>

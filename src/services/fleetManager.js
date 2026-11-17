@@ -279,7 +279,7 @@ class FleetManager {
         'deezer-weekly': 'deezer_indie_discovery',
         'nialler9-weekly': 'nialler9_indie_discovery',
         'triplejunearthed-weekly': 'triple_j_unearthed_discovery',
-        'newreleasesnow-weekly': 'newreleasesnow_indie_discovery'
+        'newreleasesnow-weekly': 'new_releases_now_indie_discovery'
       };
 
       for (const [serviceId, statusKey] of Object.entries(STATUS_KEY_MAP)) {
@@ -312,7 +312,7 @@ class FleetManager {
         'deezer-weekly': 'deezer_indie_discovery',
         'nialler9-weekly': 'nialler9_indie_discovery',
         'triplejunearthed-weekly': 'triple_j_unearthed_discovery',
-        'newreleasesnow-weekly': 'newreleasesnow_indie_discovery'
+        'newreleasesnow-weekly': 'new_releases_now_indie_discovery'
       };
       const key = STATUS_KEY_MAP[service.id];
       if (!key) return;
