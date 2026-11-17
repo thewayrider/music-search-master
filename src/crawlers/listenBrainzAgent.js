@@ -1,16 +1,18 @@
 const fs = require("fs/promises");
 const path = require("path");
+const { isWithinDays } = require("../utils/normalizer");
 
 const DEFAULTS = {
   sourceService: "ListenBrainz",
   freshReleasesEndpoint: "https://api.listenbrainz.org/1/explore/fresh-releases",
   musicbrainzBase: "https://musicbrainz.org/ws/2",
-  days: 14,
-  future: true,
+  days: 7,
+  runWindowDays: 7,
+  future: false,
   sort: "release_date",
   maxEnrich: 2000,       // Significantly increased budget
   mbDelayMs: 1100,      
-  timeoutMs: 25000,
+  timeoutMs: 45000,
   includeUnresolved: false,
   allowedTypes: null,   
   cacheFile: path.join(__dirname, "../../saved_searches/cache/listenbrainz-mb-origin.json"), 
@@ -133,7 +135,7 @@ async function runListenBrainzAgent(config = {}, exclusions = {}) {
     }
   }
 
-  const deduped = dedupeAndSort(releases, filters);
+  const deduped = dedupeAndSort(releases, { ...filters, ...options });
 
   // MAPPING TO UNIFIED AGENT FORMAT
   const unifiedResults = deduped.map(r => {
@@ -309,13 +311,10 @@ function mapReleaseType(rgType) {
 // ---------------------------------------------------------------------------
 
 function dedupeAndSort(items, filters) {
-  const runWindowDays = filters.runWindowDays || 14;
-  const cutoff = Date.now() - runWindowDays * 24 * 60 * 60 * 1000;
+  const runWindowDays = filters.runWindowDays || 7;
   const map = new Map();
   for (const item of items) {
-    const parsed = new Date(item.releaseDate).getTime();
-    const dateOk = item.releaseDate === "unknown" || Number.isNaN(parsed) || parsed >= cutoff;
-    if (!dateOk) continue;
+    if (!isWithinDays(item.releaseDate, runWindowDays, 36)) continue;
     const key = `${slugify(item.artist)}::${slugify(item.title)}`;
     const existing = map.get(key);
     if (!existing || item.score > existing.score) map.set(key, item);

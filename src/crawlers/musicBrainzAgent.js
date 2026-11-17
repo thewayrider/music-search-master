@@ -1,5 +1,6 @@
 const fs = require("fs/promises");
 const path = require("path");
+const { isWithinDays } = require("../utils/normalizer");
 
 const DEFAULTS = {
   sourceService: "MusicBrainz",
@@ -34,10 +35,18 @@ async function runMusicBrainzAgent(config = {}, exclusions = {}) {
     
     console.log(`[MusicBrainz Agent] Fetching genre: ${genre}...`);
     try {
-      const res = await http(url, {
+      let res = await http(url, {
         headers: { accept: "application/json", "user-agent": options.userAgent },
         signal: AbortSignal.timeout ? AbortSignal.timeout(options.timeoutMs) : undefined,
       });
+
+      if (res.status === 503) {
+        await sleep(3000);
+        res = await http(url, {
+          headers: { accept: "application/json", "user-agent": options.userAgent },
+          signal: AbortSignal.timeout ? AbortSignal.timeout(options.timeoutMs) : undefined,
+        });
+      }
 
       if (!res.ok) {
         console.error(`[MusicBrainz Agent] Request failed for genre ${genre}: ${res.status}`);
@@ -57,6 +66,10 @@ async function runMusicBrainzAgent(config = {}, exclusions = {}) {
         const title = rel.title;
         const rgType = mapReleaseType(rg["primary-type"]);
         const releaseDate = normalizeDate(rel.date) || "unknown";
+        // Reject partial/year-only dates (e.g. "2026" -> "2026-01-01") or dates outside 7-day window
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(String(rel.date || "")) || !isWithinDays(releaseDate, runWindowDays, 36)) {
+          continue;
+        }
         const rgMbid = rg.id; // use release-group ID for the link if available, fallback to release
         const sourceUrl = rgMbid ? `https://musicbrainz.org/release-group/${rgMbid}` : `https://musicbrainz.org/release/${rel.id}`;
         

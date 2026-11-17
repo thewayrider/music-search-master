@@ -82,32 +82,44 @@ async function harvestBandcampDaily(config = {}, exclusions = {}) {
         const items = data.results || (data.discover && data.discover.results) || [];
 
         for (const item of items) {
-          if (!item.artist || !item.title) continue;
-          if (seenUrls.has(item.url)) continue;
+          const artist = item.bandName || item.band_name || item.artist || item.albumArtist;
+          const title = item.title || item.album_title || item.item_title;
+          const itemUrl = item.itemUrl || item.url || item.item_url;
+          if (!artist || !title || !itemUrl) continue;
+          if (seenUrls.has(itemUrl)) continue;
 
-          // Drop Silent Pre-Orders & Pre-Orders
-          if (!item.featured_track || !item.featured_track.stream_url) continue;
-          if (item.is_album_preorder || item.is_preorder) continue;
+          // Drop Silent Pre-Orders & Pre-Orders (support both playerData and legacy featured_track)
+          const trackObj = item.playerData || item.featuredTrack || item.featured_track;
+          const streamUrl = trackObj && (trackObj.streamUrl || trackObj.stream_url);
+          if (!streamUrl || trackObj.isStreamingDisabled) continue;
+          const isPreorder = Boolean(
+            item.isAlbumPreorder ||
+            item.is_album_preorder ||
+            item.is_preorder ||
+            trackObj.isPreorder ||
+            (trackObj.album && trackObj.album.isPreorder)
+          );
+          if (isPreorder) continue;
 
           // Check strict recency (released within the last 24-36h)
-          const releaseDate = item.release_date || item.publish_date;
+          const releaseDate = item.releaseDate || item.release_date || item.publish_date;
           if (!isWithinHours(releaseDate, maxHours)) continue;
 
           // Check negative keywords (remaster, reissue, deluxe)
-          const fullText = `${item.artist} ${item.title} ${item.genre_text || ''}`;
+          const fullText = `${artist} ${title} ${item.genre_text || item.genre || ''}`;
           if (hasNegativeKeywords(fullText, negativeKeywords)) continue;
 
-          seenUrls.add(item.url);
+          seenUrls.add(itemUrl);
           discoveries.push({
-            artist: String(item.artist).trim(),
-            title: String(item.title).trim(),
+            artist: String(artist).trim(),
+            title: String(title).trim(),
             channel: `Bandcamp (${loc.name})`,
-            url: item.url,
+            url: itemUrl,
             releaseDate: releaseDate ? new Date(releaseDate).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
-            releaseType: item.type || "album",
+            releaseType: item.itemType === 't' ? 'single' : (item.type || "album"),
             genre: tag,
-            location: `${loc.name}, ${loc.country}`,
-            description: `Type: ${item.type || 'album'} | Tag: ${tag} | Location: ${loc.name}, ${loc.country}`
+            location: item.bandLocation || `${loc.name}, ${loc.country}`,
+            description: `Type: ${item.itemType === 't' ? 'single' : (item.type || 'album')} | Tag: ${tag} | Location: ${loc.name}, ${loc.country}`
           });
         }
       } catch (err) {

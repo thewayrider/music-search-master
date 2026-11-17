@@ -1,11 +1,15 @@
 const puppeteer = require('puppeteer');
 const { LINUX_CHROME_UA } = require('../utils/browserHeaders');
+const { checkReleaseFreshnessITunes } = require('../services/verificationTools');
 
-async function runAirChartAgent(config, exclusions) {
-    console.log(`[AIR Chart Agent] Starting extraction from AIR Charts...`);
+async function runAirChartAgent(config = {}, exclusions = {}) {
+    const freshWindowDays = config.freshWindowDays || 7;
+    const filterStale = config.filterStale !== false;
+    const filterUnverified = config.filterUnverified === true;
+    console.log(`[AIR Chart Agent] Starting extraction from AIR Charts (window: ${freshWindowDays}d)...`);
     
     let browser;
-    const results = [];
+    const rawDebuts = [];
     try {
         browser = await puppeteer.launch({
             headless: true,
@@ -67,9 +71,7 @@ async function runAirChartAgent(config, exclusions) {
                 return items;
             });
             
-            // Format to match old agent structure
             for (const item of categoryResults) {
-                // Determine category from URL
                 let categoryName = "AIR Chart";
                 if (link.includes('100-independent-albums')) categoryName = "100% Independent Albums";
                 else if (link.includes('100-independent-singles')) categoryName = "100% Independent Singles";
@@ -77,18 +79,15 @@ async function runAirChartAgent(config, exclusions) {
                 else if (link.includes('independent-label-singles')) categoryName = "Independent Label Singles";
 
                 const formattedTitle = `${item.artist} - ${item.title}`;
-
-                // Check if this song is already in the results
-                const isDuplicate = results.some(r => r.title === formattedTitle);
+                const isDuplicate = rawDebuts.some(r => r.formattedTitle === formattedTitle);
                 
                 if (!isDuplicate) {
-                    results.push({
-                        title: formattedTitle,
-                        channel: categoryName,
-                        url: item.url,
-                        views: "New Entry",
-                        uploadedAt: "This Week",
-                        description: `New to ${categoryName} this week (Time in Charts: 1).`
+                    rawDebuts.push({
+                        artist: item.artist,
+                        title: item.title,
+                        formattedTitle,
+                        categoryName,
+                        url: item.url
                     });
                 } else {
                     console.log(`[AIR Chart Agent] Skipping duplicate entry: ${formattedTitle}`);
@@ -103,6 +102,40 @@ async function runAirChartAgent(config, exclusions) {
             await browser.close();
         }
     }
+
+    // Verify true release dates against iTunes so old chart debuts & reissues are filtered
+    const results = [];
+    let droppedStale = 0;
+    let droppedUnverified = 0;
+
+    for (const item of rawDebuts) {
+        const freshness = await checkReleaseFreshnessITunes(item.artist, item.title, freshWindowDays);
+        if (filterStale && freshness.status === 'stale') {
+            droppedStale++;
+            continue;
+        }
+        if (filterUnverified && freshness.status === 'unverified') {
+            droppedUnverified++;
+            continue;
+        }
+
+        const releaseDate = freshness.earliestReleaseDate || null;
+        results.push({
+            title: item.formattedTitle,
+            channel: item.categoryName,
+            url: item.url,
+            views: "New Entry",
+            uploadedAt: releaseDate,
+            releaseDate,
+            description: `New to ${item.categoryName} (Time in Charts: 1)${releaseDate ? ` | Released: ${releaseDate}` : ''}.`
+        });
+    }
+
+    console.log(
+        `[AIR Chart Agent] Freshness Gate: kept ${results.length}/${rawDebuts.length} debuts ` +
+        `(filtered ${droppedStale} stale > ${freshWindowDays}d` +
+        (filterUnverified ? `, ${droppedUnverified} unverified` : '') + ').'
+    );
     
     return results;
 }

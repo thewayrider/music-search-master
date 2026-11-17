@@ -2,6 +2,7 @@
   "_comment": "Configuration for the Bandcamp Discover Agent",
   "bandcamp": {
     "searchName": "Bandcamp Indie Discovery",
+    "runWindowDays": 7,
     "targetGenres": ["Indie Rock", "Alt Rock", "Surf Rock", "Indie"]
   }
 }

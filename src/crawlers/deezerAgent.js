@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { verifyArtistOriginWithAI } = require('../utils/aiScraper');
 const { getJsonHeaders } = require('../utils/browserHeaders');
+const { isWithinDays } = require('../utils/normalizer');
 
 // rate-limiter.js
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -58,36 +59,42 @@ async function fetchPlaylistTracks(playlistId) {
 
 async function verifyOrigin(track) {
     let isrc = track.isrc;
-    
-    // Deezer playlist track objects sometimes omit the ISRC, so fetch track details if missing
-    if (!isrc) {
+    let releaseDate = track.release_date || null;
+    let label = 'Unknown';
+
+    if (!isrc || !releaseDate) {
         await delay(120);
         const trackRes = await fetch(`https://api.deezer.com/track/${track.id}`, { headers: getJsonHeaders() });
-        const trackData = await trackRes.json();
-        isrc = trackData.isrc || "";
-    }
-    
-    if (isrc) {
-        const countryCode = isrc.substring(0, 2);
-        // Immediate geographical match
-        if (['IE', 'AU', 'NZ'].includes(countryCode)) {
-            return { match: true, reason: `Local ISRC: ${countryCode}` };
+        if (trackRes.ok) {
+            const trackData = await trackRes.json();
+            isrc = isrc || trackData.isrc || "";
+            releaseDate = releaseDate || trackData.release_date || trackData.album?.release_date || null;
         }
     }
-    
-    // Fallback to label check for global ISRCs
+
     if (track.album && track.album.id) {
         await delay(120);
-        const albumRes = await fetch(`https://api.deezer.com/album/${track.album.id}`);
-        const albumData = await albumRes.json();
-        return { match: 'REQUIRES_LLM', label: albumData.label, isrc: isrc };
+        const albumRes = await fetch(`https://api.deezer.com/album/${track.album.id}`, { headers: getJsonHeaders() });
+        if (albumRes.ok) {
+            const albumData = await albumRes.json();
+            label = albumData.label || label;
+            releaseDate = releaseDate || albumData.release_date || null;
+        }
     }
-    
-    return { match: 'REQUIRES_LLM', label: 'Unknown', isrc: isrc };
+
+    if (isrc) {
+        const countryCode = isrc.substring(0, 2);
+        if (['IE', 'AU', 'NZ'].includes(countryCode)) {
+            return { match: true, reason: `Local ISRC: ${countryCode}`, releaseDate };
+        }
+    }
+
+    return { match: 'REQUIRES_LLM', label, isrc, releaseDate };
 }
 
 async function runDeezerAgent(config, exclusions) {
-    console.log(`[Deezer Agent] Starting extraction from Deezer Playlists...`);
+    const releaseWindowDays = config.releaseWindowDays || 7;
+    console.log(`[Deezer Agent] Starting extraction from Deezer Playlists (release window: ${releaseWindowDays}d)...`);
     const results = [];
     // Target the "Fresh picks of the week" playlists specified by user
     const playlistNames = config.playlistNames || ["New Alternative", "Hot New Rock", "Hard Rock Now"];
@@ -152,6 +159,11 @@ async function runDeezerAgent(config, exclusions) {
             const originData = await verifyOrigin(track);
             if (!originData) continue;
             
+            if (!isWithinDays(originData.releaseDate, releaseWindowDays, 36)) {
+                console.log(`[Deezer Agent] Filtered stale track (> ${releaseWindowDays}d): ${formattedTitle} (Released: ${originData.releaseDate || 'unknown'})`);
+                continue;
+            }
+
             let isMatch = false;
             let reason = '';
             
@@ -175,7 +187,8 @@ async function runDeezerAgent(config, exclusions) {
                     channel: `Deezer: ${sourcePlaylist}`,
                     url: track.link || `https://www.deezer.com/track/${track.id}`,
                     views: "New Addition",
-                    uploadedAt: "Recent", 
+                    uploadedAt: originData.releaseDate,
+                    releaseDate: originData.releaseDate,
                     description: `Discovered in Deezer playlist "${sourcePlaylist}". ${reason}`
                 });
             }
@@ -185,11 +198,15 @@ async function runDeezerAgent(config, exclusions) {
     }
     
     // Save the new highest time_add for the next run
-    try {
-        fs.writeFileSync(statePath, JSON.stringify({ lastTimeAdd: highestTimeAddSeen }, null, 2));
-        console.log(`[Deezer Agent] Updated state file with new cutoff: ${new Date(highestTimeAddSeen * 1000).toISOString()}`);
-    } catch (e) {
-        console.error('[Deezer Agent] Failed to save state file.', e);
+    if (!config.isDryRun) {
+        try {
+            fs.writeFileSync(statePath, JSON.stringify({ lastTimeAdd: highestTimeAddSeen }, null, 2));
+            console.log(`[Deezer Agent] Updated state file with new cutoff: ${new Date(highestTimeAddSeen * 1000).toISOString()}`);
+        } catch (e) {
+            console.error('[Deezer Agent] Failed to save state file.', e);
+        }
+    } else {
+        console.log(`[Deezer Agent] Dry-run: skipping state file write (highest time_add: ${new Date(highestTimeAddSeen * 1000).toISOString()}).`);
     }
     
     return results;

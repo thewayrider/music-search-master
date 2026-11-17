@@ -1,6 +1,7 @@
 const cheerio = require("cheerio");
 const { isExcluded } = require("../utils/filterEngine");
 const { getBrowserHeaders, LINUX_CHROME_UA } = require("../utils/browserHeaders");
+const { isWithinDays } = require("../utils/normalizer");
 
 const DEFAULTS = {
   baseUrl: "https://www.newreleasesnow.com",
@@ -14,7 +15,7 @@ const DEFAULTS = {
     "new-alternative-songs",
     "new-post-punk-songs"
   ],
-  releaseWindowDays: 14,
+  releaseWindowDays: 7,
   includeRss: true,
   rssUrl: "https://www.newreleasesnow.com/rss"
 };
@@ -116,9 +117,7 @@ async function runNewReleasesNowAgent(config = {}, exclusions = {}) {
       if (rawDate) {
         const parsedDate = new Date(rawDate);
         if (!Number.isNaN(parsedDate.getTime())) {
-          const ageMs = now.getTime() - parsedDate.getTime();
-          // Filter out releases older than releaseWindowDays (e.g. 14 days)
-          if (ageMs > maxAgeMs) {
+          if (!isWithinDays(parsedDate.toISOString(), options.releaseWindowDays, 36)) {
             return;
           }
           releaseDateIso = parsedDate.toISOString().slice(0, 10);
@@ -126,6 +125,9 @@ async function runNewReleasesNowAgent(config = {}, exclusions = {}) {
       }
 
       if (!releaseDateIso) {
+        if (!isWithinDays(defaultDate, options.releaseWindowDays, 36)) {
+          return;
+        }
         releaseDateIso = defaultDate;
       }
 
@@ -166,10 +168,11 @@ async function runNewReleasesNowAgent(config = {}, exclusions = {}) {
         if (pubDateStr) {
           const d = new Date(pubDateStr);
           if (!Number.isNaN(d.getTime())) {
-            const ageMs = now.getTime() - d.getTime();
-            if (ageMs > maxAgeMs) return;
+            if (!isWithinDays(d.toISOString(), options.releaseWindowDays, 36)) return;
             pubDateIso = d.toISOString().slice(0, 10);
           }
+        } else if (!isWithinDays(defaultDate, options.releaseWindowDays, 36)) {
+          return;
         }
 
         if (rawTitle.includes(" - ")) {

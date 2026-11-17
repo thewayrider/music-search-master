@@ -2,6 +2,7 @@
   "_comment": "Configuration for the Triple J Unearthed Agent",
   "triplej_unearthed": {
     "searchName": "Triple J Unearthed Discovery",
+    "runWindowDays": 7,
     "limit": 100
   }
 }

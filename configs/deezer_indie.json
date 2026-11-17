@@ -2,6 +2,7 @@
   "_comment": "Configuration for the Deezer Agent",
   "deezer": {
     "searchName": "Deezer Indie Discovery",
+    "releaseWindowDays": 7,
     "playlistNames": ["New Alternative", "Hot New Rock", "Hard Rock Now"],
     "minTimeAdd": 1788220800
   },

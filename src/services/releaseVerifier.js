@@ -28,7 +28,7 @@ function getGeminiToken() {
 const DEFAULTS = {
   ollamaBaseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
   ollamaModel: process.env.OLLAMA_MODEL || 'qwen2.5:3b',
-  releaseWindowDays: parseInt(process.env.RELEASE_WINDOW_DAYS || '14', 10),
+  releaseWindowDays: parseInt(process.env.RELEASE_WINDOW_DAYS || '7', 10),
   targetRegions: ['AU', 'NZ', 'IE'], // Default regional scope; can be ['US'] or ['GLOBAL']
   maxAgentTurns: 3
 };

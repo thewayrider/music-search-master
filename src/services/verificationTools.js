@@ -397,9 +397,73 @@ function inspect_source_clues(rawTextOrUrl) {
   };
 }
 
+/**
+ * Checks whether an artist + track/album has an aligned iTunes release date
+ * within `maxDays`. Checks both songs and albums and only trusts aligned
+ * artist+title matches (never unrelated fuzzy hits).
+ */
+async function checkReleaseFreshnessITunes(artist, title, maxDays = 7) {
+  if (!artist || !title) {
+    return { status: 'unverified', earliestReleaseDate: null, ageDays: null };
+  }
+  const cleanArt = cleanText(artist);
+  const cleanTtl = cleanText(title);
+  const query = `${artist.trim()} ${title.trim()}`;
+
+  async function queryAligned(entity) {
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=${entity}&limit=15`;
+    const res = await fetch(url, {
+      headers: { 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(8000)
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const results = data.results || [];
+    return results.filter((r) => {
+      const rArt = cleanText(r.artistName);
+      const rName = cleanText(entity === 'album' ? r.collectionName : r.trackName);
+      if (!rArt || !rName) return false;
+      const artAlign = rArt.includes(cleanArt) || cleanArt.includes(rArt);
+      const titleAlign = rName.includes(cleanTtl) || cleanTtl.includes(rName);
+      return artAlign && titleAlign;
+    });
+  }
+
+  try {
+    let aligned = await queryAligned('song');
+    if (aligned.length === 0) {
+      aligned = await queryAligned('album');
+    }
+    if (aligned.length === 0) {
+      return { status: 'unverified', earliestReleaseDate: null, ageDays: null };
+    }
+
+    const dates = aligned
+      .map((r) => (r.releaseDate ? r.releaseDate.slice(0, 10) : null))
+      .filter(Boolean)
+      .sort();
+
+    const earliest = dates[0] || null;
+    if (!earliest) {
+      return { status: 'unverified', earliestReleaseDate: null, ageDays: null };
+    }
+
+    const cutoffStr = new Date(Date.now() - maxDays * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const ageDays = Math.round((Date.now() - new Date(earliest).getTime()) / (24 * 60 * 60 * 1000));
+    return {
+      status: earliest >= cutoffStr ? 'fresh' : 'stale',
+      earliestReleaseDate: earliest,
+      ageDays
+    };
+  } catch (err) {
+    return { status: 'unverified', earliestReleaseDate: null, ageDays: null, error: err.message };
+  }
+}
+
 module.exports = {
   check_musicbrainz_artist,
   check_itunes_release_history,
+  checkReleaseFreshnessITunes,
   inspect_source_clues,
   matchCountryCode
 };

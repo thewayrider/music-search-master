@@ -208,7 +208,7 @@ async function runDailyRadar(options = {}) {
   } else if (isDryRun) {
     console.log("[Dry-Run] Skipped email dispatch. Showing verified tracks:");
     passedNewReleases.forEach((t, i) => {
-      console.log(`  ${i + 1}. ${t.artist} — ${t.title} [${t.channel}] -> ${t.url}`);
+      console.log(`  ${i + 1}. ${t.artist} — ${t.title} [${t.channel}] | Date: ${t.releaseDate || 'unknown'} -> ${t.url}`);
     });
   }
 

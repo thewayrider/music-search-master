@@ -20,10 +20,10 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
   const TV_TALK_SHOW_REGEX = /\b(the\s+tonight\s+show|tonight\s+show|starring\s+jimmy\s+fallon|jimmy\s+fallon|jimmy\s+kimmel(\s+live)?|late\s+night\s+with\s+seth\s+meyers|seth\s+meyers|the\s+late\s+show\s+with\s+stephen\s+colbert|stephen\s+colbert|the\s+late\s+late\s+show|james\s+corden|the\s+daily\s+show|saturday\s+night\s+live|\bsnl\b|good\s+morning\s+america|\bgma\b|the\s+today\s+show|today\s+show|the\s+kelly\s+clarkson\s+show|kelly\s+clarkson\s+show|the\s+jennifer\s+hudson\s+show|jennifer\s+hudson\s+show|the\s+voice|american\s+idol|america's\s+got\s+talent|\bagt\b|britain's\s+got\s+talent|\bbgt\b|the\s+graham\s+norton\s+show|graham\s+norton|later\s+with\s+jools\s+holland|jools\s+holland|live\s+from\s+the\s+tonight\s+show|live\s+on\s+(fallon|kimmel|colbert|seth\s+meyers|corden|snl))\b/i;
   const TYPE_BEAT_REGEX = /\b(type\s*beat|prod\.\s*|producer\s*beat|instrumental\s*beat|free\s+for\s+profit|beat\s*pack|buy\s*1\s*get|drum\s*kit)\b/i;
   const PODCAST_ESSAY_REGEX = /\b(podcast|investigating|documentary|video\s+essay|tutorial|how\s+to|making\s+(an?|the|some)\s+(indie|rock|song|track|beat|album|music)|making\s+of|behind\s+the\s+scenes|in\s+the\s+studio|studio\s+vlog|songwriting\s+vlog|lesson|guitar\s+lesson|drum\s+lesson|bass\s+lesson|chord\s+tutorial|production\s+tutorial|masterclass|open\s+source|pro\s+tools|fl\s+studio|ableton|logic\s+pro|nepo\s+babies|breakdown|explained|tier\s+list|gear\s+review|plugin|vst|daw|audio\s+interface)\b/i;
-  const RETRO_DATE_REGEX = /\b(released|out\s+now|album\s+out|ep\s+out|available\s+since)\s+(on\s+)?(january|february|march|april|may|june|july|august|september)\s+\d{1,2},?\s+20\d\d\b/i;
+  const RETRO_DATE_REGEX = /\b(released|out\s+now|album\s+out|ep\s+out|available\s+since)\s+(on\s+)?(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+20\d\d\b/i;
   const SOUTH_ASIAN_CHANNELS = /\b(india|indian|bollywood|tollywood|kollywood|punjabi|desi|bhangra|t-series|zee\s*music|think\s*music|aditya\s*music|speed\s*records|yrf|tips\s*official)\b/i;
 
-  function isRetroRelease(text, maxDaysOld = 21) {
+  function isRetroRelease(text, maxDaysOld = 7) {
     if (!text) return false;
     const isoMatch = text.match(/\b(20\d\d)-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])\b/);
     if (isoMatch) {
@@ -192,8 +192,8 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
           // Check built-in podcast/tutorial/video essay patterns
           if (PODCAST_ESSAY_REGEX.test(fullText)) continue;
 
-          // Check retro/past release dates stated in description (> 21 days old)
-          if (isRetroRelease(descSnippet) || RETRO_DATE_REGEX.test(descSnippet)) continue;
+          // Check retro/past release dates stated in description (> 7 days old)
+          if (isRetroRelease(descSnippet, 7)) continue;
 
           // Check negative keywords
           if (hasNegativeKeywords(fullText, negativeKeywords)) continue;

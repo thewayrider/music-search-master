@@ -1,6 +1,8 @@
 {
   "searchName": "Roots Mag",
   "rootsmag": {
-    "baseUrl": "https://www.rootsmag.nz/new-music-"
+    "baseUrl": "https://www.rootsmag.nz/new-music-",
+    "nzMusicianMaxAgeDays": 7,
+    "maxAgeDays": 7
   }
 }

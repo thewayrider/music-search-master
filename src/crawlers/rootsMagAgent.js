@@ -1,5 +1,6 @@
 const cheerio = require("cheerio");
 const { getBrowserHeaders, getRssHeaders, LINUX_CHROME_UA } = require("../utils/browserHeaders");
+const { checkReleaseFreshnessITunes } = require("../services/verificationTools");
 
 const DEFAULTS = {
   baseUrl: "https://www.rootsmag.nz/new-music-",
@@ -8,7 +9,8 @@ const DEFAULTS = {
   timeoutMs: 10000,
   enableNzMusician: true,
   nzMusicianFeedUrl: "https://nzmusician.co.nz/category/music/feed/",
-  nzMusicianMaxAgeDays: 14
+  nzMusicianMaxAgeDays: 7,
+  maxAgeDays: 7
 };
 
 const TYPE_PATTERNS = [
@@ -32,16 +34,19 @@ function slugify(s) {
   return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
-function candidateSlugs(referenceDate = new Date()) {
-  const slugs = [];
-  for (let offset = 0; offset <= 7; offset++) {
+function candidateSlugs(referenceDate = new Date(), maxDays = 7) {
+  const entries = [];
+  for (let offset = 0; offset <= maxDays; offset++) {
     const d = new Date(referenceDate);
     d.setDate(d.getDate() - offset);
     const dd = String(d.getDate()).padStart(2, "0");
     const mm = String(d.getMonth() + 1).padStart(2, "0");
-    slugs.push(`${dd}-${mm}`);
+    const slug = `${dd}-${mm}`;
+    if (!entries.some(e => e.slug === slug)) {
+      entries.push({ slug, dateStr: d.toISOString().slice(0, 10) });
+    }
   }
-  return [...new Set(slugs)];
+  return entries;
 }
 
 async function fetchText(url, options) {
@@ -128,18 +133,21 @@ async function fetchNzMusicianReleases(options = {}) {
 
 async function runRootsMagAgent(config = {}, exclusions = {}) {
   const options = { ...DEFAULTS, ...config };
-  const slugs = candidateSlugs();
+  const maxAgeDays = options.maxAgeDays || options.nzMusicianMaxAgeDays || 7;
+  const slugEntries = candidateSlugs(new Date(), maxAgeDays);
   let html = null;
   let sourceUrl = null;
+  let postDateStr = new Date().toISOString().split('T')[0];
 
   // 1. Scrape Roots Mag NZ weekly post
-  for (const slug of slugs) {
+  for (const { slug, dateStr } of slugEntries) {
     const url = `${options.baseUrl}${slug}/`;
     try {
       html = await fetchText(url, options);
       if (html && html.length > 500) {
-        console.log(`[RootsMag Agent] Found post at ${url}`);
+        console.log(`[RootsMag Agent] Found post at ${url} (${dateStr})`);
         sourceUrl = url;
+        postDateStr = dateStr;
         break;
       }
     } catch (e) {
@@ -181,25 +189,44 @@ async function runRootsMagAgent(config = {}, exclusions = {}) {
     console.warn("[RootsMag Agent] No post found for any candidate slug this week.");
   }
 
-  // Map Roots Mag candidates to unified format
-  const rootsResults = rootsCandidates.map(r => {
-    let description = `Type: ${r.releaseType} | Genres: Roots/Indie (NZ)`;
+  // Filter Roots Mag candidates against iTunes earliest release date (> 7d stale guard)
+  const rootsResults = [];
+  for (const r of rootsCandidates) {
+    const freshness = await checkReleaseFreshnessITunes(r.artist, r.title, maxAgeDays);
+    if (freshness.status === "stale") {
+      console.log(`[RootsMag Agent] Dropped stale track (> ${maxAgeDays}d): ${r.artist} - ${r.title} (${freshness.earliestReleaseDate})`);
+      continue;
+    }
+    const releaseDate = freshness.earliestReleaseDate || postDateStr;
+    const description = `Type: ${r.releaseType} | Genres: Roots/Indie (NZ)`;
     const trackAnchor = slugify(`${r.artist}-${r.title}`);
-    return {
+    rootsResults.push({
       title: `${r.artist} - ${r.title}`,
       channel: "Roots Mag",
       url: `${r.sourceUrl}#${trackAnchor}`,
       views: "Manual review",
-      uploadedAt: new Date().toISOString().split('T')[0],
+      uploadedAt: releaseDate,
+      releaseDate,
       description: description
-    };
-  });
+    });
+  }
 
   // 2. Poll NZ Musician features (if enabled)
   let nzMusicianResults = [];
   if (options.enableNzMusician !== false) {
     try {
-      nzMusicianResults = await fetchNzMusicianReleases(options);
+      const rawNz = await fetchNzMusicianReleases({ ...options, nzMusicianMaxAgeDays: maxAgeDays });
+      for (const item of rawNz) {
+        const [artist, ...rest] = item.title.split(" - ");
+        const title = rest.join(" - ");
+        const freshness = await checkReleaseFreshnessITunes(artist, title, maxAgeDays);
+        if (freshness.status === "stale") {
+          console.log(`[RootsMag Agent -> NZ Musician] Dropped stale track (> ${maxAgeDays}d): ${item.title} (${freshness.earliestReleaseDate})`);
+          continue;
+        }
+        const releaseDate = freshness.earliestReleaseDate || item.uploadedAt;
+        nzMusicianResults.push({ ...item, uploadedAt: releaseDate, releaseDate });
+      }
     } catch (nzErr) {
       console.warn("[RootsMag Agent] NZ Musician integration error:", nzErr.message);
     }

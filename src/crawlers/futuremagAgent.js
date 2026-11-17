@@ -1,11 +1,13 @@
 const cheerio = require("cheerio");
 const { extractReleasesWithAI } = require("../utils/aiScraper");
 const { getJsonHeaders, getBrowserHeaders, LINUX_CHROME_UA } = require("../utils/browserHeaders");
+const { checkReleaseFreshnessITunes } = require("../services/verificationTools");
 
 const DEFAULTS = {
   baseUrl: "https://futuremagmusic.com",
   categoryId: 1410, // "Future Focus"
   perPage: 5,
+  maxArticleAgeDays: 7,
   sourceService: "Futuremag Music",
   defaultCountry: "Australia", 
   userAgent: LINUX_CHROME_UA,
@@ -39,7 +41,7 @@ async function runFuturemagAgent(config = {}, exclusions = {}) {
   const options = { ...DEFAULTS, ...config };
   const http = fetch;
 
-  const maxAgeDays = options.maxArticleAgeDays || 14;
+  const maxAgeDays = options.maxArticleAgeDays || 7;
   const cutoffTime = Date.now() - (maxAgeDays * 24 * 60 * 60 * 1000);
 
   // 1. Fetch both the weekly roundup query and recent editorial articles
@@ -111,7 +113,13 @@ async function runFuturemagAgent(config = {}, exclusions = {}) {
     const aiResults = await extractReleasesWithAI(bodyText);
 
     for (const rel of aiResults) {
-      items.push(buildItem(rel, { articleDate, articleUrl, filters: exclusions, options, bodyText }));
+      const freshness = await checkReleaseFreshnessITunes(rel.artist, rel.title, maxAgeDays);
+      if (freshness.status === "stale") {
+        console.log(`[Futuremag Agent] Dropped stale track (> ${maxAgeDays}d): ${rel.artist} - ${rel.title} (${freshness.earliestReleaseDate})`);
+        continue;
+      }
+      const releaseDate = freshness.earliestReleaseDate || articleDate;
+      items.push(buildItem(rel, { articleDate: releaseDate, articleUrl, filters: exclusions, options, bodyText }));
     }
   }
 

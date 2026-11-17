@@ -194,8 +194,9 @@ function evaluateCandidateTrack(item, channelName = "Radar", options = {}) {
 /**
  * Processes song entry for weekly crawlers (diffEngine).
  */
-function processSongEntry(item, sourceName = "Unknown") {
+function processSongEntry(item, sourceName = "Unknown", options = {}) {
   const db = getDatabase();
+  const isDryRun = options.isDryRun || false;
 
   let artist = item.artist;
   let title = item.title;
@@ -218,18 +219,21 @@ function processSongEntry(item, sourceName = "Unknown") {
   const existing = findStmt.get(slug);
 
   if (!existing) {
-    const insertSong = db.prepare(`
-      INSERT INTO songs (artist, title, slug, first_seen_at, first_channel, first_url, release_date, release_type, description, heat_score)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
-    `);
-    const result = insertSong.run(artist, title, slug, seenAt, source, url, seenAt, releaseType, desc);
-    const songId = Number(result.lastInsertRowid);
+    let songId = null;
+    if (!isDryRun) {
+      const insertSong = db.prepare(`
+        INSERT INTO songs (artist, title, slug, first_seen_at, first_channel, first_url, release_date, release_type, description, heat_score)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+      `);
+      const result = insertSong.run(artist, title, slug, seenAt, source, url, seenAt, releaseType, desc);
+      songId = Number(result.lastInsertRowid);
 
-    const insertSighting = db.prepare(`
-      INSERT INTO sightings (song_id, channel_name, source_url, seen_at)
-      VALUES (?, ?, ?, ?)
-    `);
-    insertSighting.run(songId, source, url, seenAt);
+      const insertSighting = db.prepare(`
+        INSERT INTO sightings (song_id, channel_name, source_url, seen_at)
+        VALUES (?, ?, ?, ?)
+      `);
+      insertSighting.run(songId, source, url, seenAt);
+    }
 
     return {
       isNewGlobal: true,
@@ -245,20 +249,24 @@ function processSongEntry(item, sourceName = "Unknown") {
   const existingSighting = findSighting.get(songId, source);
 
   if (!existingSighting) {
-    const insertSighting = db.prepare(`
-      INSERT INTO sightings (song_id, channel_name, source_url, seen_at)
-      VALUES (?, ?, ?, ?)
-    `);
-    insertSighting.run(songId, source, url, seenAt);
-
-    const countStmt = db.prepare(`SELECT COUNT(*) as count FROM sightings WHERE song_id = ?`);
-    const heatCount = Number(countStmt.get(songId).count);
-
-    const updateHeat = db.prepare(`UPDATE songs SET heat_score = ? WHERE id = ?`);
-    updateHeat.run(heatCount, songId);
-
     const allSourcesStmt = db.prepare(`SELECT channel_name FROM sightings WHERE song_id = ?`);
-    const sources = allSourcesStmt.all(songId).map(s => s.channel_name);
+    const existingSources = allSourcesStmt.all(songId).map(s => s.channel_name);
+    let heatCount = existingSources.length + 1;
+    const sources = [...existingSources, source];
+
+    if (!isDryRun) {
+      const insertSighting = db.prepare(`
+        INSERT INTO sightings (song_id, channel_name, source_url, seen_at)
+        VALUES (?, ?, ?, ?)
+      `);
+      insertSighting.run(songId, source, url, seenAt);
+
+      const countStmt = db.prepare(`SELECT COUNT(*) as count FROM sightings WHERE song_id = ?`);
+      heatCount = Number(countStmt.get(songId).count);
+
+      const updateHeat = db.prepare(`UPDATE songs SET heat_score = ? WHERE id = ?`);
+      updateHeat.run(heatCount, songId);
+    }
 
     return {
       isNewGlobal: false,

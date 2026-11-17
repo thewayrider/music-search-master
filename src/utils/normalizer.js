@@ -119,6 +119,25 @@ function isWithinHours(dateStr, maxHours = 36) {
   }
 }
 
+/**
+ * Checks if a release date (YYYY-MM-DD or ISO timestamp) falls within the last
+ * `maxDays` calendar days from today (inclusive) and not beyond `maxFutureHours`.
+ */
+function isWithinDays(dateStr, maxDays = 7, maxFutureHours = 36) {
+  if (!dateStr || dateStr === "unknown") return false;
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return false;
+    const cutoffStr = new Date(Date.now() - maxDays * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const dateIso = d.toISOString().slice(0, 10);
+    if (dateIso < cutoffStr) return false;
+    const maxFutureMs = Date.now() + maxFutureHours * 60 * 60 * 1000;
+    return d.getTime() <= maxFutureMs;
+  } catch (e) {
+    return false;
+  }
+}
+
 function hasNegativeKeywords(text, negativeKeywords = []) {
   if (!text) return false;
   const lower = text.toLowerCase();
@@ -322,6 +341,7 @@ module.exports = {
   sanitizeHeadline,
   parseArtistTitle,
   isWithinHours,
+  isWithinDays,
   hasNegativeKeywords,
   isCleanTrack
 };

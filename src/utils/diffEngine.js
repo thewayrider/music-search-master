@@ -50,7 +50,7 @@ function getPreviousReport(savedSearchesDir, currentFilename) {
  * Deduplicates intra-run items, previous local runs, and cross-agent discoveries.
  * Tracks multi-source consensus Heat Scores in the central database without re-alerting duplicates.
  */
-function getNewAdditions(currentResults, previousResults = []) {
+function getNewAdditions(currentResults, previousResults = [], options = {}) {
     if (!Array.isArray(currentResults) || currentResults.length === 0) {
         return [];
     }
@@ -131,7 +131,7 @@ function getNewAdditions(currentResults, previousResults = []) {
         // Process against Central SQLite Database
         let dbOutcome = null;
         try {
-            dbOutcome = processSongEntry(item, item.channel || "Unknown");
+            dbOutcome = processSongEntry(item, item.channel || "Unknown", { isDryRun: options.isDryRun });
         } catch (dbErr) {
             console.warn(`[Diff Engine] Catalog DB warning:`, dbErr.message);
         }

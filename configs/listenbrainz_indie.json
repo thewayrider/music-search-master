@@ -2,6 +2,9 @@
   "_comment": "Configuration for the ListenBrainz Agent",
   "listenbrainz": {
     "searchName": "ListenBrainz Indie Discovery",
+    "days": 7,
+    "runWindowDays": 7,
+    "future": false,
     "maxEnrich": 2000
   },
   "targetGenres": ["Indie Rock", "Alt Rock", "Surf Rock", "Indie"],

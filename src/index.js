@@ -193,7 +193,7 @@ Examples:
     } else if (config.deezer) {
         const agent = loadAgentSafely('deezer', './crawlers/deezerAgent');
         if (agent?.runDeezerAgent) {
-            results = results.concat(await agent.runDeezerAgent(config.deezer, exclusions));
+            results = results.concat(await agent.runDeezerAgent({ ...config.deezer, isDryRun }, exclusions));
         }
     } else if (config.spotify_oauth) {
         const agent = loadAgentSafely('spotify_oauth', './crawlers/spotifyOAuthAgent');
@@ -255,7 +255,7 @@ Examples:
 
     // EveryNoise Purity Gate & Diff Engine
     const previousResults = getPreviousReport(searchSpecificDir, path.basename(jsonPath));
-    const newSongs = getNewAdditions(results, previousResults);
+    const newSongs = getNewAdditions(results, previousResults, { isDryRun });
 
     console.log(`[Diff Engine] Found ${newSongs.length} totally new songs since the last run.`);
 
@@ -266,7 +266,7 @@ Examples:
         console.log(`\n[Verifier] Running Two-Stage Verification on ${newSongs.length} newly detected additions...`);
         const verifiedSongs = await verifyReleasesBatch(newSongs, {
             targetRegions: config.targetRegions || ['AU', 'NZ', 'IE'],
-            releaseWindowDays: config.releaseWindowDays || 14
+            releaseWindowDays: config.releaseWindowDays || 7
         });
         const passedSongs = verifiedSongs.filter(s => s.isVerified);
         const filteredCount = verifiedSongs.length - passedSongs.length;
@@ -281,6 +281,13 @@ Examples:
         console.log(`Total Scraped Candidates: ${results.length}`);
         console.log(`New Additions (vs prior): ${newSongs.length}`);
         console.log(`Verified Releases:       ${songsToSave.length}`);
+        if (songsToSave.length > 0) {
+            console.log(`Candidates:`);
+            songsToSave.forEach((s, i) => {
+                const dateInfo = s.releaseDate || s.uploadedAt || 'unknown';
+                console.log(`  ${i + 1}. ${s.title} [${s.channel || searchName}] | Date: ${dateInfo}`);
+            });
+        }
         console.log(`[Dry Run] Skipping email dispatch, file save, and telemetry sync.`);
         console.log(`========================================================\n`);
         return;

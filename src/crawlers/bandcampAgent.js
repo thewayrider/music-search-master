@@ -1,4 +1,5 @@
 const https = require('https');
+const { isWithinDays } = require('../utils/normalizer');
 
 const DEFAULTS = {
   sourceService: "Bandcamp",
@@ -7,6 +8,7 @@ const DEFAULTS = {
   pageSize: 60,
   maxPages: 2,
   maxItems: 120,
+  runWindowDays: 7,
   requestDelayMs: 700,
   timeoutMs: 25000,
   allowPreorders: false,
@@ -105,7 +107,7 @@ async function runBandcampAgent(config = {}, exclusions = {}) {
   }
 
   console.log("[Bandcamp Agent] Total extracted before dedupe:", releases.length);
-  const deduped = dedupeAndSort(releases, exclusions);
+  const deduped = dedupeAndSort(releases, { ...exclusions, ...options });
 
   // MAPPING TO UNIFIED AGENT FORMAT
   const unifiedResults = deduped.map(r => {
@@ -206,14 +208,24 @@ function toCard(raw, locationCtx, queryGenre, options = {}) {
   if (!artist || !title) return null;
 
   // 1. Drop Silent Pre-Orders / Unstreamable Items:
-  // Must have a streamable featured track to preview
-  const trackObj = raw.featuredTrack || raw.featured_track;
-  const hasStreamableAudio = Boolean(trackObj && (trackObj.streamUrl || trackObj.stream_url));
+  // Bandcamp discover_web moved stream metadata from featuredTrack to playerData
+  const trackObj = raw.playerData || raw.featuredTrack || raw.featured_track;
+  const hasStreamableAudio = Boolean(
+    trackObj &&
+    (trackObj.streamUrl || trackObj.stream_url) &&
+    !trackObj.isStreamingDisabled
+  );
   if (!hasStreamableAudio) return null;
 
   // 2. Pre-Order Quarantine:
   // Drop pre-orders if allowPreorders is false (default)
-  const isPreorder = Boolean(raw.isAlbumPreorder || raw.is_album_preorder || raw.is_preorder);
+  const isPreorder = Boolean(
+    raw.isAlbumPreorder ||
+    raw.is_album_preorder ||
+    raw.is_preorder ||
+    trackObj.isPreorder ||
+    (trackObj.album && trackObj.album.isPreorder)
+  );
   if (!options.allowPreorders && isPreorder) return null;
 
   // 3. Release Date Guard (Future-Dated Releases):
@@ -365,18 +377,12 @@ function bucketFromScore(score) {
 }
 
 function dedupeAndSort(items, filters = {}) {
-  const runWindowDays = filters.runWindowDays || 14;
-  const cutoff = Date.now() - runWindowDays * 24 * 60 * 60 * 1000;
-  const maxFutureMs = Date.now() + (filters.maxFutureHours || 36) * 60 * 60 * 1000;
+  const runWindowDays = filters.runWindowDays || 7;
+  const maxFutureHours = filters.maxFutureHours || 36;
   const map = new Map();
 
   for (const item of items) {
-    const parsed = new Date(item.releaseDate).getTime();
-    const dateOk =
-      item.releaseDate === "unknown" ||
-      Number.isNaN(parsed) ||
-      (parsed >= cutoff && parsed <= maxFutureMs);
-    if (!dateOk) continue;
+    if (!isWithinDays(item.releaseDate, runWindowDays, maxFutureHours)) continue;
 
     const key = `${slugify(item.artist)}::${slugify(item.title)}`;
     const existing = map.get(key);

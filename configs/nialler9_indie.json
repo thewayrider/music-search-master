@@ -2,6 +2,7 @@
   "_comment": "Configuration for the Nialler9 Crawler",
   "nialler9": {
     "searchName": "Nialler9 Indie Discovery",
+    "maxArticleAgeDays": 7,
     "targetGenres": [
       "Indie Rock",
       "Alt Rock",

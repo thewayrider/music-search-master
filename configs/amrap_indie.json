@@ -4,7 +4,8 @@
     "searchName": "AMRAP Indie Discovery",
     "chartKeys": ["indie", "rock"],
     "targetGenres": ["Indie Rock", "Alt Rock", "Surf Rock", "Indie"],
-    "freshWindowDays": 28,
-    "filterStale": false
+    "freshWindowDays": 7,
+    "filterStale": true,
+    "filterUnverified": true
   }
 }

@@ -1,5 +1,8 @@
 {
   "airChart": {
-    "searchName": "AIR Charts Discovery"
+    "searchName": "AIR Charts Discovery",
+    "freshWindowDays": 7,
+    "filterStale": true,
+    "filterUnverified": true
   }
 }

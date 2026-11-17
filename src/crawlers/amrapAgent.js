@@ -41,8 +41,9 @@ const DEFAULTS = {
   // --- Release-date enrichment & Strict Freshness Gate ----------------------
   enrichReleaseDate: true,
   musicbrainzBase: "https://musicbrainz.org/ws/2",
-  freshWindowDays: 28,        // Informational freshness reference
-  filterStale: false,         // Keep as-is: do not drop chart debuts
+  freshWindowDays: 7,         // Max release age (days) to qualify as a fresh release
+  filterStale: true,          // Drop chart debuts whose verified release exceeds freshWindowDays
+  filterUnverified: false,    // Optional: also drop debuts with no verifiable release date
   mbMinScore: 80,             // min MusicBrainz match score (0-100) to trust
   maxEnrich: 60,              // max lookups per run
   mbDelayMs: 1100,            // MusicBrainz rate limit (~1 req/sec)
@@ -52,7 +53,7 @@ const DEFAULTS = {
   cataloguePenalty: 0,
 
   timeoutMs: 25000,
-  userAgent: "NewIndieFriday/0.1 (music-release-agent; amrap collector)",
+  userAgent: LINUX_CHROME_UA,
 };
 
 async function runAmrapAgent(config = {}, exclusions = {}) {
@@ -148,11 +149,25 @@ async function runAmrapAgent(config = {}, exclusions = {}) {
 
   // MAPPING TO UNIFIED AGENT FORMAT (Applying Strict Freshness Gate)
   const filterStale = options.filterStale !== false;
-  const filteredDebuts = filterStale ? deduped.filter(r => !r.isStale) : deduped;
+  const filterUnverified = options.filterUnverified === true;
+  let droppedStale = 0;
+  let droppedUnverified = 0;
+  const filteredDebuts = deduped.filter(r => {
+      if (filterStale && r.isStale) {
+          droppedStale++;
+          return false;
+      }
+      if (filterUnverified && r.freshness === "unverified") {
+          droppedUnverified++;
+          return false;
+      }
+      return true;
+  });
 
   console.log(
     `[AMRAP Agent] Freshness Gate: kept ${filteredDebuts.length} fresh debuts ` +
-    `(filtered ${deduped.length - filteredDebuts.length} stale releases older than ${options.freshWindowDays}d).`
+    `(filtered ${droppedStale} stale > ${options.freshWindowDays}d` +
+    (filterUnverified ? `, ${droppedUnverified} unverified` : "") + ")."
   );
 
   const unifiedResults = filteredDebuts.map(r => {
@@ -164,7 +179,8 @@ async function runAmrapAgent(config = {}, exclusions = {}) {
           ? `https://amrap.org.au/charts#${r.trackSlug}` 
           : (r.trackId ? `https://amrap.org.au/charts#${r.trackId}` : r.sourceUrl);
 
-      const trueReleaseDate = r.originalReleaseDate || r.chartWeekEnd || r.releaseDate;
+      // Never falsely stamp chartWeekEnd as the song's release date when unverified
+      const trueReleaseDate = r.originalReleaseDate || null;
 
       return {
           title: `${r.artist} - ${r.title}`,
@@ -254,13 +270,16 @@ async function enrichReleaseDates(items, http, options) {
 function applyFreshness(item, origDate, options, unresolvedReason) {
   item.originalReleaseDate = origDate;
   const weekEnd = item.chartWeekEnd || (item.releaseDate && item.releaseDate !== "unknown" ? item.releaseDate : null);
-  const res = classifyFreshness(origDate, weekEnd, options.freshWindowDays, unresolvedReason);
+  const useChartWeekRef = Boolean(options.date && weekEnd);
+  const res = classifyFreshness(origDate, useChartWeekRef ? weekEnd : null, options.freshWindowDays, unresolvedReason);
   item.freshness = res.freshness;
   item.freshnessNote = res.note;
   item.ageDays = res.ageDays;
 
   if (origDate) {
     item.releaseDate = origDate;
+  } else {
+    item.releaseDate = "unknown";
   }
 
   if (res.freshness === "catalogue") {
@@ -272,18 +291,18 @@ function applyFreshness(item, origDate, options, unresolvedReason) {
   }
 }
 
-function classifyFreshness(origDate, weekEnd, windowDays = 28, unresolvedReason) {
+function classifyFreshness(origDate, refDateOverride, windowDays = 7, unresolvedReason) {
   if (!origDate) {
     return { freshness: "unverified", note: unresolvedReason || "no release date found", ageDays: null };
   }
   const orig = parseLooseDate(origDate);
-  const ref = weekEnd ? new Date(weekEnd) : new Date();
+  const ref = refDateOverride ? new Date(refDateOverride) : new Date();
   if (!orig || Number.isNaN(orig.getTime())) {
     return { freshness: "unverified", note: `unparseable date ${origDate}`, ageDays: null };
   }
   const ageDays = Math.round((ref.getTime() - orig.getTime()) / (24 * 60 * 60 * 1000));
   if (ageDays <= windowDays && ageDays >= -7) {
-    return { freshness: "fresh", note: `released ${origDate} (${ageDays}d old at chart debut)`, ageDays };
+    return { freshness: "fresh", note: `released ${origDate} (${ageDays}d old)`, ageDays };
   }
   return { freshness: "catalogue", note: `stale: released ${origDate} (${ageDays}d old, exceeds ${windowDays}d limit)`, ageDays };
 }
@@ -439,7 +458,7 @@ function guessReleaseType(track) {
 }
 
 function dedupeAndSort(items, filters) {
-  const runWindowDays = filters.runWindowDays || 14;
+  const runWindowDays = filters.runWindowDays || 7;
   const cutoff = Date.now() - runWindowDays * 24 * 60 * 60 * 1000;
   const map = new Map();
 

@@ -1,6 +1,7 @@
 const cheerio = require("cheerio");
 const { extractReleasesWithAI } = require("../utils/aiScraper");
 const { getBrowserHeaders, getRssHeaders, LINUX_CHROME_UA } = require("../utils/browserHeaders");
+const { checkReleaseFreshnessITunes } = require("../services/verificationTools");
 
 const DEFAULTS = {
   baseUrl: "https://nialler9.com",
@@ -131,6 +132,13 @@ async function runNialler9Agent(config = {}, exclusions = {}) {
       if (seenTracks.has(trackKey)) continue;
       seenTracks.add(trackKey);
 
+      const freshness = await checkReleaseFreshnessITunes(rel.artist, rel.title, options.maxArticleAgeDays);
+      if (freshness.status === "stale") {
+        console.log(`[${options.sourceService} Agent] Dropped stale/back-catalog release (> ${options.maxArticleAgeDays}d): ${rel.artist} - ${rel.title} (${freshness.earliestReleaseDate})`);
+        continue;
+      }
+
+      const releaseDate = freshness.earliestReleaseDate || art.date;
       const trackUrl = `${art.link}#${slugify(rel.artist + '-' + rel.title)}`;
       let desc = `Type: ${rel.releaseType || 'album/single'} | Country: ${options.defaultCountry}`;
       if (rel.genres) desc += ` | Genres: ${rel.genres}`;
@@ -140,7 +148,8 @@ async function runNialler9Agent(config = {}, exclusions = {}) {
         channel: options.sourceService,
         url: trackUrl,
         views: "Worth checking",
-        uploadedAt: art.date,
+        uploadedAt: releaseDate,
+        releaseDate,
         description: desc
       });
     }
