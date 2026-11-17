@@ -3,6 +3,23 @@ const path = require('path');
 const fs = require('fs');
 const { getMasterStats, getDatabase } = require('../utils/masterDb');
 
+const STATUS_KEY_MAP = {
+  'global-radar': 'global_radar_daily',
+  'us-radar': 'us_radar_daily',
+  'bandcamp-weekly': 'bandcamp_indie_discovery',
+  'amrap-weekly': 'amrap_indie_discovery',
+  'listenbrainz-weekly': 'listenbrainz_indie_discovery',
+  'musicbrainz-weekly': 'musicbrainz_indie_discovery',
+  'aircharts-weekly': 'air_charts_discovery',
+  'rootsmag-weekly': 'roots_mag',
+  'futuremag-weekly': 'futuremag_indie_discovery',
+  'deezer-weekly': 'deezer_indie_discovery',
+  'nialler9-weekly': 'nialler9_indie_discovery',
+  'triplejunearthed-weekly': 'triple_j_unearthed_discovery',
+  'newreleasesnow-weekly': 'new_releases_now_indie_discovery',
+  'thenote-weekly': 'the_note_australia'
+};
+
 class FleetManager {
   constructor() {
     this.projectRoot = path.resolve(__dirname, '../../');
@@ -254,6 +271,22 @@ class FleetManager {
         lastExitCode: null,
         lastDurationMs: null,
         logs: []
+      },
+      'thenote-weekly': {
+        id: 'thenote-weekly',
+        name: 'The Note Australia',
+        description: 'Australian indie new-music reviews and Friday Favourites roundup with US/UK origin notes',
+        market: 'WEEKLY',
+        schedule: 'Friday at 02:30 PM MYT',
+        command: nodeExec,
+        args: ['src/index.js', 'configs/thenote_indie.json'],
+        cwd: this.projectRoot,
+        state: 'idle',
+        lastRunStartedAt: null,
+        lastRunFinishedAt: null,
+        lastExitCode: null,
+        lastDurationMs: null,
+        logs: []
       }
     };
 
@@ -266,21 +299,6 @@ class FleetManager {
     if (!fs.existsSync(this.statusFilePath)) return;
     try {
       const data = JSON.parse(fs.readFileSync(this.statusFilePath, 'utf8'));
-      const STATUS_KEY_MAP = {
-        'global-radar': 'global_radar_daily',
-        'us-radar': 'us_radar_daily',
-        'bandcamp-weekly': 'bandcamp_indie_discovery',
-        'amrap-weekly': 'amrap_indie_discovery',
-        'listenbrainz-weekly': 'listenbrainz_indie_discovery',
-        'musicbrainz-weekly': 'musicbrainz_indie_discovery',
-        'aircharts-weekly': 'air_charts_discovery',
-        'rootsmag-weekly': 'roots_mag',
-        'futuremag-weekly': 'futuremag_indie_discovery',
-        'deezer-weekly': 'deezer_indie_discovery',
-        'nialler9-weekly': 'nialler9_indie_discovery',
-        'triplejunearthed-weekly': 'triple_j_unearthed_discovery',
-        'newreleasesnow-weekly': 'new_releases_now_indie_discovery'
-      };
 
       for (const [serviceId, statusKey] of Object.entries(STATUS_KEY_MAP)) {
         const service = this.services[serviceId];
@@ -299,21 +317,6 @@ class FleetManager {
   _persistServiceStatus(service, exitCode) {
     if (!fs.existsSync(this.statusFilePath)) return;
     try {
-      const STATUS_KEY_MAP = {
-        'global-radar': 'global_radar_daily',
-        'us-radar': 'us_radar_daily',
-        'bandcamp-weekly': 'bandcamp_indie_discovery',
-        'amrap-weekly': 'amrap_indie_discovery',
-        'listenbrainz-weekly': 'listenbrainz_indie_discovery',
-        'musicbrainz-weekly': 'musicbrainz_indie_discovery',
-        'aircharts-weekly': 'air_charts_discovery',
-        'rootsmag-weekly': 'roots_mag',
-        'futuremag-weekly': 'futuremag_indie_discovery',
-        'deezer-weekly': 'deezer_indie_discovery',
-        'nialler9-weekly': 'nialler9_indie_discovery',
-        'triplejunearthed-weekly': 'triple_j_unearthed_discovery',
-        'newreleasesnow-weekly': 'new_releases_now_indie_discovery'
-      };
       const key = STATUS_KEY_MAP[service.id];
       if (!key) return;
       const data = JSON.parse(fs.readFileSync(this.statusFilePath, 'utf8'));

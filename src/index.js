@@ -210,6 +210,11 @@ Examples:
         if (agent?.runNewReleasesNowAgent) {
             results = results.concat(await agent.runNewReleasesNowAgent(config.newreleasesnow, exclusions));
         }
+    } else if (config.thenote) {
+        const agent = loadAgentSafely('thenote', './crawlers/theNoteAgent');
+        if (agent?.runTheNoteAgent) {
+            results = results.concat(await agent.runTheNoteAgent(config.thenote, exclusions));
+        }
     }
 
     // Save outputs in saved_searches
@@ -228,6 +233,7 @@ Examples:
                        config.spotify_oauth?.searchName ||
                        config.nialler9?.searchName ||
                        config.newreleasesnow?.searchName ||
+                       config.thenote?.searchName ||
                        'search_results';
 
     const safeSearchName = searchName.replace(/[^a-z0-9]/gi, '_').toLowerCase();

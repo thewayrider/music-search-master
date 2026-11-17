@@ -1,0 +1,9 @@
+{
+  "_comment": "Configuration for The Note Australia Weekly Crawler",
+  "thenote": {
+    "searchName": "The Note Australia",
+    "baseUrl": "https://www.thenote.com.au",
+    "listUrl": "https://www.thenote.com.au/news?filter=new-music",
+    "maxArticleAgeDays": 7
+  }
+}

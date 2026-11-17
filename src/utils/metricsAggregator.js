@@ -14,6 +14,7 @@ const AGENTS = [
     { id: 'roots_mag', name: 'Roots Mag', schedule: 'Fri 09:50 MYT' },
     { id: 'nialler9_indie_discovery', name: 'Nialler9', schedule: 'Fri 10:00 MYT' },
     { id: 'deezer_indie_discovery', name: 'Deezer', schedule: 'Fri 10:10 MYT' },
+    { id: 'the_note_australia', name: 'The Note Australia', schedule: 'Fri 14:30 MYT' },
     { id: 'new_releases_now_indie_discovery', name: 'New Releases Now', schedule: 'Sat 09:30 MYT' }
 ];
 

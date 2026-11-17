@@ -116,5 +116,15 @@
       "Saturday"
     ],
     "time": "09:30AM"
+  },
+  {
+    "id": "thenote",
+    "name": "LiveMusicSearchAgent_TheNote",
+    "description": "Runs The Note Australia Crawler on Friday at 02:30 PM MYT",
+    "script": "run_thenote.bat",
+    "days": [
+      "Friday"
+    ],
+    "time": "02:30PM"
   }
 ]
