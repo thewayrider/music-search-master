@@ -354,6 +354,60 @@ To ensure `package.json` scripts (`"start": "node src/index.js"`, `"command-cent
 - `/storage/emulated/10/Projects/music-search-master/.git` is mounted read-only (`ro`) in standard sandbox mode.
 - Git operations modifying `.git` (`git add`, `git commit`, `git checkout`, `git rebase`, `git push`) must be executed with elevated permission (`BypassSandbox: true`).
 
+---
+
+## 21. Strict 7-Day Release Cut-Off & Bandcamp `playerData` Schema Fix (Nov 2026)
+
+### Bandcamp `discover_web` Schema Update (`bandcampAgent.js`, `bandcampChannel.js`)
+- Bandcamp removed top-level `featuredTrack` / `featured_track` and moved streaming/preorder metadata into `playerData` (`playerData.streamUrl`, `playerData.isStreamingDisabled`, `playerData.isPreorder`, `playerData.album.isPreorder`), alongside camelCase item fields (`bandName`, `itemUrl`, `isAlbumPreorder`, `releaseDate`, `bandLocation`, `itemType`).
+- Both `src/crawlers/bandcampAgent.js` and `src/radars/bandcampChannel.js` read `playerData` with snake_case fallbacks.
+
+### Fleet-Wide 7-Day Cut-Off & Non-Destructive `--dry-run`
+- **Shared Helpers**:
+  - `isWithinDays(dateStr, maxDays = 7, maxFutureHours = 36)` in `src/utils/normalizer.js` evaluates calendar-day release cut-offs cleanly and rejects `"unknown"`, `null`, `> 7` days old, or far-future pre-orders.
+  - `checkReleaseFreshnessITunes(artist, title, maxDays = 7)` in `src/services/verificationTools.js` checks both `song` and `album` entities using aligned artist+title matches only (never unrelated fuzzy hits).
+  - `src/services/releaseVerifier.js` and `src/index.js` default `releaseWindowDays` to `7`.
+- **Per-Crawler 7-Day Enforcement**:
+  - `amrapAgent.js` / `configs/amrap_indie.json`: `freshWindowDays: 7`, `filterStale: true`, `filterUnverified: true`; never stamps `chartWeekEnd` as `uploadedAt` when `originalReleaseDate` is null.
+  - `airChartAgent.js` / `configs/air_charts.json`: `freshWindowDays: 7`, `filterStale: true`, `filterUnverified: true` verified via `checkReleaseFreshnessITunes`.
+  - `tripleJUnearthedAgent.js` / `configs/triplej_unearthed_indie.json`: parses structured Next.js `__NEXT_DATA__` (`tracksShowcase` + `reviewsShowcase`) for exact `uploadedOn` timestamps (`runWindowDays: 7`) plus iTunes commercial back-catalog guard.
+  - `deezerAgent.js` / `configs/deezer_indie.json`: fetches track/album `release_date` and enforces `releaseWindowDays: 7` (not just playlist `time_add`).
+  - `listenBrainzAgent.js` / `configs/listenbrainz_indie.json`: `days: 7`, `runWindowDays: 7`, `future: false`, `timeoutMs: 45000`.
+  - `musicBrainzAgent.js`: rejects partial dates (`YYYY` / `YYYY-MM`), enforces `isWithinDays(..., 7)`, retries once on HTTP 503.
+  - `futuremagAgent.js`, `rootsMagAgent.js`, `nialler9Agent.js`: `7`-day article/feed windows + `checkReleaseFreshnessITunes` back-catalog guard; `rootsMagAgent.js` uses the matched `dd-mm` post date instead of crawl date.
+  - `newReleasesNowAgent.js` / `configs/newreleasesnow_indie.json`: `releaseWindowDays: 7` on cards, RSS items, and fallback dates.
+  - `youtubeChannel.js`: `isRetroRelease(text, 7)` covering all 12 months.
+- **Dry-Run Isolation**: `src/index.js`, `diffEngine.js`, `masterDb.js` (`processSongEntry` respects `options.isDryRun`), and `deezerAgent.js` (skips `configs/deezer_state.json` writes) never mutate SQLite or state files during `--dry-run`.
+
+---
+
+## 22. Travel Mode on Lenovo Googlebook (`[LENOVO]` Tag, MYT Catch-Up Scheduler, `systemd`)
+
+### Why Lenovo Runs Independently During Travel
+- `geekkim` (`100.80.45.13` on Tailscale) has no auto-pull cron/endpoint and no remote desktop/SSH access configured, so `geekkim` continues running its pre-Nov 17 code until returned to Lugano.
+- To avoid losing Bandcamp/Unearthed and 7-day filtering while travelling (Malaysia, 3 months), the **Lenovo Googlebook Debian VM** runs all 13 updated crawlers independently with distinct email labeling.
+
+### Local `[LENOVO]` Email Tag & Gmail Deduplication
+- `configs/secrets.json` (gitignored, local to Lenovo) sets `"emailTag": "[LENOVO]"`.
+- `src/utils/emailNotifier.js` and `src/utils/mailer.js` prepend `emailTag` to alert subjects only when set locally (so `geekkim` never inherits `[LENOVO]` on future pulls).
+- Recommended Gmail filter to hide `geekkim` duplicates: `subject:("[Music Release Alert" OR "[US RADAR]" OR "[New Indie Live 24]") -subject:"[LENOVO]"` → Skip Inbox + Mark as read.
+
+### Malaysia Time (`Asia/Kuala_Lumpur`) & Boot/Wake Catch-Up Queue (`src/services/scheduler.js`)
+- Because the Debian VM OS clock is `Etc/UTC`, `configs/radar_config.json` sets `"scheduleTimezone": "Asia/Kuala_Lumpur"` and `src/services/scheduler.js` evaluates both `node-cron` (`{ timezone }`) and its 20s native loop in `Asia/Kuala_Lumpur` (`08:00`–`10:10 AM MYT` across `configs/schedules.json` and daily radars).
+- Handled slots persist in gitignored `saved_searches/scheduler_state.json`. On VM boot or laptop sleep/wake, `checkMissedRuns()` queues **only** missed slots within `CATCHUP_LOOKBACK_DAYS = 7` and `_drainCatchUpQueue()` executes them sequentially (1 at a time) through `fleetManager.js`.
+- **Auto-Start**: `setup_lenovo_autostart.sh` installs and enables `~/.config/systemd/user/music-search-fleet.service` (`run_node.sh src/server.js`, logging to `fleet_server.log`). The service starts automatically whenever the Android Terminal VM boots.
+- *(Reminder when returning to Lugano: revert `configs/radar_config.json` `scheduleTimezone` / `configs/schedules.json` back to `Europe/Zurich` times before syncing `geekkim`.)*
+
+---
+
+## 23. Browser Command Center & Android Monitor Gist Telemetry (`public/`, `metricsAggregator.js`, `gistSync.js`)
+
+- **Browser URL (`http://localhost:4000`)**: `public/index.html` and `public/app.js` display `Asia/Kuala_Lumpur` (`MYT`) timestamps, catch-up queue badges (`⏳ Catch-Up Queued`), `Last Slot`, and `1-Click Launch` controls.
+- **Android Music Crawler Monitor**: The Android app source code lives outside `music-search-master` and reads `crawler_metrics.json` from GitHub Gist (`9d9f324ab82907243f576f71ca001523`).
+- `src/utils/metricsAggregator.js` (`AGENTS`) defines the schedule labels shown in both the Browser Matrix and the Android Monitor. `src/utils/gistSync.js` (`mergeMetrics`) preserves the latest local `name` and `MYT` `schedule` labels even when merging newer run timestamps from `geekkim`.
+- `src/services/fleetManager.js` `STATUS_KEY_MAP` maps `newreleasesnow-weekly` → `new_releases_now_indie_discovery` (matching `saved_searches/new_releases_now_indie_discovery/`).
+
+
 
 
 
