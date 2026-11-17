@@ -18,7 +18,7 @@ class FleetManager {
         name: 'Global 24h Radar',
         description: 'Multi-channel 24h open-web discovery (Bandcamp, YouTube, SoundCloud, Blogs, Deezer, MusicBrainz)',
         market: 'DAILY',
-        schedule: 'Daily at 06:30 AM',
+        schedule: 'Daily at 08:00 AM MYT',
         command: nodeExec,
         args: ['src/index.js', '--radar-global'],
         cwd: this.projectRoot,
@@ -34,7 +34,7 @@ class FleetManager {
         name: 'US Edition Radar',
         description: 'Curated 24h US indie rock tastemakers (BrooklynVegan, Stereogum, Big Takeover, Gorilla vs Bear, etc.)',
         market: 'DAILY',
-        schedule: 'Daily at 07:00 AM',
+        schedule: 'Daily at 08:15 AM MYT',
         command: nodeExec,
         args: ['src/index.js', '--radar-us'],
         cwd: this.projectRoot,
@@ -84,7 +84,7 @@ class FleetManager {
         name: 'Bandcamp Discover Fleet',
         description: 'AU/NZ city-filtered indie & alternative releases from Bandcamp',
         market: 'WEEKLY',
-        schedule: 'Mon/Wed/Fri/Sat at 09:00 AM',
+        schedule: 'Mon/Wed/Fri/Sat at 09:00 AM MYT',
         command: nodeExec,
         args: ['src/index.js', 'configs/bandcamp_indie.json'],
         cwd: this.projectRoot,
@@ -100,7 +100,7 @@ class FleetManager {
         name: 'AMRAP Community Radio',
         description: 'Australian community radio chart debuts with MusicBrainz enrichment',
         market: 'WEEKLY',
-        schedule: 'Thursday at 04:00 PM',
+        schedule: 'Thursday at 09:40 AM MYT',
         command: nodeExec,
         args: ['src/index.js', 'configs/amrap_indie.json'],
         cwd: this.projectRoot,
@@ -116,7 +116,7 @@ class FleetManager {
         name: 'ListenBrainz Explorer',
         description: 'Fresh releases stream mapped with MusicBrainz origin cache',
         market: 'WEEKLY',
-        schedule: 'Mon/Fri at 09:00 AM',
+        schedule: 'Mon/Fri at 09:30 AM MYT',
         command: nodeExec,
         args: ['src/index.js', 'configs/listenbrainz_indie.json'],
         cwd: this.projectRoot,
@@ -132,7 +132,7 @@ class FleetManager {
         name: 'MusicBrainz Tag Registry',
         description: 'Lucene query across registered indie rock release groups',
         market: 'WEEKLY',
-        schedule: 'Mon/Wed/Fri at 09:30 AM',
+        schedule: 'Mon/Wed/Fri at 09:10 AM MYT',
         command: nodeExec,
         args: ['src/index.js', 'configs/musicbrainz_indie.json'],
         cwd: this.projectRoot,
@@ -148,7 +148,7 @@ class FleetManager {
         name: 'Triple J Unearthed',
         description: 'New Australian indie discoveries and debuts from Triple J Unearthed',
         market: 'WEEKLY',
-        schedule: 'Mon, Wed, Fri at 02:00 PM',
+        schedule: 'Mon/Wed/Fri at 09:20 AM MYT',
         command: nodeExec,
         args: ['src/index.js', 'configs/triplej_unearthed_indie.json'],
         cwd: this.projectRoot,
@@ -164,7 +164,7 @@ class FleetManager {
         name: 'AIR Independent Charts',
         description: 'Headless browser scraping of 100% Australian Independent Charts',
         market: 'WEEKLY',
-        schedule: 'Monday at 04:00 PM',
+        schedule: 'Monday at 09:40 AM MYT',
         command: nodeExec,
         args: ['src/index.js', 'configs/air_charts.json'],
         cwd: this.projectRoot,
@@ -180,7 +180,7 @@ class FleetManager {
         name: 'Deezer Editorial Playlists',
         description: 'Editorial indie playlists with ISRC origin verification',
         market: 'WEEKLY',
-        schedule: 'Friday at 11:00 AM',
+        schedule: 'Friday at 10:10 AM MYT',
         command: nodeExec,
         args: ['src/index.js', 'configs/deezer_indie.json'],
         cwd: this.projectRoot,
@@ -196,7 +196,7 @@ class FleetManager {
         name: 'Futuremag Music Blog',
         description: 'Australian music blog roundup with Gemini AI release extraction',
         market: 'WEEKLY',
-        schedule: 'Friday at 09:00 AM',
+        schedule: 'Friday at 09:40 AM MYT',
         command: nodeExec,
         args: ['src/index.js', 'configs/futuremag_indie.json'],
         cwd: this.projectRoot,
@@ -212,7 +212,7 @@ class FleetManager {
         name: 'Roots Mag & NZ Musician',
         description: 'Curated New Zealand indie releases from Roots Mag and NZ Musician',
         market: 'WEEKLY',
-        schedule: 'Friday at 09:00 AM',
+        schedule: 'Friday at 09:50 AM MYT',
         command: nodeExec,
         args: ['src/index.js', 'configs/rootsmag_indie.json'],
         cwd: this.projectRoot,
@@ -228,7 +228,7 @@ class FleetManager {
         name: 'Nialler9 Irish Indie',
         description: 'Irish and European indie releases from Nialler9 with AI extraction',
         market: 'WEEKLY',
-        schedule: 'Friday at 10:00 AM',
+        schedule: 'Friday at 10:00 AM MYT',
         command: nodeExec,
         args: ['src/index.js', 'configs/nialler9_indie.json'],
         cwd: this.projectRoot,
@@ -244,7 +244,7 @@ class FleetManager {
         name: 'New Releases Now',
         description: 'Friday album & EP releases across indie rock, pop, folk, alternative, and post-punk',
         market: 'WEEKLY',
-        schedule: 'Saturday at 09:30 AM',
+        schedule: 'Saturday at 09:30 AM MYT',
         command: nodeExec,
         args: ['src/index.js', 'configs/newreleasesnow_indie.json'],
         cwd: this.projectRoot,
@@ -426,7 +426,7 @@ class FleetManager {
       env: { ...process.env, FORCE_COLOR: '1' }
     });
 
-    this.activeProcesses.set(serviceId, child);
+    this.activeProcesses.set(service.id, child);
 
     child.stdout.on('data', data => {
       const text = data.toString();
@@ -459,6 +459,7 @@ class FleetManager {
 
     child.on('error', err => {
       service.state = 'error';
+      service.lastRunFinishedAt = new Date().toISOString();
       service.lastExitCode = -1;
       this.activeProcesses.delete(service.id);
       this._addLog(service, `[Command Center] Process failed to spawn: ${err.message}`);

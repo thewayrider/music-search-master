@@ -37,7 +37,9 @@ async function sendDailyRadarEmail(newTracks = [], radarConfig = {}) {
   const emailTitle = isUS ? 'New Indie Live 24 — US Daily Radar' : 'New Indie Live 24 — Daily Dispatch';
   const subjectPrefix = isUS ? '[US RADAR]' : '[New Indie Live 24]';
 
-  const subject = `${subjectPrefix} ${trackCount} Verified ${isUS ? 'US ' : ''}Indie Rock Drop${trackCount === 1 ? '' : 's'} Today! (${todayStr})`;
+  const tag = (process.env.EMAIL_TAG || secrets.emailTag || '').trim();
+  const baseSubject = `${subjectPrefix} ${trackCount} Verified ${isUS ? 'US ' : ''}Indie Rock Drop${trackCount === 1 ? '' : 's'} Today! (${todayStr})`;
+  const subject = tag ? `${tag} ${baseSubject}` : baseSubject;
 
   const trackCardsHtml = newTracks.map(t => `
     <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">

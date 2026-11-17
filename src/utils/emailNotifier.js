@@ -2,6 +2,11 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 
+function applyEmailTag(subject, secrets) {
+    const tag = (process.env.EMAIL_TAG || (secrets && secrets.emailTag) || '').trim();
+    return tag ? `${tag} ${subject}` : subject;
+}
+
 async function sendEmailNotification(newSongs, baseHtmlPath, searchName) {
     if (process.env.DRY_RUN === 'true') {
         console.log(`[DRY RUN] Skipping email notification for ${searchName}`);
@@ -89,7 +94,7 @@ async function sendEmailNotification(newSongs, baseHtmlPath, searchName) {
     const mailOptions = {
         from: secrets.gmailUser,
         to: secrets.gmailUser,
-        subject: subject,
+        subject: applyEmailTag(subject, secrets),
         html: htmlContent
     };
 
@@ -139,7 +144,7 @@ async function sendReminderEmail(subject, htmlContent) {
     const mailOptions = {
         from: secrets.gmailUser,
         to: secrets.gmailUser,
-        subject: subject,
+        subject: applyEmailTag(subject, secrets),
         html: htmlContent
     };
 

@@ -27,14 +27,146 @@ const DAY_MAP = {
   sat: 6
 };
 
+const WEEKDAY_SHORT_MAP = {
+  Sun: 0,
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6
+};
+
+const DEFAULT_TIMEZONE = 'Asia/Kuala_Lumpur';
+const CATCHUP_LOOKBACK_DAYS = 7;
+
 class FleetScheduler {
   constructor() {
     this.projectRoot = path.resolve(__dirname, '../../');
     this.schedulesConfigPath = path.join(this.projectRoot, 'configs/schedules.json');
+    this.radarConfigPath = path.join(this.projectRoot, 'configs/radar_config.json');
+    this.stateFilePath = path.join(this.projectRoot, 'saved_searches/scheduler_state.json');
+    this.timeZone = DEFAULT_TIMEZONE;
     this.activeTasks = new Map(); // id -> job definition
     this.cronTasks = new Map();   // id -> node-cron instance if used
+    this.catchUpQueue = [];       // [{ job, slotMs }]
     this.timerInterval = null;
     this.initialized = false;
+    this.state = null;
+  }
+
+  /**
+   * Returns wall-clock date/time components in `timeZone`
+   */
+  getZonedParts(date, timeZone = this.timeZone) {
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23'
+    });
+    const raw = {};
+    for (const part of fmt.formatToParts(date)) {
+      if (part.type !== 'literal') raw[part.type] = part.value;
+    }
+    return {
+      year: parseInt(raw.year, 10),
+      month: parseInt(raw.month, 10),
+      day: parseInt(raw.day, 10),
+      weekdayNum: WEEKDAY_SHORT_MAP[raw.weekday],
+      hour: parseInt(raw.hour, 10) % 24,
+      minute: parseInt(raw.minute, 10),
+      second: parseInt(raw.second, 10)
+    };
+  }
+
+  /**
+   * Converts wall-clock date/time in `timeZone` to exact UTC epoch ms
+   */
+  zonedTimeToUtcMs(year, month, day, hour, minute, timeZone = this.timeZone) {
+    const utcGuess = Date.UTC(year, month - 1, day, hour, minute, 0, 0);
+    const parts = this.getZonedParts(new Date(utcGuess), timeZone);
+    const zonedAsUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, 0, 0);
+    return utcGuess - (zonedAsUtc - utcGuess);
+  }
+
+  /**
+   * Formats a timestamp cleanly in the active schedule timezone
+   */
+  formatZonedTimestamp(ms) {
+    const p = this.getZonedParts(new Date(ms), this.timeZone);
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${p.year}-${pad(p.month)}-${pad(p.day)} ${pad(p.hour)}:${pad(p.minute)} (${this.timeZone})`;
+  }
+
+  /**
+   * Finds the most recent scheduled epoch ms <= `nowMs` within the last 7 days
+   */
+  getLastScheduledSlotMs(job, nowMs = Date.now()) {
+    for (let offsetDays = 0; offsetDays <= CATCHUP_LOOKBACK_DAYS; offsetDays++) {
+      const probe = new Date(nowMs - offsetDays * 24 * 60 * 60 * 1000);
+      const p = this.getZonedParts(probe, this.timeZone);
+      const dayMatch = !job.days || job.days.length === 0 || job.days.includes(p.weekdayNum);
+      if (!dayMatch) continue;
+
+      const slotMs = this.zonedTimeToUtcMs(p.year, p.month, p.day, job.hour, job.minute, this.timeZone);
+      if (slotMs <= nowMs) {
+        return slotMs;
+      }
+    }
+    return null;
+  }
+
+  _loadOrInitState(nowMs = Date.now()) {
+    if (fs.existsSync(this.stateFilePath)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(this.stateFilePath, 'utf8'));
+        if (parsed && typeof parsed === 'object' && parsed.jobs) {
+          return parsed;
+        }
+      } catch (_) {}
+    }
+
+    // First-time init: anchor baseline to today's 00:00 in schedule timezone
+    // so missed morning runs from today catch up immediately without flooding prior weeks.
+    const p = this.getZonedParts(new Date(nowMs), this.timeZone);
+    const todayMidnightMs = this.zonedTimeToUtcMs(p.year, p.month, p.day, 0, 0, this.timeZone);
+    const initialState = {
+      initializedAtMs: todayMidnightMs,
+      initializedAt: new Date(todayMidnightMs).toISOString(),
+      timezone: this.timeZone,
+      jobs: {}
+    };
+    this._saveState(initialState);
+    return initialState;
+  }
+
+  _saveState(stateObj = this.state) {
+    if (!stateObj) return;
+    try {
+      fs.mkdirSync(path.dirname(this.stateFilePath), { recursive: true });
+      fs.writeFileSync(this.stateFilePath, JSON.stringify(stateObj, null, 2));
+    } catch (err) {
+      console.warn('[Scheduler] Warning saving scheduler state:', err.message);
+    }
+  }
+
+  _recordHandledSlot(jobId, slotMs, triggerSource) {
+    if (!this.state) this.state = this._loadOrInitState();
+    const prev = this.state.jobs[jobId]?.lastHandledSlotMs || 0;
+    const effectiveSlot = Math.max(prev, slotMs || 0);
+    this.state.jobs[jobId] = {
+      lastHandledSlotMs: effectiveSlot,
+      lastHandledSlotLocal: effectiveSlot ? this.formatZonedTimestamp(effectiveSlot) : null,
+      lastTriggeredAt: new Date().toISOString(),
+      triggerSource
+    };
+    this._saveState();
   }
 
   /**
@@ -74,7 +206,7 @@ class FleetScheduler {
   }
 
   /**
-   * Initializes all scheduled jobs
+   * Initializes all scheduled jobs and triggers missed-run catch-up check
    */
   init() {
     if (this.initialized) {
@@ -86,6 +218,9 @@ class FleetScheduler {
     console.log(`[Scheduler] Initializing In-Process Fleet Scheduler (${engineName})...`);
 
     this._loadAndRegisterAll();
+    this.state = this._loadOrInitState();
+    this.checkMissedRuns();
+    this._drainCatchUpQueue();
     this._startNativeTickLoop();
     this.initialized = true;
   }
@@ -96,42 +231,48 @@ class FleetScheduler {
   reload() {
     console.log('[Scheduler] Reloading schedules from configuration...');
     this._stopAllTasks();
+    this.catchUpQueue = [];
     this._loadAndRegisterAll();
-    console.log(`[Scheduler] Reload complete. ${this.activeTasks.size} active jobs scheduled.`);
+    this.state = this._loadOrInitState();
+    this.checkMissedRuns();
+    this._drainCatchUpQueue();
+    console.log(`[Scheduler] Reload complete. ${this.activeTasks.size} active jobs scheduled (${this.timeZone}).`);
   }
 
   _loadAndRegisterAll() {
-    // 1. Daily Radars (06:30 AM Global, 07:00 AM US)
+    let radarConfig = {};
+    if (fs.existsSync(this.radarConfigPath)) {
+      try { radarConfig = JSON.parse(fs.readFileSync(this.radarConfigPath, 'utf8')); } catch (_) {}
+    }
+
+    this.timeZone = radarConfig.scheduleTimezone || DEFAULT_TIMEZONE;
+    console.log(`[Scheduler] Schedule Timezone: ${this.timeZone}`);
+
+    // 1. Daily Radars (08:00 AM Global, 08:15 AM US in Malaysia Time)
     const dailyRadars = [
       {
         id: 'global-radar',
         serviceId: 'global-radar',
         name: 'New Indie Live 24 — Global Daily Radar',
         description: 'Daily multi-channel 24h open-web discovery briefing',
-        hour: 6,
-        minute: 30,
-        days: null, // Every day
-        cron: '30 6 * * *',
-        humanSchedule: 'Daily at 06:30 AM'
+        hour: 8,
+        minute: 0,
+        days: null,
+        cron: '0 8 * * *',
+        humanSchedule: 'Daily at 08:00 AM MYT'
       },
       {
         id: 'us-radar',
         serviceId: 'us-radar',
         name: 'New Indie Live 24 — US Edition Daily Radar',
         description: 'Daily US indie rock tastemaker briefing',
-        hour: 7,
-        minute: 0,
-        days: null, // Every day
-        cron: '0 7 * * *',
-        humanSchedule: 'Daily at 07:00 AM'
+        hour: 8,
+        minute: 15,
+        days: null,
+        cron: '15 8 * * *',
+        humanSchedule: 'Daily at 08:15 AM MYT'
       }
     ];
-
-    const radarConfigPath = path.join(this.projectRoot, 'configs/radar_config.json');
-    let radarConfig = {};
-    if (fs.existsSync(radarConfigPath)) {
-      try { radarConfig = JSON.parse(fs.readFileSync(radarConfigPath, 'utf8')); } catch (_) {}
-    }
 
     for (const radar of dailyRadars) {
       if (radar.id === 'global-radar' && radarConfig.globalRadarEnabled === false) {
@@ -163,7 +304,7 @@ class FleetScheduler {
         }
 
         const humanDays = Array.isArray(item.days) ? item.days.join(', ') : 'Weekly';
-        const humanSchedule = `${humanDays} at ${item.time}`;
+        const humanSchedule = `${humanDays} at ${item.time} MYT`;
 
         this._registerJob({
           id: item.id,
@@ -190,12 +331,15 @@ class FleetScheduler {
       lastTriggeredAt: null
     };
 
-    // If node-cron is installed, also attach a cron task listener
     if (cronLib && cronLib.validate(job.cron)) {
       try {
-        const task = cronLib.schedule(job.cron, () => {
-          this._executeJob(jobEntry, 'node-cron');
-        });
+        const task = cronLib.schedule(
+          job.cron,
+          () => {
+            this._executeJob(jobEntry, 'node-cron');
+          },
+          { timezone: this.timeZone }
+        );
         this.cronTasks.set(job.id, task);
       } catch (_) {}
     }
@@ -205,13 +349,71 @@ class FleetScheduler {
   }
 
   /**
+   * Queues any jobs whose most recent scheduled slot passed while laptop/VM was off or asleep.
+   */
+  checkMissedRuns(nowMs = Date.now()) {
+    if (!this.state) this.state = this._loadOrInitState(nowMs);
+    const lookbackFloor = nowMs - CATCHUP_LOOKBACK_DAYS * 24 * 60 * 60 * 1000;
+    const floorMs = Math.max(this.state.initializedAtMs || 0, lookbackFloor);
+
+    let queuedNow = 0;
+    for (const job of this.activeTasks.values()) {
+      const lastSlotMs = this.getLastScheduledSlotMs(job, nowMs);
+      if (!lastSlotMs || lastSlotMs < floorMs) continue;
+
+      const handledMs = this.state.jobs[job.id]?.lastHandledSlotMs || 0;
+      if (lastSlotMs <= handledMs) continue;
+
+      const alreadyQueued = this.catchUpQueue.some(q => q.job.id === job.id);
+      const service = fleetManager._resolveService(job.serviceId);
+      const isRunning = service && service.state === 'running';
+      if (alreadyQueued || isRunning) continue;
+
+      this.catchUpQueue.push({ job, slotMs: lastSlotMs });
+      queuedNow++;
+      console.log(`[Scheduler] 🕒 Missed run queued for catch-up: ${job.name} (scheduled ${this.formatZonedTimestamp(lastSlotMs)})`);
+    }
+
+    if (queuedNow > 0) {
+      // Oldest missed slot first
+      this.catchUpQueue.sort((a, b) => a.slotMs - b.slotMs);
+    }
+    return queuedNow;
+  }
+
+  /**
+   * Runs queued missed jobs one at a time so crawlers don't collide on boot/wake.
+   */
+  _drainCatchUpQueue() {
+    if (this.catchUpQueue.length === 0) return;
+    if (fleetManager.activeProcesses.size > 0) return;
+
+    const next = this.catchUpQueue.shift();
+    if (!next) return;
+
+    const { job, slotMs } = next;
+    console.log(`\n[Scheduler] 🔄 Catching up missed run: ${job.name} (${this.formatZonedTimestamp(slotMs)})...`);
+    job.lastTriggeredAt = new Date().toISOString();
+    this._recordHandledSlot(job.id, slotMs, 'catchup');
+
+    try {
+      const result = fleetManager.triggerService(job.serviceId);
+      if (!result.success) {
+        console.warn(`[Scheduler] Catch-up trigger note for ${job.id}: ${result.error}`);
+      }
+    } catch (err) {
+      console.error(`[Scheduler] Error during catch-up for ${job.id}:`, err.message);
+    }
+  }
+
+  /**
    * Internal execution handler with overlap and per-minute deduplication
    */
   _executeJob(job, triggerSource = 'timer') {
     const now = new Date();
-    const minuteKey = `${now.toDateString()}_${now.getHours()}:${now.getMinutes()}`;
+    const p = this.getZonedParts(now, this.timeZone);
+    const minuteKey = `${p.year}-${p.month}-${p.day}_${p.hour}:${p.minute}`;
 
-    // Prevent double-firing within the same minute
     if (job.lastRunMinuteKey === minuteKey) {
       return;
     }
@@ -219,8 +421,14 @@ class FleetScheduler {
     job.lastRunMinuteKey = minuteKey;
     job.lastTriggeredAt = now.toISOString();
 
-    const nowStr = now.toLocaleTimeString();
-    console.log(`\n[Scheduler] ⏰ [${nowStr}] Triggering scheduled job (${triggerSource}): ${job.name} (${job.id})...`);
+    // Remove from catch-up queue if it was waiting and mark slot handled
+    this.catchUpQueue = this.catchUpQueue.filter(q => q.job.id !== job.id);
+    const slotMs = this.getLastScheduledSlotMs(job, now.getTime());
+    if (slotMs) {
+      this._recordHandledSlot(job.id, slotMs, triggerSource);
+    }
+
+    console.log(`\n[Scheduler] ⏰ [${this.formatZonedTimestamp(now.getTime())}] Triggering scheduled job (${triggerSource}): ${job.name} (${job.id})...`);
 
     try {
       const result = fleetManager.triggerService(job.serviceId);
@@ -233,27 +441,29 @@ class FleetScheduler {
   }
 
   /**
-   * Zero-dependency native tick loop: checks every 20 seconds
-   * Guarantees accurate triggers even without any external packages installed.
+   * Zero-dependency native tick loop: checks every 20 seconds in target timezone,
+   * detects sleep/wake gaps, and drains the sequential catch-up queue.
    */
   _startNativeTickLoop() {
     if (this.timerInterval) clearInterval(this.timerInterval);
 
     this.timerInterval = setInterval(() => {
       const now = new Date();
-      const currentHour = now.getHours();
-      const currentMinute = now.getMinutes();
-      const currentDay = now.getDay();
+      const p = this.getZonedParts(now, this.timeZone);
 
       for (const job of this.activeTasks.values()) {
-        const dayMatch = !job.days || job.days.length === 0 || job.days.includes(currentDay);
-        const timeMatch = job.hour === currentHour && job.minute === currentMinute;
+        const dayMatch = !job.days || job.days.length === 0 || job.days.includes(p.weekdayNum);
+        const timeMatch = job.hour === p.hour && job.minute === p.minute;
 
         if (dayMatch && timeMatch) {
           this._executeJob(job, 'native-timer');
         }
       }
-    }, 20000); // Check every 20 seconds
+
+      // Detect any missed runs after laptop sleep/wake and drain queue 1 at a time
+      this.checkMissedRuns(now.getTime());
+      this._drainCatchUpQueue();
+    }, 20000);
   }
 
   _stopAllTasks() {
@@ -273,14 +483,18 @@ class FleetScheduler {
     const list = [];
     for (const [id, job] of this.activeTasks.entries()) {
       const service = fleetManager._resolveService(job.serviceId);
+      const handled = this.state?.jobs?.[id];
       list.push({
         id,
         name: job.name,
         description: job.description,
         cronExpression: job.cron,
+        timezone: this.timeZone,
         humanSchedule: job.humanSchedule,
         serviceId: job.serviceId,
         currentState: service ? service.state : 'idle',
+        queuedForCatchUp: this.catchUpQueue.some(q => q.job.id === id),
+        lastHandledSlotLocal: handled?.lastHandledSlotLocal || null,
         lastTriggeredAt: job.lastTriggeredAt,
         lastRunStartedAt: service ? service.lastRunStartedAt : null,
         lastRunFinishedAt: service ? service.lastRunFinishedAt : null,

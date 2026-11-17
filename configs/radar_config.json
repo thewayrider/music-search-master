@@ -2,6 +2,7 @@
   "globalRadarEnabled": true,
   "usRadarEnabled": true,
   "statusNote": "Global and US Radars active on Lenovo Googlebook Debian Linux environment.",
+  "scheduleTimezone": "Asia/Kuala_Lumpur",
   "maxRecencyHours": 36,
   "maxTracksPerArtist": 2,
   "maxSoundCloudTracks": 5,

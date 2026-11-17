@@ -17,6 +17,7 @@ npm-debug.log*
 # Local Crawler Runtime Telemetry & Reports
 saved_searches/crawler_analytics.json
 saved_searches/dashboard_status.json
+saved_searches/scheduler_state.json
 saved_searches/cache/
 dashboard.html
 
