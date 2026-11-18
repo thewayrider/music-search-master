@@ -403,7 +403,7 @@ To ensure `package.json` scripts (`"start": "node src/index.js"`, `"command-cent
 ## 23. Browser Command Center & Android Monitor Gist Telemetry (`public/`, `metricsAggregator.js`, `gistSync.js`)
 
 - **Browser URL (`http://localhost:4000`)**: `public/index.html` and `public/app.js` display `Asia/Kuala_Lumpur` (`MYT`) timestamps, catch-up queue badges (`⏳ Catch-Up Queued`), `Last Slot`, and `1-Click Launch` controls.
-- **Android Music Crawler Monitor**: The Android app source code lives outside `music-search-master` and reads `crawler_metrics.json` from GitHub Gist (`9d9f324ab82907243f576f71ca001523`).
+- **Android Music Crawler Monitor**: The Android app source code lives outside `music-search-master` and reads `crawler_metrics.json` from GitHub Gist (`da09c2f650d645cbfc4a8d5cc0083e80`).
 - `src/utils/metricsAggregator.js` (`AGENTS`) defines the schedule labels shown in both the Browser Matrix and the Android Monitor. `src/utils/gistSync.js` (`mergeMetrics`) preserves the latest local `name` and `MYT` `schedule` labels even when merging newer run timestamps from `geekkim`.
 - `src/services/fleetManager.js` `STATUS_KEY_MAP` maps `newreleasesnow-weekly` → `new_releases_now_indie_discovery` (matching `saved_searches/new_releases_now_indie_discovery/`).
 
