@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { isWithinHours, hasNegativeKeywords, parseArtistTitle } = require('../utils/normalizer');
+const { isWithinHours, hasNegativeKeywords, hasForeignDescriptionProse, parseArtistTitle } = require('../utils/normalizer');
 const { getRssHeaders } = require('../utils/browserHeaders');
 
 const CHANNELS_CONFIG_PATH = path.join(__dirname, '../../configs/youtube_channels.json');
@@ -122,9 +122,10 @@ async function harvestYouTubeTastemakersDaily(config = {}, exclusions = {}) {
       continue;
     }
 
-    // Filter negative keywords
+    // Filter negative keywords and foreign-language prose
     const fullText = `${entry.channelName} ${rawTitle} ${entry.description}`;
     if (hasNegativeKeywords(fullText, negativeKeywords)) continue;
+    if (hasForeignDescriptionProse(fullText)) continue;
     if (bannedArtists.some(b => fullText.toLowerCase().includes(b.toLowerCase()))) continue;
 
     // Handle "Artist performs Song" pattern common in session channels

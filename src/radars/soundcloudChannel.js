@@ -5,6 +5,51 @@ const { getBrowserHeaders, getJsonHeaders } = require('../utils/browserHeaders')
 
 let _cachedClientId = null;
 
+/**
+ * Identifies URLs belonging to simultaneous multi-track bulk uploads (>= 3 tracks
+ * by the same artist uploaded within 5 minutes), typically album/vault dumps
+ * rather than single premieres.
+ */
+function findBulkUploadUrls(items, maxHours) {
+  const bulkUrls = new Set();
+  const byArtist = new Map();
+
+  for (const item of items) {
+    if (!item?.permalink_url || !isWithinHours(item.created_at, maxHours)) continue;
+    const parsed = parseArtistTitle(item.title || '');
+    const rawArtist = parsed.artist !== 'Unknown Artist'
+      ? parsed.artist
+      : (item.publisher_metadata?.artist || '');
+    const artistKey = rawArtist.toLowerCase().trim();
+    if (!artistKey) continue;
+
+    if (!byArtist.has(artistKey)) byArtist.set(artistKey, []);
+    byArtist.get(artistKey).push({
+      url: item.permalink_url,
+      artist: rawArtist,
+      ts: new Date(item.created_at).getTime()
+    });
+  }
+
+  const CLUSTER_WINDOW_MS = 5 * 60 * 1000;
+  for (const [, entries] of byArtist) {
+    if (entries.length < 3) continue;
+    entries.sort((a, b) => a.ts - b.ts);
+    let cluster = [entries[0]];
+    for (let i = 1; i < entries.length; i++) {
+      if (entries[i].ts - cluster[cluster.length - 1].ts <= CLUSTER_WINDOW_MS) {
+        cluster.push(entries[i]);
+      } else {
+        if (cluster.length >= 3) cluster.forEach(e => bulkUrls.add(e.url));
+        cluster = [entries[i]];
+      }
+    }
+    if (cluster.length >= 3) cluster.forEach(e => bulkUrls.add(e.url));
+  }
+
+  return bulkUrls;
+}
+
 async function getSoundCloudClientId() {
   if (_cachedClientId) return _cachedClientId;
   try {
@@ -94,7 +139,7 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
 
       if (!userId) continue;
 
-      const apiUrl = `https://api-v2.soundcloud.com/users/${userId}/tracks?limit=5&client_id=${clientId}`;
+      const apiUrl = `https://api-v2.soundcloud.com/users/${userId}/tracks?limit=10&client_id=${clientId}`;
       const res = await fetch(apiUrl, {
         headers: getJsonHeaders(),
         signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
@@ -104,9 +149,13 @@ async function harvestSoundCloudDaily(config = {}, exclusions = {}) {
 
       const data = await res.json();
       const items = data.collection || [];
+      const bulkUrls = findBulkUploadUrls(items, maxHours);
+      if (bulkUrls.size > 0) {
+        console.log(`[SoundCloud Channel] Skipping ${bulkUrls.size} bulk/archive upload track(s) on ${ch.name}.`);
+      }
 
       for (const item of items) {
-        if (!item.permalink_url || seenUrls.has(item.permalink_url)) continue;
+        if (!item.permalink_url || seenUrls.has(item.permalink_url) || bulkUrls.has(item.permalink_url)) continue;
 
         // 1. Strict recency check (last 24-36h)
         if (!isWithinHours(item.created_at, maxHours)) continue;

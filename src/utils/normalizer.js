@@ -22,7 +22,7 @@ function sanitizeHeadline(raw) {
   s = s.replace(/^\d{2,3}[\s.\-_:]+/, '');
 
   // Strip common YouTube/SoundCloud trailing pipeline delimiters (preserve disqualifying markers so isCleanTrack evaluates them)
-  const DISQUALIFYING_PIPELINE_REGEX = /\b(italian|french|spanish|german|portuguese|turkish|hindi|russian|japanese|korean|ai|suno|udio|type\s*beat|remix|rmx|cover|live|session)\b/i;
+  const DISQUALIFYING_PIPELINE_REGEX = /\b(italian|french|spanish|german|portuguese|turkish|hindi|russian|japanese|korean|canzone\s+originale|brano\s+originale|ai|suno|udio|type\s*beat|remix|rmx|cover|live|session)\b/i;
   s = s.replace(/\s*\|\s*(.*)$/i, (match, inner) => {
     return DISQUALIFYING_PIPELINE_REGEX.test(inner) ? ` ${inner.trim()}` : '';
   });
@@ -186,15 +186,16 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
     return false;
   }
 
-  // 3c. Reject clear non-English titles (French, Spanish, German, Portuguese, Italian, Turkish, Dutch, South Asian stopwords and phrases)
+  // 3c. Reject clear non-English titles (French, Spanish, German, Portuguese, Italian, Turkish, Dutch, Slavic, South Asian stopwords and phrases)
   const foreignLanguagePhrases = [
     /\b(quand\s+tu|quand\s+passes|c'est|dans\s+la|avec\s+toi|pour\s+moi|sur\s+la|les\s+yeux|je\s+suis|tu\s+es|mon\s+amour|au\s+revoir|sans\s+toi|d'un|d'une|l'amour|couronnement|fleuve|chanson|chansons|apprivoise|apprivoisé|lumiere|lumière|regard|coeur|cœur|soleil|toujours|rien|homme|femme|jamais|beau|belle|voix|musique\s+francaise|musique\s+française)\b/i,
-    /\b(vizinha|gostosa|virado|dias\s+virado|corazon|te\s+quiero|para\s+ti|por\s+favor|sin\s+ti|todo\s+el|lo\s+que|el\s+amor|la\s+vida|los\s+ojos|nada\s+mas|que\s+te|yo\s+no|esta\s+noche|del\s+sur|una\s+vez|malos?\s+vicios?|vicios?|buenas\s+noches|buenos\s+dias|cancion|canciones)\b/i,
-    /\b(piove|ciao|grazie|amore|notte|giorno|cuore|senza|sempre|tutto|niente|ancora|bello|bella|canzone|canzoni|mondo|vita|tempo|cielo|sole|mare|questo|questa|quando|perche|perché|anche|cosa|come|dove|mio|mia|tuo|tua|nostro|nostra|italiano|italiana)\b/i,
+    /\b(vizinha|gostosa|virado|dias\s+virado|corazon|corazón|te\s+quiero|para\s+ti|por\s+favor|sin\s+ti|todo\s+el|lo\s+que|el\s+amor|la\s+vida|los\s+ojos|nada\s+mas|que\s+te|yo\s+no|esta\s+noche|del\s+sur|una\s+vez|malos?\s+vicios?|vicios?|buenas\s+noches|buenos\s+dias|cancion|canción|canciones|por|mis|tus|más|págame|pagame|lágrimas|lagrimas|nunca|siempre|cuando|donde|quién|eres|estoy|contigo|conmigo)\b/i,
+    /\b(piove|ciao|grazie|amore|notte|giorno|cuore|senza|sempre|tutto|niente|ancora|bello|bella|canzone|canzoni|canzone\s+originale|brano\s+originale|mondo|vita|tempo|cielo|sole|mare|questo|questa|quando|perche|perché|anche|cosa|come|dove|mio|mia|tuo|tua|nostro|nostra|italiano|italiana|dei|degli|delle|della|nella|sulla|racconti|ritrovare|perch[ée]|cos[ìi]|pi[ùu]|voglio|siamo|lontano|insieme|parole|lacrime)\b/i,
     /\b(ich\s+sehe|ich\s+habe|ich\s+bin|ich\s+will|du\s+bist|wir\s+sind|nicht|dich|mich|weltzeituhr|sehe\s+dich|liebe\s+dich|wenn\s+du|mein\s+herz|meine\s+liebe|ohne\s+dich|mit\s+dir|fur\s+immer|für\s+immer|auf\s+wiedersehen|guten\s+morgen|guten\s+abend|alles\s+gut)\b/i,
     /\b(dikenli|değilsin|degilsin|benim|senin|icin|için|nasıl|gibi|kadar|çünkü|böyle|radyo|şarkı|dünya|tel)\b/i,
     /\b(dil|muskuraye|bandeya|pyaar|pyar|ishq|tere|meri|mera|tujhe|humsafar|zindagi|saath|kaho|suno|tum|hum|aaj|yaad|kahani|geet|gaana|aashiqui|mohabbat|deewana|shreya|arijit|armaan|naqaab|avaam|awaam|bandh|chesko|dasagriva|chalte|raat|kabhi|jaane|nachle|dhol|chupke|desi|bollywood|tollywood|safar|musafir|raahi|khuda|rabba|dosti)\b/i,
     /\b(het|een|voor|niet|zijn|naar|over|door|geen|hebben|alle|deze|maar|veel|onze|jullie|waren|wordt|worden|heeft|nederland|vlaams|dutch)\b/i,
+    /\b(vecher|lyubov|serdtse|osen|vesna|zima|doroga|gorod|veter|tuman|molchi|privet|poka|spasibo|detstvo|zhizn)\b/i,
     /\b(mc\s+[a-z]|speed\s*\+|speed\s*\+\s*grave|grave|mtg|funk\s*bh|funk\s*rj|brega|piseiro)\b/i,
     /\b(italian|french|spanish|german|portuguese|turkish|hindi|russian|japanese|korean)\s*(indie|rock|alternative|pop|punk|post-punk|metal|music|chanson)\b/i
   ];
@@ -335,6 +336,22 @@ function isCleanTrack(artist, title, negativeKeywords = [], bannedArtists = []) 
   return true;
 }
 
+/**
+ * Detects unambiguous non-English prose sentences in YouTube descriptions or
+ * RSS blurbs (e.g., Italian/Spanish/French/German release summaries).
+ */
+function hasForeignDescriptionProse(text) {
+  if (!text) return false;
+  const s = String(text).toLowerCase();
+  const proseMarkers = [
+    /(?:^|\s)(è\s+un\s+brano|è\s+la\s+storia|canzone\s+originale|brano\s+originale|questa\s+canzone|di\s+chi\s+cerca)(?:\s|$|[.,!?])/,
+    /(?:^|\s)(una\s+canción|esta\s+canción|canción\s+sobre|nuevo\s+sencillo\s+de)(?:\s|$|[.,!?])/,
+    /(?:^|\s)(cette\s+chanson|nouveau\s+single\s+de|un\s+titre\s+de)(?:\s|$|[.,!?])/,
+    /(?:^|\s)(ein\s+song\s+über|neue\s+single\s+von)(?:\s|$|[.,!?])/
+  ];
+  return proseMarkers.some(rgx => rgx.test(s));
+}
+
 module.exports = {
   slugify,
   normalizeKey,
@@ -343,5 +360,6 @@ module.exports = {
   isWithinHours,
   isWithinDays,
   hasNegativeKeywords,
+  hasForeignDescriptionProse,
   isCleanTrack
 };

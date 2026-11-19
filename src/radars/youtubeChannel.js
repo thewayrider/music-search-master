@@ -1,4 +1,4 @@
-const { hasNegativeKeywords, parseArtistTitle } = require('../utils/normalizer');
+const { hasNegativeKeywords, hasForeignDescriptionProse, parseArtistTitle } = require('../utils/normalizer');
 const { getBrowserHeaders } = require('../utils/browserHeaders');
 
 async function harvestYouTubeDaily(config = {}, exclusions = {}) {
@@ -191,6 +191,9 @@ async function harvestYouTubeDaily(config = {}, exclusions = {}) {
 
           // Check built-in podcast/tutorial/video essay patterns
           if (PODCAST_ESSAY_REGEX.test(fullText)) continue;
+
+          // Check unambiguous non-English prose descriptions
+          if (hasForeignDescriptionProse(fullText)) continue;
 
           // Check retro/past release dates stated in description (> 7 days old)
           if (isRetroRelease(descSnippet, 7)) continue;

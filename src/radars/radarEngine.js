@@ -9,7 +9,8 @@ const { harvestYouTubeTastemakersDaily } = require('./youtubeTastemakers');
 const { harvestSoundCloudDaily } = require('./soundcloudChannel');
 const { harvestUSIndieDaily } = require('./usIndieChannel');
 const { evaluateCandidateTrack, getMasterStats } = require('../utils/masterDb');
-const { isCleanTrack, parseArtistTitle } = require('../utils/normalizer');
+const { isCleanTrack, isWithinDays, parseArtistTitle } = require('../utils/normalizer');
+const { checkReleaseFreshnessITunes } = require('../services/verificationTools');
 const { sendDailyRadarEmail } = require('../utils/mailer');
 
 async function runDailyRadar(options = {}) {
@@ -90,12 +91,14 @@ async function runDailyRadar(options = {}) {
   // 2. Evaluate against Clean Track Integrity & Master SQLite Memory
   const passedNewReleases = [];
   let uncleanFiltered = 0;
+  let staleCatalogBlocked = 0;
   let recycledSinglesBlocked = 0;
   let consensusUpdates = 0;
   const seenSlugsInBatch = new Set();
 
   const artistCounts = new Map();
   const channelCounts = new Map();
+  const MAX_RELEASE_AGE_DAYS = config.maxReleaseAgeDays || 7;
   const MAX_TRACKS_PER_ARTIST = config.maxTracksPerArtist || 2;
   const MAX_SOUNDCLOUD_TRACKS = config.maxSoundCloudTracks || 5;
   const MAX_TRACKS_PER_CHANNEL = config.maxTracksPerChannel || 8;
@@ -168,7 +171,27 @@ async function runDailyRadar(options = {}) {
       continue;
     }
 
-    // E. Master Database Recycled Single Check
+    const batchKey = `${item.artist.toLowerCase()}::${item.title.toLowerCase()}`;
+    if (seenSlugsInBatch.has(batchKey)) continue;
+
+    // E. 7-Day Track Release Cutoff (item date + iTunes catalog history)
+    if (item.releaseDate && /^\d{4}-\d{2}-\d{2}$/.test(item.releaseDate) && !isWithinDays(item.releaseDate, MAX_RELEASE_AGE_DAYS)) {
+      staleCatalogBlocked++;
+      console.log(`  [-] Blocked Stale Date (>${MAX_RELEASE_AGE_DAYS}d): "${item.artist} - ${item.title}" (Date: ${item.releaseDate})`);
+      continue;
+    }
+
+    const freshness = await checkReleaseFreshnessITunes(item.artist, item.title, MAX_RELEASE_AGE_DAYS);
+    if (freshness.status === 'stale') {
+      staleCatalogBlocked++;
+      console.log(`  [-] Blocked Stale Catalog Release (>${MAX_RELEASE_AGE_DAYS}d): "${item.artist} - ${item.title}" (First released: ${freshness.earliestReleaseDate}, ${freshness.ageDays}d old)`);
+      continue;
+    }
+    if (freshness.status === 'fresh' && freshness.earliestReleaseDate) {
+      item.releaseDate = freshness.earliestReleaseDate;
+    }
+
+    // F. Master Database Recycled Single Check
     const evaluation = evaluateCandidateTrack(item, item.channel, { isDryRun });
 
     if (evaluation.isRecycledSingle) {
@@ -178,18 +201,15 @@ async function runDailyRadar(options = {}) {
     }
 
     if (evaluation.isNewGlobal) {
-      const batchKey = `${item.artist.toLowerCase()}::${item.title.toLowerCase()}`;
-      if (!seenSlugsInBatch.has(batchKey)) {
-        seenSlugsInBatch.add(batchKey);
-        artistCounts.set(artistKey, currentArtistCount + 1);
-        channelCounts.set(channelKey, currentChannelCount + 1);
-        passedNewReleases.push({
-          ...item,
-          heatScore: evaluation.heatScore,
-          sources: evaluation.sources
-        });
-        console.log(`  [+] Verified Clean Drop: "${item.artist} - ${item.title}" [${item.channel}]`);
-      }
+      seenSlugsInBatch.add(batchKey);
+      artistCounts.set(artistKey, currentArtistCount + 1);
+      channelCounts.set(channelKey, currentChannelCount + 1);
+      passedNewReleases.push({
+        ...item,
+        heatScore: evaluation.heatScore,
+        sources: evaluation.sources
+      });
+      console.log(`  [+] Verified Clean Drop: "${item.artist} - ${item.title}" [${item.channel}]`);
     } else if (evaluation.isNewSighting) {
       consensusUpdates++;
       console.log(`  [🔥] Tastemaker Consensus: "${item.artist} - ${item.title}" confirmed by ${item.channel} (Heat: ${evaluation.heatScore})`);
@@ -197,11 +217,12 @@ async function runDailyRadar(options = {}) {
   }
 
   console.log("\n------------------------------------------------------------");
-  console.log(`[Summary] Raw Candidates:   ${rawCandidates.length}`);
-  console.log(`[Summary] Unclean Filtered: ${uncleanFiltered}`);
-  console.log(`[Summary] Recycled Blocked: ${recycledSinglesBlocked}`);
-  console.log(`[Summary] Consensus Bumped: ${consensusUpdates}`);
-  console.log(`[Summary] Pure Clean Drops: ${passedNewReleases.length}`);
+  console.log(`[Summary] Raw Candidates:    ${rawCandidates.length}`);
+  console.log(`[Summary] Unclean Filtered:  ${uncleanFiltered}`);
+  console.log(`[Summary] Stale (>7d) Blocked:${staleCatalogBlocked}`);
+  console.log(`[Summary] Recycled Blocked:  ${recycledSinglesBlocked}`);
+  console.log(`[Summary] Consensus Bumped:  ${consensusUpdates}`);
+  console.log(`[Summary] Pure Clean Drops:  ${passedNewReleases.length}`);
   // 3. Dispatch Email if Live
   if (!isDryRun && passedNewReleases.length > 0) {
     await sendDailyRadarEmail(passedNewReleases, config);
