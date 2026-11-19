@@ -385,7 +385,7 @@ To ensure `package.json` scripts (`"start": "node src/index.js"`, `"command-cent
 
 ### Why Lenovo Runs Independently During Travel
 - `geekkim` (`100.80.45.13` on Tailscale) has no auto-pull cron/endpoint and no remote desktop/SSH access configured, so `geekkim` continues running its pre-Nov 17 code until returned to Lugano.
-- To avoid losing Bandcamp/Unearthed and 7-day filtering while travelling (Malaysia, 3 months), the **Lenovo Googlebook Debian VM** runs all 13 updated crawlers independently with distinct email labeling.
+- To avoid losing Bandcamp/Unearthed and 7-day filtering while travelling (Malaysia, 3 months), the **Lenovo Googlebook Debian VM** runs all 14 updated crawlers independently with distinct email labeling.
 
 ### Local `[LENOVO]` Email Tag & Gmail Deduplication
 - `configs/secrets.json` (gitignored, local to Lenovo) sets `"emailTag": "[LENOVO]"`.
@@ -404,11 +404,21 @@ To ensure `package.json` scripts (`"start": "node src/index.js"`, `"command-cent
 
 - **Browser URL (`http://localhost:4000`)**: `public/index.html` and `public/app.js` display `Asia/Kuala_Lumpur` (`MYT`) timestamps, catch-up queue badges (`⏳ Catch-Up Queued`), `Last Slot`, and `1-Click Launch` controls.
 - **Android Music Crawler Monitor**: The Android app source code lives outside `music-search-master` and reads `crawler_metrics.json` from GitHub Gist (`da09c2f650d645cbfc4a8d5cc0083e80`).
-- `src/utils/metricsAggregator.js` (`AGENTS`) defines the schedule labels shown in both the Browser Matrix and the Android Monitor. `src/utils/gistSync.js` (`mergeMetrics`) preserves the latest local `name` and `MYT` `schedule` labels even when merging newer run timestamps from `geekkim`.
-- `src/services/fleetManager.js` `STATUS_KEY_MAP` maps `newreleasesnow-weekly` → `new_releases_now_indie_discovery` (matching `saved_searches/new_releases_now_indie_discovery/`).
+- `src/utils/metricsAggregator.js` (`AGENTS`) defines the schedule labels shown in both the Browser Matrix and the Android Monitor. `src/utils/gistSync.js` (`mergeMetrics`) preserves the latest local `name` and `MYT` `schedule` labels when merging newer timestamps on updated machines, **but** an un-updated peer (`geekkim`) pushing `localDate >= gistDate` with old `AGENTS` labels overwrites the shared Gist (`9d9f324ab82907243f576f71ca001523` was retired/deleted and replaced with dedicated secret Gist `da09c2f650d645cbfc4a8d5cc0083e80` in Lenovo's `configs/secrets.json` and the Android app's **Cloud Sync Settings**).
+- `src/services/fleetManager.js` `STATUS_KEY_MAP` maps `newreleasesnow-weekly` → `new_releases_now_indie_discovery` and `thenote-weekly` → `the_note_australia`.
 
+---
 
+## 24. The Note Australia (14th Crawler) & Global Radar Hardening (`theNoteAgent.js`, `radarEngine.js`, `soundcloudChannel.js`, `normalizer.js`)
 
+### The Note Australia (`configs/thenote_indie.json`, `src/crawlers/theNoteAgent.js`)
+- Runs Fridays at **14:30 MYT** (`configs/schedules.json` `thenote`, wired into `src/index.js`, `fleetManager.js`, and `metricsAggregator.js`).
+- Scrapes `https://www.thenote.com.au/news?filter=new-music` within a 7-day article window and `checkReleaseFreshnessITunes(..., 7)`, parsing *Friday Favourites* roundups and single-artist headlines (apostrophe-safe lookahead + `extractReleasesWithAI` fallback), and cross-references `data/master_catalog.sqlite`.
+- **Keeps US/UK acts** for cross-referencing rather than filtering them out; resolves artist country via `check_musicbrainz_artist` (cached in `saved_searches/cache/thenote-mb-origin.json`) + `inspect_source_clues` and prepends `Note: US artist | ` (`US`), `Note: UK artist | ` (`GB`), or `Origin: <code> | ` in email `description`.
 
+### Global/US Radar 7-Day Freshness, SoundCloud Bulk-Dump & Language Guards
+- **7-Day Catalog Gate (`src/radars/radarEngine.js`)**: Video/audio upload timestamps (`maxRecencyHours: 36`) alone pass late premieres of older songs (13–28+ days old). `runDailyRadar` now enforces `isWithinDays` and `checkReleaseFreshnessITunes(..., config.maxReleaseAgeDays || 7)` *before* `evaluateCandidateTrack`, blocking stale catalog tracks and updating verified `releaseDate` values.
+- **SoundCloud Bulk-Dump Guard (`src/radars/soundcloudChannel.js`)**: `findBulkUploadUrls` fetches `limit=10` tracks per curated label and skips simultaneous same-artist batch uploads (`>= 3` tracks within 5 minutes, e.g. archive/vault dumps with blank metadata).
+- **Non-English Safeguards (`src/utils/normalizer.js`, `youtubeChannel.js`, `youtubeTastemakers.js`)**: `sanitizeHeadline` preserves `canzone originale` / `brano originale` across `|` splits; `isCleanTrack` expands Spanish, Italian, and transliterated Slavic stopwords (without colliding tokens like `las`/`los`); and `hasForeignDescriptionProse` checks YouTube video/RSS descriptions for clear non-English prose.
 
 
