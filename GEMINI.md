@@ -390,7 +390,7 @@ To ensure `package.json` scripts (`"start": "node src/index.js"`, `"command-cent
 ### Local `[LENOVO]` Email Tag & Gmail Deduplication
 - `configs/secrets.json` (gitignored, local to Lenovo) sets `"emailTag": "[LENOVO]"`.
 - `src/utils/emailNotifier.js` and `src/utils/mailer.js` prepend `emailTag` to alert subjects only when set locally (so `geekkim` never inherits `[LENOVO]` on future pulls).
-- Recommended Gmail filter to hide `geekkim` duplicates: `subject:("[Music Release Alert" OR "[US RADAR]" OR "[New Indie Live 24]") -subject:"[LENOVO]"` → Skip Inbox + Mark as read.
+- Recommended Gmail filter to hide `geekkim` duplicates (put in Gmail **Has the words**, keeping **Subject** and **Doesn't have** blank so Gmail doesn't break nested `OR` inside `subject:((...))`): `{subject:"Music Release Alert" subject:"US RADAR" subject:"New Indie Live 24"} -subject:LENOVO` → Skip the Inbox (Archive it) + Mark as read.
 
 ### Malaysia Time (`Asia/Kuala_Lumpur`) & Boot/Wake Catch-Up Queue (`src/services/scheduler.js`)
 - Because the Debian VM OS clock is `Etc/UTC`, `configs/radar_config.json` sets `"scheduleTimezone": "Asia/Kuala_Lumpur"` and `src/services/scheduler.js` evaluates both `node-cron` (`{ timezone }`) and its 20s native loop in `Asia/Kuala_Lumpur` (`08:00`–`10:10 AM MYT` across `configs/schedules.json` and daily radars).
@@ -420,5 +420,13 @@ To ensure `package.json` scripts (`"start": "node src/index.js"`, `"command-cent
 - **7-Day Catalog Gate (`src/radars/radarEngine.js`)**: Video/audio upload timestamps (`maxRecencyHours: 36`) alone pass late premieres of older songs (13–28+ days old). `runDailyRadar` now enforces `isWithinDays` and `checkReleaseFreshnessITunes(..., config.maxReleaseAgeDays || 7)` *before* `evaluateCandidateTrack`, blocking stale catalog tracks and updating verified `releaseDate` values.
 - **SoundCloud Bulk-Dump Guard (`src/radars/soundcloudChannel.js`)**: `findBulkUploadUrls` fetches `limit=10` tracks per curated label and skips simultaneous same-artist batch uploads (`>= 3` tracks within 5 minutes, e.g. archive/vault dumps with blank metadata).
 - **Non-English Safeguards (`src/utils/normalizer.js`, `youtubeChannel.js`, `youtubeTastemakers.js`)**: `sanitizeHeadline` preserves `canzone originale` / `brano originale` across `|` splits; `isCleanTrack` expands Spanish, Italian, and transliterated Slavic stopwords (without colliding tokens like `las`/`los`); and `hasForeignDescriptionProse` checks YouTube video/RSS descriptions for clear non-English prose.
+
+---
+
+## 25. Unified Master DB Slugs & Pre-Email Final Duplicate Gate (`masterDb.js`, `preEmailDedupe.js`, `theNoteAgent.js`)
+
+- **Unified Cross-Fleet Slug Resolution (`src/utils/masterDb.js`)**: Previously `diffEngine.js` concatenated `item.title = "${artist} - ${title}"` before calling `processSongEntry`, creating `artist::artist-title` slugs for weekly crawlers while daily radars stored `artist::title` via `evaluateCandidateTrack`. Both functions now share `resolveCanonicalSong(item)`, query `WHERE slug IN (?, ?) ORDER BY id ASC LIMIT 1` (canonical + legacy), and store canonical `artist::title` slugs cleanly.
+- **The Note Sidebar & Headline Hardening (`src/crawlers/theNoteAgent.js`)**: `parseHeadlineRelease` handles collaboration headlines (`Collaborate with ... on New Track '...'`) and applies `cleanArtistName` to strip editorial location/adjective prefixes (`Adelaide Favourites `, etc.). AI fallback uses `extractCleanMainText($art)`, removing `<script>`, `<style>`, `<article>` related-articles cards, sidebars, nav, and footers before extracting text.
+- **Pre-Email Final Duplicate Gate (`src/utils/preEmailDedupe.js`)**: `finalDeduplicateBeforeEmail` runs automatically at the end of every scrape right before finalising emails and writing archives in both `src/index.js` (all 12 weekly crawlers) and `src/radars/radarEngine.js` (Global & US daily radars). It checks both intra-batch near-duplicates and the full SQLite `songs`/`sightings` catalog + last 30 days of `saved_searches/*/*.json` using normalized titles, normalized artists (`normalizeArtist`, `artistsMatch`), and clean URLs (ignoring only rows newly inserted during the current run via `created_at`).
 
 
