@@ -10,6 +10,7 @@ const { harvestSoundCloudDaily } = require('./soundcloudChannel');
 const { harvestUSIndieDaily } = require('./usIndieChannel');
 const { evaluateCandidateTrack, getMasterStats } = require('../utils/masterDb');
 const { isCleanTrack, isWithinDays, parseArtistTitle } = require('../utils/normalizer');
+const { finalDeduplicateBeforeEmail } = require('../utils/preEmailDedupe');
 const { checkReleaseFreshnessITunes } = require('../services/verificationTools');
 const { sendDailyRadarEmail } = require('../utils/mailer');
 
@@ -214,6 +215,14 @@ async function runDailyRadar(options = {}) {
       consensusUpdates++;
       console.log(`  [🔥] Tastemaker Consensus: "${item.artist} - ${item.title}" confirmed by ${item.channel} (Heat: ${evaluation.heatScore})`);
     }
+  }
+
+  // 2b. Final Pre-Email Cross-Crawler & Intra-Batch Duplicate Gate
+  if (passedNewReleases.length > 0) {
+    const preEmailCheck = finalDeduplicateBeforeEmail(passedNewReleases, {
+      sourceLabel: market === 'US' ? 'US Edition Radar' : 'Global 24h Radar',
+    });
+    passedNewReleases.splice(0, passedNewReleases.length, ...preEmailCheck.approved);
   }
 
   console.log("\n------------------------------------------------------------");

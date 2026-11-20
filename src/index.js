@@ -15,6 +15,7 @@ const { getMasterStats } = require('./utils/masterDb');
 const { runDailyRadar } = require('./radars/radarEngine');
 const { generateHTML } = require('./utils/htmlGenerator');
 const { getPreviousReport, getNewAdditions } = require('./utils/diffEngine');
+const { finalDeduplicateBeforeEmail } = require('./utils/preEmailDedupe');
 const { sendEmailNotification } = require('./utils/emailNotifier');
 const { aggregateCrawlerMetrics } = require('./utils/metricsAggregator');
 const { syncMetricsToGist } = require('./utils/gistSync');
@@ -278,6 +279,12 @@ Examples:
         const filteredCount = verifiedSongs.length - passedSongs.length;
         console.log(`[Verifier] Complete: ${passedSongs.length} verified, ${filteredCount} filtered (reissues/non-target acts).\n`);
         songsToSave = passedSongs;
+    }
+
+    // Final Pre-Email Cross-Crawler & Intra-Batch Duplicate Gate
+    if (songsToSave.length > 0) {
+        const preEmailCheck = finalDeduplicateBeforeEmail(songsToSave, { sourceLabel: searchName });
+        songsToSave = preEmailCheck.approved;
     }
 
     if (isDryRun) {
