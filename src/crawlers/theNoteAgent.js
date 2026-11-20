@@ -29,6 +29,21 @@ function stripWrappingQuotes(value) {
   return cleanText(value).replace(/^['"‘“]+|['"’”]+$/g, "").trim();
 }
 
+function cleanArtistName(value) {
+  return cleanText(value)
+    .replace(
+      /^(?:(?:adelaide|melbourne|sydney|perth|brisbane|hobart|australian|aussie|local|uk|us|indie|psych(?:-pop|-rock)?|garage|synth-pop)\s+)*(?:favourites?|favorites?|legends?|icons?|veterans?|pioneers?|duo|trio|quartet|band|group|rockers?|punks?|singer-songwriter)\s+/i,
+      ""
+    )
+    .trim();
+}
+
+function extractCleanMainText($art) {
+  const $clone = $art.root().clone();
+  $clone.find('script, style, article, aside, nav, footer, [class*="related"], [class*="more-news"], [class*="newsletter"]').remove();
+  return cleanText($clone.find("main").text());
+}
+
 function slugify(value) {
   return String(value || "")
     .toLowerCase()
@@ -144,9 +159,21 @@ function parseHeadlineRelease(headline) {
   );
   if (sharedSingleMatch) {
     return {
-      artist: cleanText(sharedSingleMatch[1]),
+      artist: cleanArtistName(sharedSingleMatch[1]),
       title: stripWrappingQuotes(sharedSingleMatch[2] || sharedSingleMatch[3]),
       releaseType: "single",
+    };
+  }
+
+  // Match collaboration headlines ("Artist Collaborate with X on New Track 'Title'")
+  const collabMatch = h.match(
+    /^(.+?)\s+(?:collaborates?|teams?\s+up)\s+with\s+.+?\s+on\s+(?:a\s+|the\s+|their\s+)?(?:new\s+)?(?:single|track|song|album)\s+(?:['‘](.+?)['’](?=$|[\s.,;:!?])|["“](.+?)["”])/i
+  );
+  if (collabMatch) {
+    return {
+      artist: cleanArtistName(collabMatch[1]),
+      title: stripWrappingQuotes(collabMatch[2] || collabMatch[3]),
+      releaseType: /\balbum\b/i.test(h) ? "album" : "single",
     };
   }
 
@@ -161,7 +188,7 @@ function parseHeadlineRelease(headline) {
   if (dropMatch) {
     const releaseType = /\balbum\b/i.test(h) ? "album" : "single";
     return {
-      artist: cleanText(dropMatch[1]),
+      artist: cleanArtistName(dropMatch[1]),
       title: stripWrappingQuotes(dropMatch[2] || dropMatch[3]),
       releaseType,
     };
@@ -218,7 +245,7 @@ async function runTheNoteAgent(config = {}, exclusions = {}) {
         const $art = cheerio.load(artHtml);
         extracted = parseRoundupHeadings($art);
         if (extracted.length === 0) {
-          const bodyText = cleanText($art("main, article").text());
+          const bodyText = extractCleanMainText($art);
           extracted = await extractReleasesWithAI(`${art.headline}\n${bodyText.slice(0, 10000)}`);
         }
       } catch (err) {
@@ -232,7 +259,7 @@ async function runTheNoteAgent(config = {}, exclusions = {}) {
         try {
           const artHtml = await fetchHtml(art.url, options);
           const $art = cheerio.load(artHtml);
-          const bodyText = cleanText($art("main, article").text());
+          const bodyText = extractCleanMainText($art);
           extracted = await extractReleasesWithAI(`${art.headline}\n${bodyText.slice(0, 6000)}`);
         } catch (err) {
           console.warn(`[The Note Australia] Error fetching article ${art.url}:`, err.message);

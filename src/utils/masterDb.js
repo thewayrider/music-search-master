@@ -82,6 +82,34 @@ function getDatabase() {
 }
 
 /**
+ * Resolves canonical artist, pure song title (without leading "Artist - "),
+ * and both canonical (`artist::title`) and legacy (`artist::artist-title`) slugs
+ * so Radars and Weekly Crawlers share a unified catalog index.
+ */
+function resolveCanonicalSong(item) {
+  let artist = (item.artist || "").trim();
+  let title = (item.songTitle || item.title || "").trim();
+
+  if (!artist || !item.songTitle) {
+    const parsed = parseArtistTitle(item.title || "");
+    if (!artist) artist = parsed.artist;
+    if (!item.songTitle && parsed.title && parsed.artist !== "Unknown Artist") {
+      title = parsed.title;
+    }
+  }
+
+  // Strip accidental "Artist - " prefix if item.title had been concatenated by diffEngine
+  const prefixMatch = title.match(/^(.+?)\s+[–—-]\s+(.+)$/);
+  if (prefixMatch && artist && slugify(prefixMatch[1]) === slugify(artist)) {
+    title = prefixMatch[2].trim();
+  }
+
+  const canonicalSlug = normalizeKey(artist, title);
+  const legacySlug = normalizeKey(artist, `${artist} - ${title}`);
+  return { artist, title, canonicalSlug, legacySlug };
+}
+
+/**
  * Evaluates candidate track for daily 24h radars.
  * Distinguishes brand-new releases from recycled pre-release singles.
  */
@@ -89,16 +117,8 @@ function evaluateCandidateTrack(item, channelName = "Radar", options = {}) {
   const db = getDatabase();
   const isDryRun = options.isDryRun || false;
 
-  let artist = item.artist;
-  let title = item.title;
-
-  if (!artist || !title) {
-    const parsed = parseArtistTitle(item.title || "");
-    artist = parsed.artist;
-    title = parsed.title;
-  }
-
-  const slug = normalizeKey(artist, title);
+  const { artist, title, canonicalSlug, legacySlug } = resolveCanonicalSong(item);
+  const slug = canonicalSlug;
   const nowIso = new Date().toISOString();
   const seenAt = item.uploadedAt || nowIso.slice(0, 10);
   const channel = item.channel || channelName;
@@ -106,9 +126,9 @@ function evaluateCandidateTrack(item, channelName = "Radar", options = {}) {
   const releaseType = item.releaseType || "single";
   const desc = item.description || "";
 
-  // 1. Check if track exists
-  const findStmt = db.prepare(`SELECT * FROM songs WHERE slug = ?`);
-  const existing = findStmt.get(slug);
+  // 1. Check if track exists (matching both canonical and legacy crawler slugs)
+  const findStmt = db.prepare(`SELECT * FROM songs WHERE slug IN (?, ?) ORDER BY id ASC LIMIT 1`);
+  const existing = findStmt.get(canonicalSlug, legacySlug);
 
   if (!existing) {
     if (!isDryRun) {
@@ -198,16 +218,8 @@ function processSongEntry(item, sourceName = "Unknown", options = {}) {
   const db = getDatabase();
   const isDryRun = options.isDryRun || false;
 
-  let artist = item.artist;
-  let title = item.title;
-
-  if (!artist) {
-    const parsed = parseArtistTitle(item.title);
-    artist = parsed.artist;
-    title = parsed.title;
-  }
-
-  const slug = normalizeKey(artist, title);
+  const { artist, title, canonicalSlug, legacySlug } = resolveCanonicalSong(item);
+  const slug = canonicalSlug;
   const nowIso = new Date().toISOString();
   const seenAt = item.uploadedAt || nowIso.slice(0, 10);
   const source = item.channel || sourceName;
@@ -215,8 +227,8 @@ function processSongEntry(item, sourceName = "Unknown", options = {}) {
   const releaseType = item.releaseType || "single";
   const desc = item.description || "";
 
-  const findStmt = db.prepare(`SELECT * FROM songs WHERE slug = ?`);
-  const existing = findStmt.get(slug);
+  const findStmt = db.prepare(`SELECT * FROM songs WHERE slug IN (?, ?) ORDER BY id ASC LIMIT 1`);
+  const existing = findStmt.get(canonicalSlug, legacySlug);
 
   if (!existing) {
     let songId = null;
